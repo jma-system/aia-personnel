@@ -54,7 +54,8 @@ function setup(){
  if(pdfButton){pdfButton.textContent='Télécharger PDF';pdfButton.onclick=()=>{const d=getDocs()[current];if(!d?.validated)return notify('Valide la fiche avant téléchargement.');download([d])}}
  const panel=document.getElementById('exportPanel');
  const group=[...panel.querySelectorAll('button')].find(b=>b.getAttribute('onclick')==='printSelected()');
- if(group){group.textContent='Télécharger PDF groupé';group.onclick=()=>download(selectedDocs())}\n const fallback=document.createElement('button');fallback.type='button';fallback.textContent='Imprimer / PDF classique';fallback.onclick=()=>window.printSelected();group?.parentElement.append(fallback);
+ if(group){group.textContent='Télécharger PDF groupé';group.onclick=()=>download(selectedDocs())}
+ const fallback=document.createElement('button');fallback.type='button';fallback.textContent='Imprimer / PDF classique';fallback.onclick=()=>window.printSelected();group?.parentElement.append(fallback);
  const hint=panel.querySelector('p.muted');
  if(hint)hint.textContent='Le PDF sera téléchargé sur ton téléphone. Tu pourras ensuite le déplacer manuellement vers Google Drive. Pour les caractères non pris en charge, conserve l’export par impression.';
 }
