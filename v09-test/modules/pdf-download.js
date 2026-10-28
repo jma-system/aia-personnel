@@ -36,7 +36,7 @@ async function download(items){
   items.forEach((d,i)=>{
    if(i){pdf.addPage();y=20}
    lines(d.title||'Fiche AIA',16,true);y+=3;
-   lines([d.publication,d.format,d.date].filter(Boolean).join(' • '),10);y+=5;
+   lines([d.publication,d.format,d.date].filter(Boolean).join(' - '),10);y+=5;
    pdf.setDrawColor(115,125,140);
    const paragraphs=String(d.body||'').split(/\r?\n/);
    for(const p of paragraphs){if(!p.trim()){y+=4;continue}lines(p,12)}
@@ -54,7 +54,7 @@ function setup(){
  if(pdfButton){pdfButton.textContent='Télécharger PDF';pdfButton.onclick=()=>{const d=getDocs()[current];if(!d?.validated)return notify('Valide la fiche avant téléchargement.');download([d])}}
  const panel=document.getElementById('exportPanel');
  const group=[...panel.querySelectorAll('button')].find(b=>b.getAttribute('onclick')==='printSelected()');
- if(group){group.textContent='Télécharger PDF groupé';group.onclick=()=>download(selectedDocs())}
+ if(group){group.textContent='Télécharger PDF groupé';group.onclick=()=>download(selectedDocs())}\n const fallback=document.createElement('button');fallback.type='button';fallback.textContent='Imprimer / PDF classique';fallback.onclick=()=>window.printSelected();group?.parentElement.append(fallback);
  const hint=panel.querySelector('p.muted');
  if(hint)hint.textContent='Le PDF sera téléchargé sur ton téléphone. Tu pourras ensuite le déplacer manuellement vers Google Drive. Pour les caractères non pris en charge, conserve l’export par impression.';
 }
