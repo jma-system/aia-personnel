@@ -1,0 +1,21 @@
+/* Bloc thème : écran uniquement. La palette définitive sera choisie après le build. */
+@media screen {
+  header { flex-wrap: wrap; gap: 8px; }
+  #aia-theme-toggle { flex: 0 0 auto; min-height: 44px; }
+  html[data-aia-theme="dark"] { color-scheme: dark; color: #edf0f3; background: #11151a; }
+  html[data-aia-theme="dark"] .card,
+  html[data-aia-theme="dark"] dialog { background: #1b2129; color: #edf0f3; border-color: #586371; }
+  html[data-aia-theme="dark"] button,
+  html[data-aia-theme="dark"] input,
+  html[data-aia-theme="dark"] select,
+  html[data-aia-theme="dark"] textarea { background: #252e39; color: #edf0f3; border-color: #657487; }
+  html[data-aia-theme="dark"] input::placeholder,
+  html[data-aia-theme="dark"] textarea::placeholder { color: #b7c0cc; }
+  html[data-aia-theme="dark"] .muted { color: #bcc5d0; }
+  html[data-aia-theme="dark"] .primary { background: #315779; color: white; }
+  html[data-aia-theme="dark"] .selected { background: #36506b; border-color: #a4c9ed; }
+  html[data-aia-theme="dark"] .pill { background: #dfe7f0; }
+  html[data-aia-theme="dark"] .document { background: #161c23; color: #f0f2f5; border-color: #718196; }
+  html[data-aia-theme="dark"] dialog a { color: #a8d1ff; }
+  #aia-theme-toggle:focus-visible { outline: 3px solid #98c4ef; outline-offset: 2px; }
+}
