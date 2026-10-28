@@ -91,3 +91,16 @@ Ouvrir l'aperçu V08 sur Honor, sélectionner CVM puis ouvrir le programme ; vé
 - PROUVÉ EN TEST SUR TÉLÉPHONE : affichage CVM, sélection multiple, passage successif des deux demandes à des fiches manuelles et conservation des quatre fiches après réouverture.
 - Non démontré séparément : conservation d'une file encore non traitée après réouverture. Non validés : actualisation automatique, génération IA, PDF de V08 sur téléphone.
 - Prochaine action : exporter ensemble les deux fiches de test CVM et vérifier le PDF sur Android, puis bloc Clair / Nuit.
+
+## CLÔTURE TEST CVM ET BLOC THÈME — 28 octobre 2026
+- Capture 38685 : aperçu d'impression Android de deux sujets CVM, sur deux pages distinctes. Phil confirme ensuite l'enregistrement du PDF (« C fait »). Export groupé de ces deux fiches PROUVÉ sur téléphone. Réouverture du PDF enregistré non testée dans cette séquence.
+- Le parcours CVM de cette semaine est PROUVÉ sur Honor : huit sujets affichés, sélection de deux sujets, création manuelle séparée, validation, conservation et export groupé. La mise à jour hebdomadaire automatique et la génération IA restent non implémentées.
+
+### Bloc Clair / Nuit — PRÉPARÉ, validation téléphone en attente
+- v08/modules/theme.js : bouton en-tête, état accessible aria-pressed, préférence locale isolée aia-preference-theme ; défaut clair.
+- v08/modules/theme.css : styles uniquement écran, palette provisoire sobre ; couleurs finales après le build. La feuille est chargée avec media=screen et ses règles sont dans @media screen.
+- Dépendances : header et document.documentElement, localStorage uniquement pour la préférence ; toast message facultatif si mémorisation impossible. Aucun accès aux clés des fiches ou à la file des demandes.
+- v08/index.html : ajout du lien CSS et du module ; script V07 préservé intégralement. index.html racine non modifié.
+- Tests DOM passés : clair par défaut, bascule nuit, restauration du choix dans une nouvelle page simulée, retour clair, absence de bouton dupliqué, stockage refusé sans blocage, clés fiches et demandes inchangées. Vérification syntaxique JS passée. Tests CVM précédents repassés avec succès.
+- Rendu visuel et PDF en mode Nuit À TESTER sur Honor ; ces tests DOM ne valident pas le rendu d'un navigateur réel.
+- Prochaine action : ouvrir /v08/?theme=1 sur Honor, appuyer sur Clair et vérifier le passage en Nuit, puis fermer/réouvrir pour contrôler la mémorisation ; ensuite vérifier que le PDF reste blanc.
