@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "weeks": [
+    {
+      "start": "2026-10-26",
+      "end": "2026-11-01",
+      "label": "26 octobre – 1er novembre 2026",
+      "reading": "La Tour de Garde · édition d’étude · août 2026, p. 20-25",
+      "checked": "2026-10-28",
+      "source": "https://wol.jw.org/fr/wol/d/r30/lp-f/2026523",
+      "jwSource": "https://www.jw.org/fr/bibliothèque/revues/tour-de-garde-etude-aout-2026/Chérissons-lhonneur-que-nous-avons-doffrir-à-Dieu-un-service-sacré/",
+      "subjects": [
+        {
+          "number": 1,
+          "title": "Chérissons l’honneur que nous avons d’offrir à Dieu un service sacré"
+        }
+      ]
+    }
+  ]
+}
