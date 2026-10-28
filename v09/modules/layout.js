@@ -33,9 +33,10 @@
  const quick=document.createElement('div');quick.className='aia-quick-access';
  const jw=document.createElement('a');jw.href='https://www.jw.org/fr/';jw.target='_blank';jw.rel='noopener noreferrer';decorate(jw,'globe','JW.org');
  decorate(video,'video','Vidéos');document.querySelector('#desk h2').textContent='Vidéos';
- function folder(label,name){const b=document.createElement('button');b.type='button';b.disabled=true;b.title='Dossier externe à choisir';decorate(b,name,label);return b}
- quick.append(jw,video,folder('Mes fiches','folder'),folder('Index','index'));
- const hint=document.createElement('p');hint.className='muted aia-folder-hint';hint.textContent='Mes fiches et Index : dossiers PDF à choisir.';
+ function folder(label,name,url){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label','Ouvrir le dossier Google Drive '+label);decorate(a,name,label);return a}
+ const wol=document.createElement('a');wol.href='https://wol.jw.org/fr/wol/h/r30/lp-f';wol.target='_blank';wol.rel='noopener noreferrer';decorate(wol,'book','WOL');
+ quick.append(jw,wol,video,folder('Mes fiches','folder','https://drive.google.com/drive/folders/1rnqcYTSutBjuKXl2VoUCHahukaCJqsBh'),folder('Index','index','https://drive.google.com/drive/folders/1Vh4BBJ2f5rLo7l4TKaxvS4P4E-riXvkB'));
+ const hint=document.createElement('p');hint.className='muted aia-folder-hint';hint.textContent='Dossiers PDF Google Drive externes.';
  oldActions.remove();home.append(search,quick,hint);
 })();
 
