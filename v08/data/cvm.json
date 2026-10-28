@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "weeks": [
+    {
+      "start": "2026-10-26",
+      "end": "2026-11-01",
+      "label": "26 octobre – 1er novembre 2026",
+      "reading": "Jérémie 47-48",
+      "checked": "2026-10-28",
+      "source": "https://wol.jw.org/fr/wol/d/r30/lp-f/202026259",
+      "jwSource": "https://www.jw.org/fr/bibliothèque/reunion-tj-cahier/mwb-septembre-octobre-2026/Programme-pour-la-réunion-Vie-et-ministère-du-26-octobre-au-1er-novembre-2026/",
+      "subjects": [
+        {
+          "number": 1,
+          "title": "Jéhovah est un juge juste et miséricordieux"
+        },
+        {
+          "number": 2,
+          "title": "Perles spirituelles"
+        },
+        {
+          "number": 3,
+          "title": "Lecture de la Bible"
+        },
+        {
+          "number": 4,
+          "title": "Engage la conversation"
+        },
+        {
+          "number": 5,
+          "title": "Entretiens l’intérêt"
+        },
+        {
+          "number": 6,
+          "title": "Fais des disciples"
+        },
+        {
+          "number": 7,
+          "title": "Besoins de l’assemblée"
+        },
+        {
+          "number": 8,
+          "title": "Étude biblique de l’assemblée"
+        }
+      ]
+    }
+  ]
+}
