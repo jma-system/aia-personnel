@@ -81,3 +81,13 @@ Priorité à l'usage, à la simplicité et au coût minimal.
 
 ### Prochaine action
 Ouvrir l'aperçu V08 sur Honor, sélectionner CVM puis ouvrir le programme ; vérifier l'affichage avant de tester l'enregistrement multiple. Valider uniquement après preuve téléphone. Ensuite bloc Clair / Nuit.
+
+## PREUVE TÉLÉPHONE CVM — 28 octobre 2026, 14 h 06 (heure affichée sur Honor)
+- Capture 38677 : programme de la semaine et huit cases affichés sur Honor 400 Lite.
+- Phil confirme deux sélections ; capture 38678 : deux demandes en attente.
+- Captures 38680/38681 : sujet 1 créé manuellement avec « Test sujet 1 », sauvegardé puis validé ; total trois fiches.
+- Capture 38682 : sujet 2 « Perles spirituelles », texte « Test sujet 2 », sauvegardé et validé ; total quatre fiches.
+- Après demande de fermeture/réouverture, capture 38683 : quatre fiches validées visibles, dont les deux fiches initiales « Test HTTPS » et « Test pdf 2 ».
+- PROUVÉ EN TEST SUR TÉLÉPHONE : affichage CVM, sélection multiple, passage successif des deux demandes à des fiches manuelles et conservation des quatre fiches après réouverture.
+- Non démontré séparément : conservation d'une file encore non traitée après réouverture. Non validés : actualisation automatique, génération IA, PDF de V08 sur téléphone.
+- Prochaine action : exporter ensemble les deux fiches de test CVM et vérifier le PDF sur Android, puis bloc Clair / Nuit.
