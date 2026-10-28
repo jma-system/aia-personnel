@@ -120,3 +120,15 @@ Ouvrir l'aperçu V08 sur Honor, sélectionner CVM puis ouvrir le programme ; vé
 4. Nouvelle doctrine de stockage : travail temporaire, aucune conservation persistante des fiches dans le navigateur ; PDF exportés manuellement dans dossiers externes. Préserver les quatre fiches existantes jusqu'à sécurisation de leur export. La fermeture du navigateur seule ne garantit pas l'effacement ; mécanisme à concevoir et tester.
 5. Aucun coût ou abonnement supplémentaire sans autorisation explicite. Modules autonomes et tests Honor.
 - V09 non appliquée. Prochaine proposition à Phil : commencer par le bloc de présentation compacte, puis accès externes et migration des fiches après export sécurisé ; recherche multi-IA après cadrage technique. Attendre son accord sur le prochain bloc avant de coder V09.
+
+## BLOC PRÉSENTATION COMPACTE V09 — 28 octobre 2026
+- Accord explicite de Phil (« Oui ») pour le seul bloc accueil compact « Assistant IA ».
+- Aperçu séparé /v09/ ; V07 racine et V08 conservées. Copie des modules CVM, thème et données sans changement.
+- v09/index.html : titre Assistant IA dans l'en-tête avec AIA ; commentaire d'accueil retiré ; calendrier déplacé dans l'en-tête ; ordre CVM/TG et Tract/Fiche/Étude ; libellé Enregistrer raccourci ; commandes existantes conservées.
+- Compteur retiré visuellement (élément technique conservé caché pour ne pas modifier les fonctions de sauvegarde).
+- v09/modules/compact.css : bloc autonome, uniquement écran ; styles limités à body[data-aia-layout="compact"]. En-tête compact, soleil/lune en haut à droite (état aria-pressed conservé), actions groupées sur deux colonnes ; palette provisoire inchangée.
+- Le script fonctionnel V07 reste identique octet pour octet : stockage, navigation, correction, validation, PDF et JW Desk non modifiés.
+- Tests DOM repassés sur V09 : CVM huit sujets, multi-sélection et file, sujet absent sans ancien programme, navigation, deux pages d'impression, fiches préservées, échec stockage ; thème et mémorisation simulée ; calendrier unique accessible, compteur caché sans casser les références, CSS valide et uniquement écran.
+- Tests visuels de l'accueil sur Honor À FAIRE. Ne pas déclarer l'absence de défilement prouvée sans capture téléphone. Aucune règle de stockage V09 ou connexion multi-IA appliquée.
+- Précision sur le suivi LABO de 14 h 15 : mémorisation du thème déjà confirmée par Phil dans cette conversation ; parcours des deux sujets CVM et PDF déjà testé, voir preuves précédentes. Le programme intégré reste limité à la semaine du 26/10 ; actualisation automatique non activée.
+- Prochaine action : ouvrir /v09/ sur Honor et vérifier l'accueil compact ; conserver les quatre fiches et tester leur accès. Les autres blocs V09 restent en attente d'accord.
