@@ -132,3 +132,12 @@ Ouvrir l'aperçu V08 sur Honor, sélectionner CVM puis ouvrir le programme ; vé
 - Tests visuels de l'accueil sur Honor À FAIRE. Ne pas déclarer l'absence de défilement prouvée sans capture téléphone. Aucune règle de stockage V09 ou connexion multi-IA appliquée.
 - Précision sur le suivi LABO de 14 h 15 : mémorisation du thème déjà confirmée par Phil dans cette conversation ; parcours des deux sujets CVM et PDF déjà testé, voir preuves précédentes. Le programme intégré reste limité à la semaine du 26/10 ; actualisation automatique non activée.
 - Prochaine action : ouvrir /v09/ sur Honor et vérifier l'accueil compact ; conserver les quatre fiches et tester leur accès. Les autres blocs V09 restent en attente d'accord.
+
+
+## V09 — accueil inspiré de la maquette, 28 octobre 2026
+
+ACTION : disposition compacte avec icônes, bloc Sujet / Format / Création, recherche multi-IA et quatre accès JW.org, Vidéos, Mes fiches, Index. Couleurs sobres provisoires. JW.org ouvre le site officiel dans un nouvel onglet. Vidéos conserve uniquement le bloc de notes existant ; transcription et synthèse automatiques non connectées. Recherche et microphone désactivés, connexion sécurisée à préparer. Mes fiches et Index désactivés, deux dossiers externes distincts à choisir. Accès temporaire « Fiches de test » préservant les contenus existants.
+
+TEST / PREUVE : tests DOM réussis : quatre accès, états désactivés explicites, lien JW.org, notes Vidéos, absence de doublons, sélection multiple CVM, navigation, deux entrées PDF, conservation des fiches existantes, changement et mémorisation du thème, erreurs de stockage. Styles limités à l'écran. Aucun changement de persistance des fiches, aucune clé API ni coût ajouté. V07 et V08 préservées.
+
+VALIDATION : contrôle visuel de ce nouvel accueil sur Honor 400 Lite en attente. Les fonctions dossiers externes, multi-IA et effacement à la fermeture restent à développer et tester séparément. Les tests DOM ne remplacent pas les tests PDF et visuels sur téléphone.
