@@ -141,3 +141,14 @@ ACTION : disposition compacte avec icônes, bloc Sujet / Format / Création, rec
 TEST / PREUVE : tests DOM réussis : quatre accès, états désactivés explicites, lien JW.org, notes Vidéos, absence de doublons, sélection multiple CVM, navigation, deux entrées PDF, conservation des fiches existantes, changement et mémorisation du thème, erreurs de stockage. Styles limités à l'écran. Aucun changement de persistance des fiches, aucune clé API ni coût ajouté. V07 et V08 préservées.
 
 VALIDATION : contrôle visuel de ce nouvel accueil sur Honor 400 Lite en attente. Les fonctions dossiers externes, multi-IA et effacement à la fermeture restent à développer et tester séparément. Les tests DOM ne remplacent pas les tests PDF et visuels sur téléphone.
+
+
+## Validation visuelle accueil V09 et bloc TG — 28 octobre 2026
+
+Accueil : capture utilisateur 38698 sur Honor 400 Lite, puis accord explicite « Oui » : disposition validée. Couleurs toujours provisoires.
+
+ACTION TG : TG désigne La Tour de Garde (étude), et non le service de terrain. Nouveau module autonome modules/tg.js et données data/tg.json. Programme sélectionné à partir de la date du calendrier ; article sélectionnable et ajouté à la file TG avec date et format. Source officielle WOL https://wol.jw.org/fr/wol/d/r30/lp-f/2026523 et JW.org, vérifiées le 28 octobre 2026. Couverture intégrée : semaine du 26 octobre au 1er novembre 2026 uniquement. Hors couverture : message explicite et lien WOL daté, aucune substitution de semaine, aucune mise à jour automatique annoncée.
+
+TEST / PREUVE : tests DOM TG réussis : correspondance date/article, bornes de semaine, date absente, sélection/création TG avec format et date capturés à l’ouverture, alternance CVM/TG, erreur réseau, fiches existantes intactes, erreur de stockage sans ajout. Tests de disposition et régression CVM/thème réussis. Script original, V07, V08 et persistance des fiches inchangés.
+
+VALIDATION TG : test réel sur téléphone en attente ; aucune génération de texte IA ajoutée.
