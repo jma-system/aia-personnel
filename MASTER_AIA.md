@@ -104,3 +104,19 @@ Ouvrir l'aperçu V08 sur Honor, sélectionner CVM puis ouvrir le programme ; vé
 - Tests DOM passés : clair par défaut, bascule nuit, restauration du choix dans une nouvelle page simulée, retour clair, absence de bouton dupliqué, stockage refusé sans blocage, clés fiches et demandes inchangées. Vérification syntaxique JS passée. Tests CVM précédents repassés avec succès.
 - Rendu visuel et PDF en mode Nuit À TESTER sur Honor ; ces tests DOM ne valident pas le rendu d'un navigateur réel.
 - Prochaine action : ouvrir /v08/?theme=1 sur Honor, appuyer sur Clair et vérifier le passage en Nuit, puis fermer/réouvrir pour contrôler la mémorisation ; ensuite vérifier que le PDF reste blanc.
+
+## VALIDATION THÈME ET CADRAGE V09 — 28 octobre 2026
+- Phil confirme le fonctionnement Clair / Sombre ; capture 38686 : accueil sombre.
+- Phil confirme que le mode Sombre est conservé après fermeture de l'onglet et réouverture.
+- À la demande de vérifier le PDF en mode Sombre (page blanche, texte noir), Phil répond « Oui ». Confirmation utilisateur ; capture 38687 montre la fiche en mode Nuit, pas l'aperçu PDF. Ne pas présenter cette capture comme preuve visuelle du PDF.
+- Bloc Clair / Nuit VALIDÉ sur les tests et confirmations de Phil : bascule, préférence mémorisée, PDF annoncé blanc/noir. Les quatre fiches restent visibles sur la capture 38687.
+- Chantier V08 actuel terminé pour le périmètre testé : instantané CVM de la semaine, sélection multiple vers création manuelle, conservation des fiches, PDF groupé, thème indépendant.
+- Restent hors validation V08 : actualisation hebdomadaire automatique, recherche réelle et génération IA, persistance multi-appareils ou longue durée.
+
+### Cahier des charges V09 reçu — ne vaut PAS autorisation de modifier immédiatement le code
+1. Accueil compact suivant maquette : titre Assistant IA, supprimer commentaire de préparation et compteur en en-tête ; garder CVM/TG, formats et actions ; couleurs définitives différées.
+2. Accès bas : JW.org dans nouvel onglet, Vidéos (ancien JW Desk), Mes fiches vers dossier externe de PDF AIA, Index vers autre dossier externe de PDF existants ; emplacements à choisir. Ne pas confondre avec bibliothèque locale V08.
+3. Recherche multi-IA : saisie, microphone selon compatibilité, choix ChatGPT/Claude/Gemini/DeepSeek et modèles ultérieurs, réponses affichées. Architecture serveur sécurisée, aucune clé navigateur ou dépôt, opérationnalité seulement après tests ; orientation MANDO future.
+4. Nouvelle doctrine de stockage : travail temporaire, aucune conservation persistante des fiches dans le navigateur ; PDF exportés manuellement dans dossiers externes. Préserver les quatre fiches existantes jusqu'à sécurisation de leur export. La fermeture du navigateur seule ne garantit pas l'effacement ; mécanisme à concevoir et tester.
+5. Aucun coût ou abonnement supplémentaire sans autorisation explicite. Modules autonomes et tests Honor.
+- V09 non appliquée. Prochaine proposition à Phil : commencer par le bloc de présentation compacte, puis accès externes et migration des fiches après export sécurisé ; recherche multi-IA après cadrage technique. Attendre son accord sur le prochain bloc avant de coder V09.
