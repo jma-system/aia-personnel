@@ -1,0 +1,57 @@
+/* Bloc présentation compacte V09. Écran uniquement ; aucune règle PDF. */
+@media screen {
+  body[data-aia-layout="compact"] header {
+    display: grid; grid-template-columns: minmax(0,1fr) minmax(120px,140px) 44px;
+    gap: 8px; padding: 8px 10px; align-items: center;
+  }
+  body[data-aia-layout="compact"] .aia-brand {display:flex; align-items:center; gap:8px; min-width:0;}
+  body[data-aia-layout="compact"] .aia-brand strong {font-size:20px; letter-spacing:0;}
+  body[data-aia-layout="compact"] header h1 {font-size:12px;line-height:1.15;margin:0;font-weight:600;}
+  body[data-aia-layout="compact"] header #date {font-size:13px;min-height:44px;padding:6px;min-width:0;width:100%;}
+  body[data-aia-layout="compact"] #aia-theme-toggle {width:44px;min-width:44px;height:44px;padding:6px;font-size:0;}
+  body[data-aia-layout="compact"] #aia-theme-toggle::before {content:'☀';font-size:23px;line-height:1;}
+  body[data-aia-layout="compact"] #aia-theme-toggle[aria-pressed="true"]::before {content:'☾';}
+  body[data-aia-layout="compact"] main {padding:10px;max-width:680px;}
+  body[data-aia-layout="compact"] #home {padding:12px;margin:0;}
+  body[data-aia-layout="compact"] #home label {margin:8px 0 5px;font-size:13px;}
+  body[data-aia-layout="compact"] #home > label:first-of-type {margin-top:0;}
+  body[data-aia-layout="compact"] #home button {min-height:44px;padding:8px;font-size:14px;line-height:1.2;}
+  body[data-aia-layout="compact"] #home input {padding:9px;min-height:44px;font-size:14px;}
+  body[data-aia-layout="compact"] #home .row {gap:6px;}
+  body[data-aia-layout="compact"] #home .actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;}
+  body[data-aia-layout="compact"] #queueInfo {font-size:12px;margin:8px 0;line-height:1.35;}
+  @media (max-width:350px) {
+    body[data-aia-layout="compact"] header {grid-template-columns:minmax(0,1fr) 120px 44px;gap:6px;padding:6px;}
+    body[data-aia-layout="compact"] .aia-brand {gap:4px;}
+    body[data-aia-layout="compact"] .aia-brand strong {font-size:18px;}
+    body[data-aia-layout="compact"] header h1 {font-size:11px;}
+  }
+}
+
+/* Disposition de la maquette : cartes, icônes et quatre accès. */
+@media screen {
+ body[data-aia-layout="compact"] #home {background:transparent;border:0;padding:0;}
+ body[data-aia-layout="compact"] #home > label:first-of-type {display:none;}
+ body[data-aia-layout="compact"] #home > .row:first-of-type {margin:0 0 8px;gap:8px;}
+ body[data-aia-layout="compact"] #home > .row:first-of-type button {min-height:52px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16px;}
+ .aia-icon {width:24px;height:24px;flex:none;vertical-align:middle;}
+ .aia-workflow,.aia-search-panel {border:1px solid #cad2dc;border-radius:12px;padding:10px;margin-top:8px;background:#fff;}
+ html[data-aia-theme="dark"] .aia-workflow,html[data-aia-theme="dark"] .aia-search-panel {background:#1b2129;border-color:#586371;}
+ body[data-aia-layout="compact"] #home .aia-workflow label:first-child {margin-top:0;}
+ body[data-aia-layout="compact"] #home .aia-workflow .row button,
+ body[data-aia-layout="compact"] #home .aia-workflow .actions button {display:flex;align-items:center;justify-content:center;gap:7px;}
+ .aia-workflow .row .aia-icon {width:20px;height:20px;}
+ body[data-aia-layout="compact"] #home .aia-test-library {min-height:32px;padding:4px 8px;font-size:12px;}
+ .aia-search-heading {display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+ .aia-search-heading strong {font-size:13px;}
+ .aia-search-heading select {max-width:120px;padding:5px;font-size:12px;}
+ .aia-search-row {display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:6px;}
+ .aia-search-panel p {margin:5px 0 0;font-size:11px;}
+ .aia-quick-access {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px;}
+ body[data-aia-layout="compact"] #home .aia-quick-access button,
+ .aia-quick-access a {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:70px;border:1px solid #cad2dc;border-radius:10px;padding:6px 2px;font:600 12px/1.2 system-ui,sans-serif;text-align:center;text-decoration:none;background:#fff;color:#172234;}
+ html[data-aia-theme="dark"] .aia-quick-access a {background:#252e39;color:#edf0f3;border-color:#657487;}
+ .aia-quick-access button:disabled,.aia-search-panel :disabled {opacity:.65;cursor:default;}
+ .aia-folder-hint {font-size:11px;margin:5px 0 0;text-align:center;line-height:1.3;}
+}
+
