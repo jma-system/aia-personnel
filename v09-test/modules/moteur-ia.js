@@ -23,13 +23,8 @@ window.createFromQueue=async function(){
   queue.shift();
   localStorage.setItem(QKEY,JSON.stringify(queue));
   queueStatus();
-  editId=null;
-  byId('editHeading').textContent='Révision : '+item.publication+' • '+item.format;
-  byId('textTitle').value=item.subject;
-  byId('textContent').value=result.text;
-  byId('editor').dataset.info=JSON.stringify(item);
-  show('editor');
-  message('Texte IA prêt à être vérifié et corrigé.');
+  if(!window.AIAPreview?.open(item,result.text))throw new Error('Page de lecture indisponible.');
+  message('Texte prêt : lis-le avant de décider.');
  }catch(e){message('IA indisponible : '+(e.message||'erreur')+'. Sélection conservée.');}
  finally{busy=false;if(btn){btn.disabled=false;btn.removeAttribute('aria-busy')}}
 };
