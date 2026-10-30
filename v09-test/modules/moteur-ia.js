@@ -1,31 +1,52 @@
-/* AIA — Bloc moteur IA facultatif. Tant qu'aucun endpoint n'est configuré, l'ancien éditeur demeure inchangé. */
+/* AIA V09-test — Passerelle ChatGPT gratuite pour l'application.
+   Pas d'API ni de clé dans le navigateur. L'utilisateur transmet le sujet et
+   récupère sa réponse lui-même; aucune génération autonome n'est simulée. */
 (()=>{
 'use strict';
-const ENDPOINT=''; // URL Cloudflare Worker à renseigner après déploiement, suffixe /generate.
-if(!ENDPOINT)return;
-const original=window.createFromQueue;
-if(typeof original!=='function')return;
-let busy=false;
-window.createFromQueue=async function(){
- if(busy)return;
- if(!Array.isArray(queue)||!queue.length)return message('Enregistre d’abord au moins un sujet.');
- const item=queue[0];
- // Aucun téléchargement des publications : seul le sujet saisi est transmis.
- busy=true;
- const btn=document.querySelector('[onclick="createFromQueue()"]');
- if(btn){btn.disabled=true;btn.setAttribute('aria-busy','true')}
- message('Génération IA en cours…');
- try{
-  const response=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...item,sourceText:''}),signal:AbortSignal.timeout(60000)});
-  const result=await response.json();
-  if(!response.ok||typeof result.text!=='string'||!result.text.trim())throw new Error(result.error||'Réponse IA invalide.');
-  // Ne retirer de la file qu'après réussite : aucune fiche perdue en cas d'erreur.
-  queue.shift();
-  localStorage.setItem(QKEY,JSON.stringify(queue));
-  queueStatus();
-  if(!window.AIAPreview?.open(item,result.text))throw new Error('Page de lecture indisponible.');
-  message('Texte prêt : lis-le avant de décider.');
- }catch(e){message('IA indisponible : '+(e.message||'erreur')+'. Sélection conservée.');}
- finally{busy=false;if(btn){btn.disabled=false;btn.removeAttribute('aria-busy')}}
+if(typeof window.createFromQueue!=='function'||!document.querySelector('main'))return;
+const root=document.createElement('section');root.id='assistantBridge';root.className='card hidden';
+root.innerHTML='<div class="actions no-print"><button type="button" id="bridgeBack">← Retour accueil</button></div><h2>Assistant de rédaction</h2><p class="muted">Sans serveur IA : tu peux préparer ta demande pour ChatGPT puis importer la réponse. Rien n’est envoyé automatiquement.</p><p id="bridgeSubject"></p><label for="bridgeSource">Extrait ou notes de la publication (facultatif)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
+document.querySelector('main').append(root);
+const el=id=>document.getElementById(id);
+let item=null;
+function draftPrompt(){
+ const source=el('bridgeSource').value.trim();
+ const questions=item.publication==='TG'?'Ajoute 3 ou 4 questions de révision avec réponses naturelles.':'';
+ return ['Tu prépares une fiche personnelle AIA en français naturel (/HUMAN).',
+ 'Publication : '+item.publication,'Sujet : '+item.subject,'Format : '+item.format,'Date : '+item.date,
+ 'Rédige une '+item.format.toLowerCase()+' claire, structurée, chaleureuse et utile pour une révision personnelle.',
+ questions,
+ 'Important : n’invente aucune citation, référence biblique, question officielle ni contenu d’article absent de la source.',
+ 'Si la source est insuffisante, indique honnêtement ce qui reste à vérifier. N’affirme pas avoir consulté jw.org.',
+ source?'TEXTE FOURNI PAR MOI :\n'+source:'Aucun texte source fourni. Ne prétends pas résumer fidèlement un article non communiqué.',
+ 'Retourne seulement le texte de la fiche, prêt à relire et corriger.'
+ ].filter(Boolean).join('\n\n');
+}
+async function copyRequest(){
+ const txt=draftPrompt();
+ try{await navigator.clipboard.writeText(txt);message('Demande copiée. Ouvre ChatGPT et colle-la.')}
+ catch(e){const t=el('bridgeSource');t.value=txt;t.focus();t.select();message('Copie automatique indisponible : sélectionne puis copie la demande affichée.')}
+}
+el('bridgeCopy').onclick=copyRequest;
+el('bridgeOpen').onclick=()=>window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
+el('bridgeBack').onclick=()=>showHome();
+el('bridgeRead').onclick=()=>{
+ const result=el('bridgeResult').value.trim();
+ if(!result)return message('Colle d’abord le texte de la fiche.');
+ if(!item||!window.AIAPreview?.open(item,result))return message('La lecture est indisponible; ta réponse reste ici.');
+ // Consommer la sélection uniquement après affichage réussi.
+ const index=queue.findIndex(x=>x===item);
+ if(index>=0){queue.splice(index,1);try{localStorage.setItem(QKEY,JSON.stringify(queue))}catch(e){}queueStatus()}
+ item=null;
+ message('Fiche prête à relire. Aucun PDF automatique.');
+};
+const previousShow=window.show;
+window.show=function(id){previousShow(id);root.classList.toggle('hidden',id!=='assistantBridge')};
+window.createFromQueue=function(){
+ if(!Array.isArray(queue)||!queue.length)return message('Enregistre d’abord un sujet.');
+ item=queue[0];
+ el('bridgeSubject').textContent=[item.publication,item.subject,item.format].filter(Boolean).join(' • ');
+ el('bridgeSource').value='';el('bridgeResult').value='';
+ show('assistantBridge');
 };
 })();
