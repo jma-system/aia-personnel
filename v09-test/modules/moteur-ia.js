@@ -1,16 +1,15 @@
-/* AIA V09-test — Passerelle ChatGPT gratuite pour l'application.
-   Pas d'API ni de clé dans le navigateur. L'utilisateur transmet le sujet et
-   récupère sa réponse lui-même; aucune génération autonome n'est simulée. */
+/* AIA V09-test — Génération via serveur privé Render, sans secrets dans le code public. */
 (()=>{
 'use strict';
 if(typeof window.createFromQueue!=='function'||!document.querySelector('main'))return;
 const root=document.createElement('section');root.id='assistantBridge';root.className='card hidden';
-root.innerHTML='<h2>Assistant de rédaction</h2><p class="muted">Sans serveur IA : tu peux préparer ta demande pour ChatGPT puis importer la réponse. Rien n’est envoyé automatiquement.</p><p id="bridgeSubject"></p><label for="bridgeSource">Extrait ou notes de la publication (facultatif)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
+root.innerHTML='<h2>Assistant de rédaction</h2><p class="muted">Moteur IA connecté. Sélectionne ton sujet et ajoute son texte de référence pour un résumé fidèle. Aucun PDF automatique.</p><p id="bridgeSubject"></p><label for="bridgeSource">Texte source ou notes de référence (nécessaire pour générer)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
 document.querySelector('main').append(root);
 const el=id=>document.getElementById(id);
 // L'adresse sera renseignée UNIQUEMENT après déploiement et validation du serveur.
 // Aucun secret ni jeton ne doit être inscrit dans GitHub.
 const API_ENDPOINT='https://aia-personnel.onrender.com/generate';
+let sessionToken='';
 let inFlight=false;
 const auto=document.createElement('div');
 auto.className='aia-auto no-print';
@@ -29,7 +28,7 @@ autoButton.onclick=async()=>{
  if(!sourceText)return message('Ajoute le texte de la publication : AIA ne doit pas inventer son contenu.');
  // Le jeton d'accès est demandé à l'utilisateur uniquement après déploiement.
  // Il n'est jamais stocké dans le navigateur ou dans le dépôt public.
- const token=window.prompt('Code privé AIA (pas la clé OpenAI) :');
+ const token=sessionToken||window.prompt('Code privé AIA (pas la clé API OpenAI), uniquement pour cette session :');
  if(!token)return;
  inFlight=true;autoButton.disabled=true;
  autoStatus.textContent='Rédaction en cours…';
@@ -43,10 +42,12 @@ autoButton.onclick=async()=>{
   const payload=await response.json();
   if(!response.ok||typeof payload.text!=='string'||!payload.text.trim())
    throw new Error(payload.error||'Réponse invalide');
+  sessionToken=token;
   el('bridgeResult').value=payload.text;
   autoStatus.textContent='Texte reçu. Relis-le avant validation.';
   message('Fiche rédigée. Appuie sur Lire et corriger.');
  }catch(e){
+  if(e?.message==='Accès refusé')sessionToken='';
   autoStatus.textContent='Échec de génération : aucun sujet ni fiche supprimé.';
   message(e?.message||'Moteur IA indisponible');
  }finally{inFlight=false;autoButton.disabled=false;}
@@ -92,11 +93,21 @@ window.addEventListener('aia:fiche-saved',event=>{
 });
 const previousShow=window.show;
 window.show=function(id){previousShow(id);root.classList.toggle('hidden',id!=='assistantBridge')};
-window.createFromQueue=function(){
- if(!Array.isArray(queue)||!queue.length)return message('Enregistre d’abord un sujet.');
- item=queue[0];
+function openDraft(next,source=''){
+ if(!next||!next.subject)return message('Choisis d’abord un sujet.');
+ item={...next};
  el('bridgeSubject').textContent=[item.publication,item.subject,item.format].filter(Boolean).join(' • ');
- el('bridgeSource').value='';el('bridgeResult').value='';
+ el('bridgeSource').value=source;el('bridgeResult').value='';
+ autoStatus.textContent='Moteur connecté — texte de référence nécessaire avant la génération.';
  show('assistantBridge');
+}
+window.AIAEngine={openDraft};
+window.createFromQueue=function(){
+ const chosen=el('subject').value.trim();
+ const next=chosen
+  ? {publication,format,subject:chosen,date:el('date').value}
+  : Array.isArray(queue)&&queue.length ? queue[0] : null;
+ if(!next)return message('Choisis un article ou saisis un sujet avant Création.');
+ openDraft(next);
 };
 })();
