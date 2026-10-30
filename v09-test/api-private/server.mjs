@@ -21,8 +21,9 @@ function reply(res,status,data){
  res.end(JSON.stringify(data));
 }
 createServer(async(req,res)=>{
- if(req.url==='/health'&&req.method==='GET')return reply(res,200,{status:key&&access?'ready':'missing-secrets'});
- if(req.url!=='/generate'||!['POST','OPTIONS'].includes(req.method))return reply(res,404,{error:'Not found'});
+ const pathname=new URL(req.url,'http://localhost').pathname;
+ if(pathname==='/health'&&req.method==='GET')return reply(res,200,{status:key&&access?'ready':'missing-secrets'});
+ if(pathname!=='/generate'||!['POST','OPTIONS'].includes(req.method))return reply(res,404,{error:'Not found'});
  if(req.headers.origin!==origin)return reply(res,403,{error:'Origine non autorisée'});
  if(req.method==='OPTIONS'){
   res.writeHead(204,{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type, X-AIA-Access','Access-Control-Max-Age':'600','Vary':'Origin'});
