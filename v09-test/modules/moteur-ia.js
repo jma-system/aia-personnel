@@ -5,7 +5,7 @@
 'use strict';
 if(typeof window.createFromQueue!=='function'||!document.querySelector('main'))return;
 const root=document.createElement('section');root.id='assistantBridge';root.className='card hidden';
-root.innerHTML='<div class="actions no-print"><button type="button" id="bridgeBack">← Retour accueil</button></div><h2>Assistant de rédaction</h2><p class="muted">Sans serveur IA : tu peux préparer ta demande pour ChatGPT puis importer la réponse. Rien n’est envoyé automatiquement.</p><p id="bridgeSubject"></p><label for="bridgeSource">Extrait ou notes de la publication (facultatif)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
+root.innerHTML='<h2>Assistant de rédaction</h2><p class="muted">Sans serveur IA : tu peux préparer ta demande pour ChatGPT puis importer la réponse. Rien n’est envoyé automatiquement.</p><p id="bridgeSubject"></p><label for="bridgeSource">Extrait ou notes de la publication (facultatif)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
 document.querySelector('main').append(root);
 const el=id=>document.getElementById(id);
 let item=null;
@@ -29,7 +29,7 @@ async function copyRequest(){
 }
 el('bridgeCopy').onclick=copyRequest;
 el('bridgeOpen').onclick=()=>window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
-el('bridgeBack').onclick=()=>showHome();
+
 el('bridgeRead').onclick=()=>{
  const result=el('bridgeResult').value.trim();
  if(!result)return message('Colle d’abord le texte de la fiche.');
