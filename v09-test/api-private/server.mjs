@@ -37,25 +37,35 @@ createServer(async(req,res)=>{
  try{
   for await(const part of req){
    data+=part.toString();
-   if(Buffer.byteLength(data)>24000)return reply(res,413,{error:'Texte trop long'});
+   if(Buffer.byteLength(data)>110000)return reply(res,413,{error:'Texte trop long'});
   }
   const input=JSON.parse(data);
   const subject=String(input.subject||'').trim().slice(0,180);
   const publication=['CVM','TG'].includes(input.publication)?input.publication:'TG';
   const format=['Tract','Fiche','Étude'].includes(input.format)?input.format:'Fiche';
-  const sourceText=String(input.sourceText||'').trim().slice(0,18000);
+  const sourceText=String(input.sourceText||'').trim().slice(0,80000);
   if(!subject)return reply(res,400,{error:'Sujet obligatoire'});
   if(!sourceText)return reply(res,422,{error:'Ajoute un extrait de la publication pour produire un résumé fidèle'});
   if(!allowRequest())return reply(res,429,{error:'Limite de sécurité atteinte : 5 fiches/jour ou 30/mois sur cette instance'});
   recent.set(ip,Date.now());
   usage.dayCount++;usage.monthCount++;
-  const instructions='Rédige en français /HUMAN naturel, personnel et fluide, pour une étude individuelle. Respecte les textes fournis, ne crée aucune citation ou référence biblique imaginaire. Ne prétends jamais avoir consulté JW.org. Pour une Tour de Garde, termine par 3 à 4 questions de révision et leurs réponses. Retourne seulement la fiche.';
+  const instructions=[
+  'Tu aides à préparer une étude personnelle en français naturel et fluide (/HUMAN). Utilise EXCLUSIVEMENT le texte source fourni; ne prétends pas consulter JW.org ou une publication absente.',
+  'Identifie chaque question d’étude et le ou les paragraphes associés. Examine toutes les sections et tous les paragraphes sans en ignorer.',
+  'Ne recopie pas intégralement le texte source; crée une synthèse originale fidèle avec références bibliques uniquement lorsqu’elles sont présentes dans la source.',
+  'Pour Tract : donne une présentation courte et accessible des idées essentielles, sans prétendre traiter toutes les questions une par une.',
+  'Pour Fiche : présente les enseignements majeurs par section, les points des questions de paragraphes, et une application pratique de façon synthétique.',
+  'Pour Étude : propose une analyse plus approfondie, structurée par section, couvrant chaque question de paragraphe, les références citées et les applications.',
+  'Pour TG : repère précisément les questions de révision qui figurent à la FIN de la publication; restitue-les sous forme de reformulations brèves et réponds-y en français naturel en te fondant sur l’article. Ne fabrique pas de questions officielles.',
+  'Si l’article est incomplet ou les questions finales sont absentes, indique clairement ce qui manque et ne prétends pas avoir traité la totalité de l’article.',
+  'Retourne uniquement la fiche rédigée, sans consignes techniques.'
+ ].join(' ');
   const response=await fetch('https://api.openai.com/v1/chat/completions',{
    method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
    body:JSON.stringify({model:'gpt-5.4-mini',messages:[
     {role:'system',content:instructions},
     {role:'user',content:JSON.stringify({publication,format,subject,date:String(input.date||''),sourceText})}
-   ],max_completion_tokens:2300}),
+   ],max_completion_tokens:5000}),
    signal:AbortSignal.timeout(55000)
   });
   const json=await response.json();
