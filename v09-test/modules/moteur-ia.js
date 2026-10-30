@@ -25,7 +25,7 @@ function draftPrompt(){
 async function copyRequest(){
  const txt=draftPrompt();
  try{await navigator.clipboard.writeText(txt);message('Demande copiée. Ouvre ChatGPT et colle-la.')}
- catch(e){const t=el('bridgeSource');t.value=txt;t.focus();t.select();message('Copie automatique indisponible : sélectionne puis copie la demande affichée.')}
+ catch(e){let t=el('bridgeFallback');if(!t){t=document.createElement('textarea');t.id='bridgeFallback';t.setAttribute('aria-label','Demande à copier');t.readOnly=true;el('bridgeCopy').after(t)}t.value=txt;t.focus();t.select();message('Copie automatique indisponible : copie la demande sélectionnée.')}
 }
 el('bridgeCopy').onclick=copyRequest;
 el('bridgeOpen').onclick=()=>window.open('https://chatgpt.com/','_blank','noopener,noreferrer');
