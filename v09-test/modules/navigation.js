@@ -1,54 +1,71 @@
-/* AIA V09 test: navigation par historique d'écrans, sans toucher aux fiches. */
-(() => {
-  'use strict';
-  const pages=['home','editor','library','viewer','exportPanel','desk'];
-  const originalShow=window.show;
-  if(typeof originalShow!=='function') return;
-  let active=pages.find(id=>!document.getElementById(id)?.classList.contains('hidden'))||'home';
-  const history=[];
-  function renderButtons(){
-    for(const id of pages.filter(x=>x!=='home')){
-      const section=document.getElementById(id);
-      if(!section)continue;
-      let bar=section.querySelector('.aia-navigation');
-      if(!bar){
-        bar=document.createElement('div');bar.className='aia-navigation no-print';
-        bar.style.cssText='display:flex;gap:9px;flex-wrap:wrap;margin:0 0 14px';
-        const back=document.createElement('button');back.type='button';back.textContent='← Retour';back.dataset.aiaBack='1';
-        const home=document.createElement('button');home.type='button';home.textContent='⌂ Accueil';home.dataset.aiaHome='1';
-        back.addEventListener('click',()=>goBack());
-        home.addEventListener('click',()=>goHome());
-        bar.append(back,home);section.prepend(bar);
-      }
-      bar.querySelector('[data-aia-back]').disabled=!history.length && active===id;
-    }
+/* AIA V09-test — Navigation unique de tous les écrans, sans toucher aux fiches. */
+(()=>{
+'use strict';
+const ids=['home','editor','library','viewer','exportPanel','desk','preview','assistantBridge'];
+const baseShow=window.show;
+if(typeof baseShow!=='function')return;
+let active='home';
+let backStack=[],forwardStack=[],navigating=false;
+const get=id=>document.getElementById(id);
+function enabled(id){return ids.includes(id)&&!!get(id)}
+function paint(){
+ for(const id of ids){
+  const section=get(id);if(!section)continue;
+  section.classList.toggle('hidden',id!==active);
+  let bar=section.querySelector(':scope > .aia-navigation');
+  if(!bar){
+   bar=document.createElement('div');bar.className='aia-navigation no-print';
+   bar.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px';
+   const prev=document.createElement('button');prev.type='button';prev.dataset.aiaPrev='1';prev.textContent='〈 Précédent';prev.onclick=goBack;
+   const next=document.createElement('button');next.type='button';next.dataset.aiaNext='1';next.textContent='Suivant 〉';next.onclick=goForward;
+   bar.append(prev,next);
+   if(id!=='home'){
+    const home=document.createElement('button');home.type='button';home.dataset.aiaHome='1';home.textContent='⌂ Accueil';home.onclick=goHome;bar.append(home);
+   }
+   section.prepend(bar);
   }
-  function goHome(){history.length=0;active='home';window.show('home');renderButtons()}
-  function goBack(){
-    const target=history.pop()||'home';
-    active=target;window.show(target);
-    if(target==='viewer'&&typeof window.renderViewer==='function')window.renderViewer();
-    if(target==='library'&&typeof window.openLibrary==='function'){
-      // Refresh list without recording a second navigation step.
-      window.openLibrary();
-    }
-    renderButtons();
-  }
-  window.show=function(id){
-    if(!pages.includes(id))return originalShow(id);
-    if(id!==active){history.push(active);if(history.length>40)history.shift();}
-    active=id;originalShow(id);renderButtons();
-  };
-  // Ancien bouton Accueil : même comportement, historique remis à zéro.
-  window.showHome=goHome;
-  // Les anciens boutons « Retour » deviennent de vrais retours.
-  for(const sectionId of ['editor','exportPanel']){
-    const section=document.getElementById(sectionId);
-    const buttons=section?.querySelectorAll('.actions button')||[];
-    for(const button of buttons){
-      if(button.textContent.trim()!=='Retour')continue;
-      button.onclick=goBack;
-    }
-  }
-  renderButtons();
+  bar.querySelector('[data-aia-prev]').disabled=backStack.length===0;
+  bar.querySelector('[data-aia-next]').disabled=forwardStack.length===0;
+ }
+}
+function showTarget(id){
+ navigating=true;
+ try{baseShow(id)}finally{navigating=false}
+ active=id;
+ paint();
+ window.scrollTo(0,0);
+}
+function goBack(){
+ if(!backStack.length)return;
+ forwardStack.push(active);
+ showTarget(backStack.pop());
+}
+function goForward(){
+ if(!forwardStack.length)return;
+ backStack.push(active);
+ showTarget(forwardStack.pop());
+}
+function goHome(){
+ if(active!=='home')backStack.push(active);
+ forwardStack=[];
+ showTarget('home');
+}
+window.show=function(id){
+ if(!enabled(id))return baseShow(id);
+ if(navigating)return baseShow(id);
+ if(id!==active){
+  backStack.push(active);
+  if(backStack.length>50)backStack.shift();
+  forwardStack=[];
+ }
+ showTarget(id);
+};
+window.showHome=goHome;
+window.AIANavigation={back:goBack,forward:goForward,home:goHome};
+for(const id of ['editor','exportPanel']){
+ get(id)?.querySelectorAll('.actions button').forEach(button=>{
+  if(button.textContent.trim()==='Retour')button.onclick=goBack;
+ });
+}
+paint();
 })();
