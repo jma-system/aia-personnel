@@ -34,12 +34,16 @@ el('bridgeRead').onclick=()=>{
  const result=el('bridgeResult').value.trim();
  if(!result)return message('Colle d’abord le texte de la fiche.');
  if(!item||!window.AIAPreview?.open(item,result))return message('La lecture est indisponible; ta réponse reste ici.');
- // Consommer la sélection uniquement après affichage réussi.
- const index=queue.findIndex(x=>x===item);
- if(index>=0){queue.splice(index,1);try{localStorage.setItem(QKEY,JSON.stringify(queue))}catch(e){}queueStatus()}
- item=null;
+ // La sélection reste en attente tant que le brouillon n'a pas été sauvegardé.
  message('Fiche prête à relire. Aucun PDF automatique.');
 };
+window.addEventListener('aia:fiche-saved',event=>{
+ const saved=event.detail?.item;
+ if(!saved)return;
+ const i=queue.findIndex(x=>x===saved);
+ if(i>=0){queue.splice(i,1);try{localStorage.setItem(QKEY,JSON.stringify(queue))}catch(e){}queueStatus()}
+ if(item===saved)item=null;
+});
 const previousShow=window.show;
 window.show=function(id){previousShow(id);root.classList.toggle('hidden',id!=='assistantBridge')};
 window.createFromQueue=function(){
