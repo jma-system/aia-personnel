@@ -50,7 +50,7 @@
   // Réutilise le mécanisme actuel : ne modifie aucune fiche existante.
   saveDraft();
   if(validated && byId('viewer') && !byId('viewer').classList.contains('hidden'))validateCurrent();
-  if(!byId('viewer').classList.contains('hidden'))pending=null;
+  // Le suivi de la file est déclenché uniquement après sauvegarde réussie.
  }
  correct.onclick=()=>{if(prepareEditor())show('editor')};
  draft.onclick=()=>save(false);
@@ -67,6 +67,16 @@
    return true;
   },
   close(){pending=null;panel.classList.add('hidden')}
+ };
+ const originalSaveDraft=window.saveDraft;
+ window.saveDraft=function(){
+  const source=pending?.item;
+  const wasFromPreview=!!source && byId('editor').dataset.info===JSON.stringify(source);
+  originalSaveDraft();
+  if(wasFromPreview && !byId('viewer').classList.contains('hidden')){
+   pending=null;
+   window.dispatchEvent(new CustomEvent('aia:fiche-saved',{detail:{item:source}}));
+  }
  };
  const oldShow=window.show;
  window.show=function(id){
