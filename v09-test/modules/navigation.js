@@ -23,10 +23,10 @@
       bar.querySelector('[data-aia-back]').disabled=!history.length && active===id;
     }
   }
-  function goHome(){history.length=0;active='home';originalShow('home');renderButtons()}
+  function goHome(){history.length=0;active='home';window.show('home');renderButtons()}
   function goBack(){
     const target=history.pop()||'home';
-    active=target;originalShow(target);
+    active=target;window.show(target);
     if(target==='viewer'&&typeof window.renderViewer==='function')window.renderViewer();
     if(target==='library'&&typeof window.openLibrary==='function'){
       // Refresh list without recording a second navigation step.
