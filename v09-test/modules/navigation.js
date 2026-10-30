@@ -15,9 +15,9 @@ function paint(){
   let bar=section.querySelector(':scope > .aia-navigation');
   if(!bar){
    bar=document.createElement('div');bar.className='aia-navigation no-print';
-   bar.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px';
-   const prev=document.createElement('button');prev.type='button';prev.dataset.aiaPrev='1';prev.textContent='〈 Précédent';prev.onclick=goBack;
-   const next=document.createElement('button');next.type='button';next.dataset.aiaNext='1';next.textContent='Suivant 〉';next.onclick=goForward;
+   bar.style.cssText='display:flex;justify-content:flex-start;gap:8px;align-items:center;flex-wrap:nowrap;margin:0 0 14px;width:max-content;max-width:100%';
+   const prev=document.createElement('button');prev.type='button';prev.dataset.aiaPrev='1';prev.textContent='〈';prev.setAttribute('aria-label','Page précédente');prev.title='Page précédente';prev.style.cssText='min-width:44px;padding:7px 11px';prev.onclick=goBack;
+   const next=document.createElement('button');next.type='button';next.dataset.aiaNext='1';next.textContent='〉';next.setAttribute('aria-label','Page suivante');next.title='Page suivante';next.style.cssText='min-width:44px;padding:7px 11px';next.onclick=goForward;
    bar.append(prev,next);
    if(id!=='home'){
     const home=document.createElement('button');home.type='button';home.dataset.aiaHome='1';home.textContent='⌂ Accueil';home.onclick=goHome;bar.append(home);
