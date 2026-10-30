@@ -10,7 +10,7 @@ document.querySelector('main').append(root);
 const el=id=>document.getElementById(id);
 // L'adresse sera renseignée UNIQUEMENT après déploiement et validation du serveur.
 // Aucun secret ni jeton ne doit être inscrit dans GitHub.
-const API_ENDPOINT='';
+const API_ENDPOINT='https://aia-personnel.onrender.com/generate';
 let inFlight=false;
 const auto=document.createElement('div');
 auto.className='aia-auto no-print';
