@@ -40,7 +40,10 @@ el('bridgeRead').onclick=()=>{
 window.addEventListener('aia:fiche-saved',event=>{
  const saved=event.detail?.item;
  if(!saved)return;
- const i=queue.findIndex(x=>x===saved);
+ // La page de lecture reçoit une copie du sujet : comparer ses champs,
+ // et non les références JavaScript (sinon la file ne diminue jamais).
+ const i=queue.findIndex(x=>x.publication===saved.publication &&
+   x.format===saved.format && x.subject===saved.subject && x.date===saved.date);
  if(i>=0){queue.splice(i,1);try{localStorage.setItem(QKEY,JSON.stringify(queue))}catch(e){}queueStatus()}
  if(item===saved)item=null;
 });
