@@ -8,6 +8,49 @@ const root=document.createElement('section');root.id='assistantBridge';root.clas
 root.innerHTML='<h2>Assistant de rédaction</h2><p class="muted">Sans serveur IA : tu peux préparer ta demande pour ChatGPT puis importer la réponse. Rien n’est envoyé automatiquement.</p><p id="bridgeSubject"></p><label for="bridgeSource">Extrait ou notes de la publication (facultatif)</label><textarea id="bridgeSource" placeholder="Ajoute ici le texte que tu souhaites résumer. Sans texte source, la rédaction devra rester générale et signaler les informations à vérifier."></textarea><div class="actions"><button type="button" id="bridgeCopy" class="primary">Copier la demande</button><button type="button" id="bridgeOpen">Ouvrir ChatGPT</button></div><label for="bridgeResult">Réponse obtenue dans ChatGPT</label><textarea id="bridgeResult" placeholder="Colle ici la réponse rédigée par ChatGPT…"></textarea><div class="actions"><button type="button" id="bridgeRead" class="primary">Lire et corriger la fiche</button></div>';
 document.querySelector('main').append(root);
 const el=id=>document.getElementById(id);
+// L'adresse sera renseignée UNIQUEMENT après déploiement et validation du serveur.
+// Aucun secret ni jeton ne doit être inscrit dans GitHub.
+const API_ENDPOINT='';
+let inFlight=false;
+const auto=document.createElement('div');
+auto.className='aia-auto no-print';
+auto.innerHTML='<div class="actions"><button type="button" id="aiaGenerate" class="primary">Générer automatiquement</button></div><p id="aiaAutoStatus" class="muted" role="status"></p>';
+el('bridgeSource').after(auto);
+const autoButton=el('aiaGenerate');
+const autoStatus=el('aiaAutoStatus');
+const canGenerate=()=>/^https:\/\/[^/]+\/generate$/.test(API_ENDPOINT);
+autoButton.disabled=!canGenerate();
+autoStatus.textContent=canGenerate()
+ ? 'Moteur prêt à tester. Texte de la publication requis.'
+ : 'Génération automatique en attente de connexion sécurisée. Aucun paiement ni appel API.';
+autoButton.onclick=async()=>{
+ if(inFlight||!canGenerate()||!item)return;
+ const sourceText=el('bridgeSource').value.trim();
+ if(!sourceText)return message('Ajoute le texte de la publication : AIA ne doit pas inventer son contenu.');
+ // Le jeton d'accès est demandé à l'utilisateur uniquement après déploiement.
+ // Il n'est jamais stocké dans le navigateur ou dans le dépôt public.
+ const token=window.prompt('Code privé AIA (pas la clé OpenAI) :');
+ if(!token)return;
+ inFlight=true;autoButton.disabled=true;
+ autoStatus.textContent='Rédaction en cours…';
+ try{
+  const response=await fetch(API_ENDPOINT,{
+   method:'POST',
+   headers:{'Content-Type':'application/json','X-AIA-Access':token},
+   body:JSON.stringify({...item,sourceText}),
+   signal:AbortSignal.timeout(60000)
+  });
+  const payload=await response.json();
+  if(!response.ok||typeof payload.text!=='string'||!payload.text.trim())
+   throw new Error(payload.error||'Réponse invalide');
+  el('bridgeResult').value=payload.text;
+  autoStatus.textContent='Texte reçu. Relis-le avant validation.';
+  message('Fiche rédigée. Appuie sur Lire et corriger.');
+ }catch(e){
+  autoStatus.textContent='Échec de génération : aucun sujet ni fiche supprimé.';
+  message(e?.message||'Moteur IA indisponible');
+ }finally{inFlight=false;autoButton.disabled=false;}
+};
 let item=null;
 function draftPrompt(){
  const source=el('bridgeSource').value.trim();
