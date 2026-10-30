@@ -8,6 +8,14 @@ const origin='https://jma-system.github.io';
 const key=process.env.OPENAI_API_KEY;
 const access=process.env.AIA_ACCESS_TOKEN;
 const recent=new Map();
+// Plafonds conservateurs par instance : ne remplacent PAS un contrôle de dépenses OpenAI.
+const usage={day:'',dayCount:0,month:'',monthCount:0};
+function allowRequest(){
+ const now=new Date(),day=now.toISOString().slice(0,10),month=day.slice(0,7);
+ if(usage.day!==day){usage.day=day;usage.dayCount=0}
+ if(usage.month!==month){usage.month=month;usage.monthCount=0}
+ return usage.dayCount<5 && usage.monthCount<30;
+}
 function reply(res,status,data){
  res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':origin,'Vary':'Origin','Cache-Control':'no-store'});
  res.end(JSON.stringify(data));
@@ -37,7 +45,9 @@ createServer(async(req,res)=>{
   const sourceText=String(input.sourceText||'').trim().slice(0,18000);
   if(!subject)return reply(res,400,{error:'Sujet obligatoire'});
   if(!sourceText)return reply(res,422,{error:'Ajoute un extrait de la publication pour produire un résumé fidèle'});
+  if(!allowRequest())return reply(res,429,{error:'Limite de sécurité atteinte : 5 fiches/jour ou 30/mois sur cette instance'});
   recent.set(ip,Date.now());
+  usage.dayCount++;usage.monthCount++;
   const instructions='Rédige en français /HUMAN naturel, personnel et fluide, pour une étude individuelle. Respecte les textes fournis, ne crée aucune citation ou référence biblique imaginaire. Ne prétends jamais avoir consulté JW.org. Pour une Tour de Garde, termine par 3 à 4 questions de révision et leurs réponses. Retourne seulement la fiche.';
   const response=await fetch('https://api.openai.com/v1/chat/completions',{
    method:'POST',headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'},
