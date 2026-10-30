@@ -6,7 +6,7 @@ if(!library)return;
 const list=document.getElementById('list');
 const selectedIds=new Set();
 const toolbar=document.createElement('div');toolbar.className='no-print';
-toolbar.innerHTML='<div class="row" style="margin:12px 0"><button type="button" id="aia-select-all">Tout sélectionner</button><button type="button" id="aia-select-none">Tout désélectionner</button></div><p id="aia-selected-count" class="muted">0 fiche sélectionnée</p><div class="actions"><button type="button" id="aia-save-selected" class="primary">Enregistrer en PDF</button><button type="button" id="aia-delete-selected" style="color:#a21b1b;border-color:#a21b1b">Supprimer</button></div>';
+toolbar.innerHTML='<p class="muted">Appuie sur le titre d’une fiche pour l’ouvrir, la corriger et ajouter tes commentaires. Le PDF est facultatif.</p><div class="row" style="margin:12px 0"><button type="button" id="aia-select-all">Tout sélectionner</button><button type="button" id="aia-select-none">Tout désélectionner</button></div><p id="aia-selected-count" class="muted">0 fiche sélectionnée</p><div class="actions"><button type="button" id="aia-save-selected" class="primary">Enregistrer en PDF</button><button type="button" id="aia-delete-selected" style="color:#a21b1b;border-color:#a21b1b">Supprimer</button></div>';
 list.after(toolbar);
 const existingActions=library.querySelector('.actions');
 if(existingActions)existingActions.querySelectorAll('button').forEach(b=>{if(b.getAttribute('onclick')==='openExport()')b.style.display='none'});
