@@ -1,0 +1,12 @@
+/* AYA INDEX — bloc 1 */
+.aia-index-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.aia-index-tabs button{flex:1;min-width:75px;font-size:13px}
+.aia-index-layout{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px}
+.aia-index-letters{display:flex;flex-direction:column;gap:2px}
+.aia-index-letters button{padding:5px 1px;font-size:12px;min-height:28px;border-radius:5px}
+.aia-index-content{min-width:0}.aia-index-content h3{font-size:16px;margin:2px 0 12px}
+.aia-index-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.aia-index-tile{padding:7px;display:flex;flex-direction:column;gap:7px;text-align:center;align-items:stretch}
+.aia-index-placeholder{min-height:75px;background:#edf0f3;color:#526071;border:1px dashed #aeb8c3;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;padding:5px}
+.aia-index-tile strong{font-size:13px}
+@media(min-width:560px){.aia-index-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
