@@ -17,6 +17,7 @@
  function icon(name){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.classList.add('aia-icon');const p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',paths[name]);svg.append(p);return svg;}
  function decorate(el,name,label){el.replaceChildren(icon(name),document.createTextNode(label));}
  decorate(document.getElementById('cvm'),'book','CVM');decorate(document.getElementById('tg'),'users','TG');
+ const publicationRow=document.getElementById('tg').parentElement;const repertoire=document.createElement('button');repertoire.type='button';repertoire.id='aia-repertoire-open';repertoire.textContent='Répertoire';repertoire.setAttribute('aria-label','Ouvrir le répertoire interactif');publicationRow.append(repertoire);publicationRow.classList.add('aia-publication-row');
  for(const [id,label,name] of [['f-Tract','Tract','file'],['f-Fiche','Fiche','file'],['f-Étude','Étude','book']])decorate(document.getElementById(id),name,label);
  const save=home.querySelector('[onclick="saveSelection()"]'),create=home.querySelector('[onclick="createFromQueue()"]');
  decorate(save,'save','Enregistrer');decorate(create,'spark','Création');
@@ -35,7 +36,7 @@
  decorate(video,'video','Vidéos');document.querySelector('#desk h2').textContent='Vidéos';
  function folder(label,name,url){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label','Ouvrir le dossier Google Drive '+label);decorate(a,name,label);return a}
  const wol=document.createElement('a');wol.href='https://wol.jw.org/fr/wol/h/r30/lp-f';wol.target='_blank';wol.rel='noopener noreferrer';decorate(wol,'book','WOL');
- quick.append(jw,wol,video,folder('Mes fiches','folder','https://drive.google.com/drive/folders/1rnqcYTSutBjuKXl2VoUCHahukaCJqsBh'),folder('Index','index','https://drive.google.com/drive/folders/1Vh4BBJ2f5rLo7l4TKaxvS4P4E-riXvkB'));
+ quick.append(jw,wol,video,folder('Mes fiches','folder','https://drive.google.com/drive/folders/1rnqcYTSutBjuKXl2VoUCHahukaCJqsBh'));
  const hint=document.createElement('p');hint.className='muted aia-folder-hint';hint.textContent='Dossiers PDF Google Drive externes.';
  oldActions.remove();home.append(search,quick,hint);
 })();
