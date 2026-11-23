@@ -1,12 +1,19 @@
-/* AYA INDEX — bloc 1 */
-.aia-index-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
-.aia-index-tabs button{flex:1;min-width:75px;font-size:13px}
+/* AYA — INDEX : palette bleue, navigation tactile. V09-test uniquement. */
+#indexPanel{background:#f8fbff;border:1px solid #c6d9ee}
+#indexPanel h2{color:#173c69}
+#indexPanel .muted{color:#526b87}
+.aia-index-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 14px}
+.aia-index-tabs button{flex:1;min-width:75px;font-size:15px;font-weight:700;border:1px solid #9fb9d6;background:#fff;color:#23456e;border-radius:10px}
+.aia-index-tabs button.selected{background:#1d65b4;border-color:#1d65b4;color:#fff}
 .aia-index-layout{display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px}
-.aia-index-letters{display:flex;flex-direction:column;gap:2px}
-.aia-index-letters button{width:100%;box-sizing:border-box;padding:8px 0;font-size:20px;font-weight:700;min-height:48px;min-width:0;touch-action:manipulation;border-radius:8px}
-.aia-index-content{min-width:0}.aia-index-content h3{font-size:16px;margin:2px 0 12px}
-.aia-index-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.aia-index-tile{padding:7px;display:flex;flex-direction:column;gap:7px;text-align:center;align-items:stretch}
-.aia-index-placeholder{min-height:75px;background:#edf0f3;color:#526071;border:1px dashed #aeb8c3;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;padding:5px}
-.aia-index-tile strong{font-size:13px}
+.aia-index-letters{display:flex;flex-direction:column;gap:4px}
+.aia-index-letters button{width:100%;box-sizing:border-box;padding:8px 0;font-size:20px;font-weight:700;min-height:48px;min-width:0;touch-action:manipulation;border-radius:10px;border:1px solid #afc5de;background:#edf5ff;color:#193c66}
+.aia-index-letters button.selected{background:#1d65b4;border-color:#1d65b4;color:#fff}
+.aia-index-content{min-width:0}
+.aia-index-content h3{font-size:18px;margin:2px 0 12px;color:#163b6a}
+.aia-index-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.aia-index-tile{padding:8px;display:flex;flex-direction:column;gap:8px;text-align:center;align-items:stretch;border:1px solid #b4cbe5;border-radius:16px;background:#eaf4ff;color:#17365e}
+.aia-index-tile:focus-visible{outline:3px solid #2475d0;outline-offset:2px}
+.aia-index-placeholder{min-height:92px;background:#dcecff;color:#426384;border:1px dashed #86add5;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;padding:8px}
+.aia-index-tile strong{font-size:14px;color:#163760}
 @media(min-width:560px){.aia-index-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
