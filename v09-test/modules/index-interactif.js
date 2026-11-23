@@ -4,7 +4,7 @@
 const main=document.querySelector('main');if(!main)return;
 const topics=["L’avenir","La famille","Dieu","La prière","Jésus","Le Royaume de Dieu","Les souffrances","La mort","La religion","Actualité"];
 const section=document.createElement('section');section.id='indexPanel';section.className='card hidden';
-section.innerHTML='<h2>Mon INDEX</h2><p class="muted">Répertoire interactif — première structure.</p><div class="aia-index-tabs" role="group" aria-label="Rubriques"></div><div class="aia-index-layout"><nav class="aia-index-letters" aria-label="Alphabet"></nav><div class="aia-index-content" aria-live="polite"></div></div><div class="actions"><button type="button" id="aia-index-home">Retour accueil</button></div>';
+section.innerHTML='<h2>Mon Répertoire</h2><p class="muted">Répertoire interactif — première structure.</p><div class="aia-index-tabs" role="group" aria-label="Rubriques"></div><div class="aia-index-layout"><nav class="aia-index-letters" aria-label="Alphabet"></nav><div class="aia-index-content" aria-live="polite"></div></div><div class="actions"><button type="button" id="aia-index-home">Retour accueil</button></div>';
 main.append(section);
 const tabs=section.querySelector('.aia-index-tabs'),letters=section.querySelector('.aia-index-letters'),content=section.querySelector('.aia-index-content');
 let category='THÈMES',letter='';
@@ -21,7 +21,7 @@ content.append(grid);if(!items.length){const p=document.createElement('p');p.tex
 ['TRACTS','FICHES','THÈMES'].forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{category=t;letter='';render()};tabs.append(b)});
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.onclick=()=>{letter=letter===l?'':l;render()};letters.append(b)});
 section.querySelector('#aia-index-home').onclick=()=>window.showHome?window.showHome():window.show('home');
-const old=document.querySelector('.aia-quick-access a[href*="1Vh4BBJ2f5rLo7l4TKaxvS4P4E-riXvkB"]');
-if(old){old.removeAttribute('href');old.removeAttribute('target');old.removeAttribute('rel');old.setAttribute('role','button');old.setAttribute('tabindex','0');old.setAttribute('aria-label','Ouvrir mon INDEX interactif');old.onclick=e=>{e.preventDefault();window.show('indexPanel')};old.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();window.show('indexPanel')}}}
+const openButton=document.getElementById('aia-repertoire-open');
+if(openButton)openButton.addEventListener('click',()=>window.show('indexPanel'));
 render();
 })();
