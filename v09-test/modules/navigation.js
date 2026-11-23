@@ -1,7 +1,7 @@
 /* AIA V09-test — Navigation unique de tous les écrans, sans toucher aux fiches. */
 (()=>{
 'use strict';
-const ids=['home','editor','library','viewer','exportPanel','desk','preview','assistantBridge'];
+const ids=['home','editor','library','viewer','exportPanel','desk','preview','assistantBridge','indexPanel'];
 const baseShow=window.show;
 if(typeof baseShow!=='function')return;
 let active='home';
