@@ -18,7 +18,7 @@ const items=topics.filter(t=>!letter||t.toLocaleUpperCase('fr-FR').startsWith(le
 items.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='aia-index-tile';const pic=document.createElement('span');pic.className='aia-index-placeholder';pic.textContent='Illustration à venir';const name=document.createElement('strong');name.textContent=t;b.append(pic,name);b.onclick=()=>{content.replaceChildren();const title=document.createElement('h3');title.textContent=t;const p=document.createElement('p');p.className='muted';p.textContent='Fiche à préparer.';const back=document.createElement('button');back.textContent='Retour aux thèmes';back.onclick=render;content.append(title,p,back)};grid.append(b)});
 content.append(grid);if(!items.length){const p=document.createElement('p');p.textContent='Aucun thème pour cette lettre.';content.append(p)}
 }
-['RUBRIQUES','FICHES','THÈMES'].forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{category=t;letter='';render()};tabs.append(b)});
+['TRACTS','FICHES','THÈMES'].forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{category=t;letter='';render()};tabs.append(b)});
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.onclick=()=>{letter=letter===l?'':l;render()};letters.append(b)});
 section.querySelector('#aia-index-home').onclick=()=>window.showHome?window.showHome():window.show('home');
 const openButton=document.getElementById('aia-repertoire-open');
