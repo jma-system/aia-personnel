@@ -4,7 +4,7 @@
 const main=document.querySelector('main');if(!main)return;
 const topics=["L’avenir","La famille","Dieu","La prière","Jésus","Le Royaume de Dieu","Les souffrances","La mort","La religion","Actualité"];
 const section=document.createElement('section');section.id='indexPanel';section.className='card hidden';
-section.innerHTML='<h2>Mon Répertoire</h2><p class="muted">Répertoire interactif — première structure.</p><div class="aia-index-tabs" role="group" aria-label="Rubriques"></div><div class="aia-index-layout"><nav class="aia-index-letters" aria-label="Alphabet"></nav><div class="aia-index-content" aria-live="polite"></div></div><div class="actions"><button type="button" id="aia-index-home">Retour accueil</button></div>';
+section.innerHTML='<div class="aia-index-tabs" role="group" aria-label="Rubriques"></div><div class="aia-index-layout"><nav class="aia-index-letters" aria-label="Alphabet"></nav><div class="aia-index-content" aria-live="polite"></div></div><div class="actions"><button type="button" id="aia-index-home">Retour accueil</button></div>';
 main.append(section);
 const tabs=section.querySelector('.aia-index-tabs'),letters=section.querySelector('.aia-index-letters'),content=section.querySelector('.aia-index-content');
 let category='THÈMES',letter='';
