@@ -206,8 +206,8 @@ function categoryView(category,letter){
   info.textContent='Appuie sur + Ajouter pour créer ton premier sous-thème sous '+letter+'.';
   wrap.append(info);
  }
- area.append(wrap);
  area.querySelector('p.muted')?.remove();
+ area.append(wrap);
  if(selected){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
   note(matches.length+' fiche'+(matches.length===1?'':'s')+' dans '+selected);
