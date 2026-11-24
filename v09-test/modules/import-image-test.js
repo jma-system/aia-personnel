@@ -14,7 +14,7 @@ const selectedSubtheme=new Map();
 const extraStore='sous-themes';
 const dbName='aia-repertoire-v09-test';
 const storeName='fiches';
-let db=null,ready=false,request=null,focusBefore=null,replaceId=null;
+let db=null,ready=false,request=null,focusBefore=null,replaceId=null,activeTheme=null;
 const picker=document.createElement('input');
 picker.type='file';picker.accept='image/png,image/jpeg,image/webp';picker.hidden=true;picker.multiple=true;
 section.append(picker);
@@ -48,7 +48,11 @@ close.onclick=closeImage;
 viewer.addEventListener('click',e=>{if(e.target===viewer)closeImage()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)closeImage()});
 function labelFrom(filename){return filename.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim()||'Fiche'}
-function refresh(){section.dispatchEvent(new Event('aia:refresh-index'))}
+function refresh(){
+ const theme=activeTheme;
+ section.dispatchEvent(new Event('aia:refresh-index'));
+ if(theme){activeTheme=theme;renderTheme(theme)}
+}
 function note(msg){const p=document.createElement('p');p.className='aia-gallery-count';p.textContent=msg;area.append(p)}
 function openDatabase(){
  return new Promise((resolve,reject)=>{
@@ -126,7 +130,9 @@ function thumb(item){
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
  const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
- const choose=makeButton('Sélectionner','aia-gallery-choose');
+ const choose=makeButton('S','aia-gallery-choose');
+ choose.setAttribute('aria-label','Sélectionner des images');
+ choose.title='Sélectionner des images';
  choose.setAttribute('aria-pressed','false');
  const count=document.createElement('span');count.className='aia-gallery-selected-count';
  count.setAttribute('aria-live','polite');
@@ -139,7 +145,9 @@ function gallery(items,category='',letter='',theme=''){
  let selectionActive=false;
  const cells=[];
  function update(){
-  choose.textContent=selectionActive?'Annuler':'Sélectionner';
+  choose.textContent='S';
+  choose.setAttribute('aria-label',selectionActive?'Annuler la sélection':'Sélectionner des images');
+  choose.title=selectionActive?'Annuler la sélection':'Sélectionner des images';
   choose.setAttribute('aria-pressed',String(selectionActive));
   count.textContent=selectionActive?String(selectedIds.size):'';
   trash.disabled=!selectionActive||selectedIds.size===0;
@@ -179,7 +187,7 @@ function gallery(items,category='',letter='',theme=''){
   if(!confirm('Supprimer '+targets.length+' image(s) '+place+' ?'))return;
   // Une seule transaction : toutes les suppressions réussissent ou aucune.
   const edits=targets.map(item=>{
-   if(theme)return {...item,topic:''};
+   if(theme)return item.placements.length?{...item,topic:''}:null;
    const remaining=item.placements.filter(p=>!(p.category===category&&p.letter===letter));
    return remaining.length?{...item,placements:remaining}:null;
   });
@@ -200,16 +208,18 @@ function gallery(items,category='',letter='',theme=''){
   }
   refresh();
  });
- const heading=area.querySelector('.aia-subtheme-heading')||(theme?area.querySelector('h3'):null);
- if(heading){
-  const header=document.createElement('div');header.className='aia-gallery-heading-row';
-  heading.replaceWith(header);header.append(heading,bar);
-  wrap.append(grid);
- }else{
-  wrap.append(bar,grid);
- }
+ wrap.append(bar,grid);
  update();
  return wrap;
+}
+// La même ligne de commandes est utilisée dans chaque sous-dossier.
+function toolbar(importButton,view){
+ const row=document.createElement('div');
+ row.className='aia-repertoire-toolbar';
+ const controls=view.querySelector('.aia-gallery-selection-bar');
+ if(!controls)throw new Error('Barre de sélection manquante');
+ row.append(importButton,controls);
+ return row;
 }
 // Sous-thèmes horizontaux pour chaque lettre de A à Z.
 function normalized(text){
@@ -297,18 +307,10 @@ function categoryView(category,letter){
  area.append(wrap);
  if(selected){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
-  if(matches.length){
-   const view=gallery(matches,category,letter);
-   const selectionBar=view.querySelector('.aia-gallery-selection-bar');
-   const importButton=wrap.querySelector('.aia-import-button');
-   if(selectionBar&&importButton){
-    const toolbar=document.createElement('div');
-    toolbar.className='aia-repertoire-toolbar';
-    importButton.replaceWith(toolbar);
-    toolbar.append(importButton,selectionBar);
-   }
-   area.append(view);
-  }
+  const view=gallery(matches,category,letter);
+  const importButton=wrap.querySelector('.aia-import-button');
+  if(importButton)importButton.replaceWith(toolbar(importButton,view));
+  area.append(view);
  }
 }
 picker.addEventListener('change',async()=>{
@@ -328,8 +330,9 @@ picker.addEventListener('change',async()=>{
     if(!current)throw new Error('Fiche introuvable');
     await save({...current,blob:file,label:labelFrom(file.name)});
    }else if(target){
+    const placements=target.category==='THÈMES'?[]:[{category:target.category,letter:target.letter}];
     const item={id:crypto.randomUUID(),blob:file,label:labelFrom(file.name),
-      topic:target.topic,subtheme:target.subtheme||'',placements:[{category:target.category,letter:target.letter}]};
+      topic:target.topic||'',subtheme:target.subtheme||'',placements};
     await save(item);
    }else return;
    saved++;
@@ -337,7 +340,21 @@ picker.addEventListener('change',async()=>{
  }
  if(errors||invalid)alert(saved+' fiche(s) enregistrée(s). '+invalid+' format(s) ignoré(s), '+errors+' erreur(s) de stockage.');
 });
+function renderTheme(theme){
+ area.replaceChildren();
+ const heading=document.createElement('h3');heading.textContent=theme;
+ const items=records.filter(item=>item.topic===theme);
+ const view=gallery(items,'','',theme);
+ const add=makeButton('Importer','aia-import-button');
+ add.setAttribute('aria-label','Importer des images dans le thème '+theme);
+ add.onclick=()=>{
+  request={category:'THÈMES',letter:'',topic:theme,subtheme:''};
+  replaceId=null;picker.multiple=true;picker.click();
+ };
+ area.append(heading,toolbar(add,view),view);
+}
 section.addEventListener('aia:index-render',e=>{
+ activeTheme=null;
  const {category,letter}=e.detail||{};
  if(category==='THÈMES'){
   if(!ready)return;
@@ -354,11 +371,9 @@ section.addEventListener('aia:index-render',e=>{
 section.addEventListener('aia:theme-select',e=>{
  const theme=e.detail?.theme;
  if(!topics.includes(theme))return;
- const matches=records.filter(r=>r.topic===theme);
- if(!matches.length)return;
- e.preventDefault();area.replaceChildren();
- const heading=document.createElement('h3');heading.textContent=theme;
- area.append(heading,gallery(matches,'','',theme));
+ e.preventDefault();
+ activeTheme=theme;
+ renderTheme(theme);
 });
 window.addEventListener('pagehide',()=>{
  closeImage();records.forEach(discard);db?.close();
