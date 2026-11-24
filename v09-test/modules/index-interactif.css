@@ -87,3 +87,8 @@
 #indexPanel .aia-subtheme-strip button.selected{background:#216cb8!important;color:#fff!important;border-color:#216cb8!important}
 #indexPanel .aia-subtheme-strip .aia-subtheme-add{border-style:dashed!important}
 #indexPanel .aia-subtheme-heading{font-size:17px;font-weight:700;color:#163b6a;margin:2px 0 0}
+
+/* Suppression directe et confirmée depuis chaque galerie */
+#indexPanel .aia-gallery-cell{position:relative}
+#indexPanel .aia-gallery-trash{position:absolute;top:9px;right:9px;z-index:2;width:40px;min-width:40px;height:40px;min-height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #b6c7da;border-radius:50%;background:#fff!important;color:#193c66!important;font-size:21px;box-shadow:0 1px 4px #0002}
+#indexPanel .aia-gallery-trash:focus-visible{outline:3px solid #216cb8;outline-offset:2px}
