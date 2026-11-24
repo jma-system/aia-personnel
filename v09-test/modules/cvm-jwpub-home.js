@@ -17,10 +17,10 @@
  hint.style.cssText='font-size:13px;line-height:1.45;color:#53657a;margin:0 0 10px';
  const frame=document.createElement('iframe');
  frame.title='Sélection des semaines et des sujets CVM JWPUB';
- frame.src='./test-cvm-jwpub.html?embedded=1';
+ frame.src='./test-cvm-jwpub.html?embedded=2';
  frame.loading='lazy';
  frame.style.cssText='display:block;width:100%;height:75vh;min-height:620px;border:1px solid #c9d9e8;border-radius:12px;background:#f3f6fa';
- section.append(heading,hint,frame);
+ section.append(frame);
  const workflow=home.querySelector('.aia-workflow');
  const quick=home.querySelector('.aia-search-panel');
  if(workflow)workflow.before(section);else if(quick)quick.before(section);else home.append(section);
