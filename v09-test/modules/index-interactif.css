@@ -41,3 +41,19 @@
 #indexPanel .aia-import-preview{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 #indexPanel .aia-import-image{display:block;width:100%;max-width:450px;max-height:520px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #a9c3dc}
 #indexPanel .aia-import-preview button{min-height:44px;border:1px solid #a9c3dc;background:#fff;color:#193c66;border-radius:8px}
+
+/* AIA — classement de fiche et lecture de l'image sans texte ajouté */
+#indexPanel .aia-family-form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+#indexPanel .aia-family-label{margin:4px 0 0;color:#193c66;font-size:15px}
+#indexPanel .aia-family-choices{display:flex;flex-wrap:wrap;gap:8px}
+#indexPanel .aia-family-choice{display:flex;gap:5px;align-items:center;min-height:44px;padding:5px 9px;border:1px solid #a9c3dc;border-radius:9px;background:#fff;color:#193c66;font-size:14px}
+#indexPanel .aia-family-choice input{width:21px;height:21px;accent-color:#216cb8}
+#indexPanel .aia-family-entry{display:flex;align-items:center;gap:12px;width:100%;min-height:62px;padding:8px;text-align:left;border:1px solid #a9c3dc;background:#eaf4ff;color:#17365e;border-radius:12px;margin:8px 0}
+#indexPanel .aia-family-entry img{width:66px;height:80px;object-fit:cover;border-radius:6px}
+#indexPanel .aia-family-thumb{width:100%;height:92px;object-fit:cover;border-radius:7px}
+#indexPanel .aia-family-preview{width:100%}
+#indexPanel .aia-family-remove{min-height:44px;width:100%;color:#193c66;background:#fff;border:1px solid #a9c3dc;border-radius:8px}
+.aia-photo-viewer[hidden]{display:none!important}
+.aia-photo-viewer{position:fixed;inset:0;z-index:99999;background:#111;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
+.aia-photo-viewer>img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.aia-photo-close{position:absolute;top:12px;right:12px;z-index:1;width:44px;height:44px;border-radius:50%;background:#172d4e;color:#fff;border:1px solid #fff;font-size:30px;line-height:1}
