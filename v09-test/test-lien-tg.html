@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIA — Test lien JW Library</title><style>
+body{font:16px/1.5 system-ui,Arial;max-width:650px;margin:auto;padding:18px;color:#172234;background:#f4f6f9}main{background:white;border:1px solid #dce2e8;border-radius:14px;padding:16px}input{box-sizing:border-box;width:100%;padding:12px;border:1px solid #aeb9c7;border-radius:8px;font:inherit}button{margin-top:12px;padding:12px 16px;background:#213b5b;color:white;border:0;border-radius:9px;font:inherit;font-weight:600}#result{margin-top:15px;padding:12px;background:#edf2f7;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#23547f}</style></head><body><main><h2>Test AIA — Lien TG</h2><p>Colle un lien partagé depuis JW Library. AIA vérifie son format et identifie le document. Ce test ne récupère pas encore le texte de l'article.</p><label for="link">Lien JW Library</label><input id="link" type="url" value="https://www.jw.org/finder?srcid=jwlshare&amp;wtlocale=F&amp;prefer=lang&amp;docid=2026565"><button id="check">Analyser le lien</button><div id="result" role="status">En attente du test.</div><p><a href="./index.html">Retour à AIA Test</a></p></main><script>
+'use strict';
+document.getElementById('check').addEventListener('click',()=>{
+ const out=document.getElementById('result');
+ try{
+  const url=new URL(document.getElementById('link').value.trim());
+  if(url.protocol!=='https:'||!['jw.org','www.jw.org'].includes(url.hostname)||url.pathname!=='/finder')throw Error('Ce lien ne correspond pas au format JW.org/finder attendu.');
+  const id=url.searchParams.get('docid'),locale=url.searchParams.get('wtlocale');
+  if(!id||!/^\d{5,12}$/.test(id))throw Error('Identifiant de document absent ou invalide.');
+  out.textContent='SUCCÈS — Lien reconnu.\nDocument : '+id+'\nLangue : '+(locale||'non précisée')+'\n\nLa reconnaissance du lien fonctionne. La lecture du contenu reste à tester séparément.';
+ }catch(error){out.textContent='ÉCHEC — '+error.message}
+});
+</script></body></html>
