@@ -96,3 +96,19 @@
 /* Bouton de suppression visible, sous chaque image, indépendant de l'aperçu. */
 #indexPanel .aia-gallery-delete-button{position:static;display:block;width:100%;min-height:42px;margin-top:7px;padding:7px 5px;border:1px solid #9fb9d6;border-radius:9px;background:#fff!important;color:#17365e!important;font-size:12px;font-weight:600;line-height:1.25;white-space:normal;touch-action:manipulation}
 #indexPanel .aia-gallery-delete-button:focus-visible{outline:3px solid #216cb8;outline-offset:2px}
+
+/* Sélection multiple : contrôles à droite du sous-thème, sans boutons individuels */
+#indexPanel .aia-gallery-heading-row{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;flex-wrap:wrap;margin:2px 0 6px}
+#indexPanel .aia-gallery-heading-row>.aia-subtheme-heading{margin:0;flex:1 1 auto;min-width:45px}
+#indexPanel .aia-gallery-heading-row>h3{margin:0;flex:1 1 auto}
+#indexPanel .aia-gallery-selection-bar{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0}
+#indexPanel .aia-gallery-choose{min-height:40px;padding:6px 9px;font-size:12px;background:#fff!important;color:#17365e!important;border:1px solid #9fb9d6;border-radius:9px}
+#indexPanel .aia-gallery-selected-count{font-size:11px;color:#23456e;white-space:nowrap}
+#indexPanel .aia-gallery-batch-trash{width:42px;height:42px;min-width:42px;min-height:42px;padding:0;border:1px solid #9fb9d6;border-radius:10px;background:#fff!important;color:#17365e!important;font-size:21px}
+#indexPanel .aia-gallery-batch-trash:disabled{opacity:.35}
+#indexPanel .aia-gallery-list>.aia-gallery-selection-bar{margin-bottom:8px}
+#indexPanel .aia-gallery-card{position:relative}
+#indexPanel .aia-gallery-tick[hidden]{display:none!important}
+#indexPanel .aia-gallery-tick{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:2px solid #216cb8;background:#fff;color:#fff;font-size:19px;line-height:24px;font-weight:700}
+#indexPanel .aia-gallery-card.is-selected{outline:3px solid #216cb8;outline-offset:-3px}
+#indexPanel .aia-gallery-card.is-selected .aia-gallery-tick{background:#216cb8}
