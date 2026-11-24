@@ -296,7 +296,6 @@ function categoryView(category,letter){
  area.append(wrap);
  if(selected){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
-  note(matches.length+' fiche'+(matches.length===1?'':'s')+' dans '+selected);
   if(matches.length)area.append(gallery(matches,category,letter));
  }
 }
@@ -347,8 +346,7 @@ section.addEventListener('aia:theme-select',e=>{
  if(!matches.length)return;
  e.preventDefault();area.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=theme;
- const back=makeButton('Retour aux thèmes','aia-gallery-back');
- back.onclick=refresh;area.append(heading,back,gallery(matches,'','',theme));
+ area.append(heading,gallery(matches,'','',theme));
 });
 window.addEventListener('pagehide',()=>{
  closeImage();records.forEach(discard);db?.close();
