@@ -149,7 +149,7 @@ function gallery(items,category='',letter='',theme=''){
   choose.setAttribute('aria-label',selectionActive?'Annuler la sélection':'Sélectionner des images');
   choose.title=selectionActive?'Annuler la sélection':'Sélectionner des images';
   choose.setAttribute('aria-pressed',String(selectionActive));
-  count.textContent=selectionActive?String(selectedIds.size):'';
+  count.textContent=selectionActive&&selectedIds.size>0?String(selectedIds.size):'';
   trash.disabled=!selectionActive||selectedIds.size===0;
   grid.classList.toggle('is-selecting',selectionActive);
   for(const {item,button,tick} of cells){
