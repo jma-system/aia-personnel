@@ -25,6 +25,16 @@ const close=document.createElement('button');close.type='button';close.className
 close.textContent='×';close.setAttribute('aria-label','Fermer');
 const large=document.createElement('img');large.alt='Fiche agrandie';
 viewer.append(close,large);document.body.append(viewer);
+// Bloquer uniquement le menu contextuel natif sur les images du Répertoire.
+// Les clics courts, la sélection multiple et les boutons restent opérationnels.
+function preventImageContextMenu(event){
+ if(event.target.closest('img'))event.preventDefault();
+}
+section.addEventListener('contextmenu',event=>{
+ if(event.target.closest('.aia-gallery-card'))preventImageContextMenu(event);
+});
+viewer.addEventListener('contextmenu',preventImageContextMenu);
+large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
@@ -105,7 +115,7 @@ function makeButton(text,cls){
 function thumb(item){
  const btn=makeButton('', 'aia-gallery-card');
  btn.setAttribute('aria-label','Ouvrir '+item.label);
- const image=document.createElement('img');image.src=item.url;image.alt='';
+ const image=document.createElement('img');image.src=item.url;image.alt='';image.draggable=false;
  btn.append(image);
  // Masquer les noms purement numériques attribués aux photos (ex. 40495).
  if(!/^\d+$/.test(item.label.trim())){
