@@ -141,7 +141,7 @@ function gallery(items,category='',letter='',theme=''){
  function update(){
   choose.textContent=selectionActive?'Annuler':'Sélectionner';
   choose.setAttribute('aria-pressed',String(selectionActive));
-  count.textContent=selectionActive?selectedIds.size+' sélectionnée'+(selectedIds.size>1?'s':''):'';
+  count.textContent=selectionActive?String(selectedIds.size):'';
   trash.disabled=!selectionActive||selectedIds.size===0;
   grid.classList.toggle('is-selecting',selectionActive);
   for(const {item,button,tick} of cells){
@@ -279,7 +279,8 @@ function categoryView(category,letter){
  };
  bar.append(create);wrap.append(bar);
  if(selected){
-  const add=makeButton('Importer des images — '+selected,'aia-import-button');
+  const add=makeButton('Importer','aia-import-button');
+  add.setAttribute('aria-label','Importer des images dans '+selected+' sous '+letter);
   add.onclick=()=>{
    const topic=selected==='Famille'?'La famille'
     :topics.find(t=>normalized(t.replace(/^(?:La |Le |Les |L’|L')/i,''))===normalized(selected))||'';
@@ -296,7 +297,18 @@ function categoryView(category,letter){
  area.append(wrap);
  if(selected){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
-  if(matches.length)area.append(gallery(matches,category,letter));
+  if(matches.length){
+   const view=gallery(matches,category,letter);
+   const selectionBar=view.querySelector('.aia-gallery-selection-bar');
+   const importButton=wrap.querySelector('.aia-import-button');
+   if(selectionBar&&importButton){
+    const toolbar=document.createElement('div');
+    toolbar.className='aia-repertoire-toolbar';
+    importButton.replaceWith(toolbar);
+    toolbar.append(importButton,selectionBar);
+   }
+   area.append(view);
+  }
  }
 }
 picker.addEventListener('change',async()=>{
