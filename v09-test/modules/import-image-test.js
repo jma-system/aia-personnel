@@ -247,21 +247,27 @@ function categoryView(category,letter){
  const items=records.filter(item=>isUnder(item,category,letter));
  // Initialiser F avec les sous-thèmes déjà validés. Sur les autres lettres,
  // les noms sont créés par l'utilisateur ou issus des fiches existantes.
+ // Les noms d'origine restent les identifiants : renommer n'altère aucune photo.
  const names=letter==='F'?['Famille','Foi']:[];
  for(const entry of customSubthemes){
-  if(entry.category===category&&entry.letter===letter)names.push(entry.name);
+  if(entry.category===category&&entry.letter===letter)names.push(entry.source||entry.name);
  }
  for(const item of items)names.push(existingSubtheme(item,letter));
  const unique=[...new Set(names)];
- const selected=unique.includes(selectedSubtheme.get(key))
-  ?selectedSubtheme.get(key):(unique[0]||'');
+ const named=source=>{
+  const entry=customSubthemes.find(e=>e.category===category&&e.letter===letter&&(e.source||e.name)===source);
+  return entry?.name||source;
+ };
+ const previous=selectedSubtheme.get(key);
+ const selected=unique.includes(previous)?previous:
+  (unique.find(source=>named(source)===previous)||unique[0]||'');
  selectedSubtheme.set(key,selected);
  const wrap=document.createElement('div');wrap.className='aia-gallery-controls';
  const bar=document.createElement('div');
  bar.className='aia-subtheme-strip';
  bar.setAttribute('aria-label','Sous-thèmes sous '+letter);
  for(const name of unique){
-  const button=makeButton(name,'aia-subtheme-tab');
+  const button=makeButton(named(name),'aia-subtheme-tab');
   const active=name===selected;
   button.classList.toggle('selected',active);
   button.setAttribute('aria-pressed',String(active));
@@ -277,9 +283,9 @@ function categoryView(category,letter){
   if(!startsWithLetter(name,letter)){
    alert('Choisis un sous-thème commençant par la lettre '+letter+'.');return;
   }
-  const current=unique.find(x=>normalized(x)===normalized(name));
+  const current=unique.find(x=>normalized(named(x))===normalized(name));
   if(current){selectedSubtheme.set(key,current);refresh();return}
-  const entry={id:category+'|'+letter+'|'+normalized(name),category,letter,name};
+  const entry={id:category+'|'+letter+'|'+normalized(name),category,letter,source:name,name};
   try{
    await operation('readwrite',store=>store.put(entry),extraStore);
    customSubthemes.push(entry);
@@ -287,10 +293,41 @@ function categoryView(category,letter){
    refresh();
   }catch(error){alert('Enregistrement impossible : '+(error?.message||'erreur'))}
  };
- bar.append(create);wrap.append(bar);
+ bar.append(create);
+ const rename=makeButton('✎','aia-subtheme-rename');
+ rename.setAttribute('aria-label',selected?'Renommer le sous-thème '+named(selected):'Renommer un sous-thème');
+ rename.title=selected?'Renommer « '+named(selected)+' »':'Choisir un sous-thème';
+ rename.disabled=!selected;
+ rename.onclick=async()=>{
+  if(!selected)return;
+  const oldLabel=named(selected);
+  const answer=prompt('Nouveau nom pour « '+oldLabel+' » :',oldLabel);
+  if(answer===null)return;
+  const name=answer.trim().replace(/\s+/g,' ').slice(0,45);
+  if(!name){alert('Saisis un nom.');return}
+  if(!startsWithLetter(name,letter)){
+   alert('Le nom doit commencer par '+letter+' pour rester dans cette lettre.');return;
+  }
+  const collision=unique.find(source=>source!==selected&&normalized(named(source))===normalized(name));
+  if(collision){alert('Ce sous-thème existe déjà dans '+category+' sous '+letter+'.');return}
+  if(name===oldLabel)return;
+  const previousEntry=customSubthemes.find(e=>e.category===category&&e.letter===letter&&(e.source||e.name)===selected);
+  const updated=previousEntry?
+   {...previousEntry,source:selected,name}:
+   {id:'nom|'+category+'|'+letter+'|'+normalized(selected),category,letter,source:selected,name,kind:'renamed'};
+  try{
+   await operation('readwrite',store=>store.put(updated),extraStore);
+   const index=customSubthemes.findIndex(e=>e.id===updated.id);
+   if(index>=0)customSubthemes[index]=updated;else customSubthemes.push(updated);
+   selectedSubtheme.set(key,selected);
+   refresh();
+  }catch(error){alert('Impossible de renommer : '+(error?.message||'erreur de stockage'))}
+ };
+ const barRow=document.createElement('div');barRow.className='aia-subtheme-row';
+ barRow.append(bar,rename);wrap.append(barRow);
  if(selected){
   const add=makeButton('Importer','aia-import-button');
-  add.setAttribute('aria-label','Importer des images dans '+selected+' sous '+letter);
+  add.setAttribute('aria-label','Importer des images dans '+named(selected)+' sous '+letter);
   add.onclick=()=>{
    const topic=selected==='Famille'?'La famille'
     :topics.find(t=>normalized(t.replace(/^(?:La |Le |Les |L’|L')/i,''))===normalized(selected))||'';
@@ -309,7 +346,7 @@ function categoryView(category,letter){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
   const view=gallery(matches,category,letter);
   const importButton=wrap.querySelector('.aia-import-button');
-  if(importButton)importButton.replaceWith(toolbar(importButton,view));
+  if(importButton)wrap.append(toolbar(importButton,view));
   area.append(view);
  }
 }
