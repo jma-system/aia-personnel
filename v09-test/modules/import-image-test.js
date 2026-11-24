@@ -9,6 +9,9 @@ const topics=['L’avenir','La famille','Dieu','La prière','Jésus','Le Royaume
 const categories=['TRACTS','FICHES'];
 const allowed=new Set(['image/png','image/jpeg','image/webp']);
 const records=[];
+const customSubthemes=[];
+const selectedSubtheme=new Map();
+const extraStore='sous-themes';
 const dbName='aia-repertoire-v09-test';
 const storeName='fiches';
 let db=null,ready=false,request=null,focusBefore=null,replaceId=null;
@@ -40,17 +43,20 @@ function note(msg){const p=document.createElement('p');p.className='aia-gallery-
 function openDatabase(){
  return new Promise((resolve,reject)=>{
   if(!('indexedDB'in window)){reject(new Error('IndexedDB indisponible'));return}
-  const req=indexedDB.open(dbName,1);
-  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(storeName))req.result.createObjectStore(storeName,{keyPath:'id'})};
+  const req=indexedDB.open(dbName,2);
+  req.onupgradeneeded=()=>{
+   if(!req.result.objectStoreNames.contains(storeName))req.result.createObjectStore(storeName,{keyPath:'id'});
+   if(!req.result.objectStoreNames.contains(extraStore))req.result.createObjectStore(extraStore,{keyPath:'id'});
+  };
   req.onsuccess=()=>resolve(req.result);
   req.onerror=()=>reject(req.error||new Error('Ouverture impossible'));
  });
 }
-function operation(mode,perform){
+function operation(mode,perform,store=storeName){
  return new Promise((resolve,reject)=>{
   if(!db){reject(new Error('Stockage indisponible'));return}
-  const tx=db.transaction(storeName,mode);
-  const object=tx.objectStore(storeName);
+  const tx=db.transaction(store,mode);
+  const object=tx.objectStore(store);
   let result;
   try{result=perform(object)}catch(error){try{tx.abort()}catch(_){}reject(error);return}
   if(result&&typeof result==='object'&&'onsuccess'in result){
@@ -64,7 +70,7 @@ function operation(mode,perform){
 function makeRecord(raw){return {...raw,url:URL.createObjectURL(raw.blob)}}
 function discard(item){if(item?.url)URL.revokeObjectURL(item.url)}
 async function save(item){
- const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,placements:item.placements};
+ const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,subtheme:item.subtheme||'',placements:item.placements};
  await operation('readwrite',store=>store.put(raw));
  const index=records.findIndex(r=>r.id===item.id);
  if(index>=0){discard(records[index]);records[index]=makeRecord(raw)}
@@ -116,23 +122,84 @@ function gallery(items){
  }
  return grid;
 }
+// F : sous-thèmes filtrés, défilables horizontalement.
+function existingSubtheme(item){
+ if(item.subtheme)return item.subtheme;
+ if(item.topic==='La famille')return 'Famille';
+ if(item.topic==='Foi')return 'Foi';
+ return 'Autres';
+}
+function isUnder(item,category,letter){
+ return item.placements.some(p=>p.category===category&&p.letter===letter);
+}
 function categoryView(category,letter){
  if(!categories.includes(category)||!letter)return;
  if(!ready){note('Ouverture du stockage…');return}
  if(!db){note('Stockage indisponible sur ce navigateur.');return}
  const wrap=document.createElement('div');wrap.className='aia-gallery-controls';
- const topicLabel=document.createElement('label');topicLabel.className='aia-gallery-label';topicLabel.textContent='Thème associé (facultatif)';
- const topic=document.createElement('select');topic.className='aia-gallery-select';
- const blank=document.createElement('option');blank.value='';blank.textContent='Aucun thème';topic.append(blank);
- for(const name of topics){const o=document.createElement('option');o.value=name;o.textContent=name;topic.append(o)}
- topicLabel.append(topic);
- const add=makeButton('Importer des images sous '+letter,'aia-import-button');
- add.onclick=()=>{request={category,letter,topic:topic.value};replaceId=null;picker.multiple=true;picker.click()};
- wrap.append(add,topicLabel);area.append(wrap);
- const matches=records.filter(r=>r.placements.some(p=>p.category===category&&p.letter===letter));
+ // L'interface habituelle demeure hors de la lettre F.
+ if(letter!=='F'){
+  const label=document.createElement('label');label.className='aia-gallery-label';label.textContent='Thème associé (facultatif)';
+  const select=document.createElement('select');select.className='aia-gallery-select';
+  const none=document.createElement('option');none.value='';none.textContent='Aucun thème';select.append(none);
+  topics.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option)});
+  label.append(select);
+  const add=makeButton('Importer des images sous '+letter,'aia-import-button');
+  add.onclick=()=>{request={category,letter,topic:select.value,subtheme:''};replaceId=null;picker.multiple=true;picker.click()};
+  wrap.append(add,label);area.append(wrap);
+  const matches=records.filter(item=>isUnder(item,category,letter));
+  area.querySelector('p.muted')?.remove();
+  note(matches.length+' fiche'+(matches.length===1?'':'s')+' enregistrée'+(matches.length===1?'':'s'));
+  if(matches.length)area.append(gallery(matches));
+  return;
+ }
+ const key=category+'|F';
+ const items=records.filter(item=>isUnder(item,category,'F'));
+ const names=['Famille','Foi',...customSubthemes.filter(t=>t.category===category&&t.letter==='F').map(t=>t.name)];
+ if(items.some(item=>existingSubtheme(item)==='Autres'))names.push('Autres');
+ const unique=[...new Set(names)];
+ const selected=unique.includes(selectedSubtheme.get(key))?selectedSubtheme.get(key):'Famille';
+ selectedSubtheme.set(key,selected);
+ const bar=document.createElement('div');bar.className='aia-subtheme-strip';bar.setAttribute('aria-label','Sous-thèmes sous F');
+ for(const name of unique){
+  const button=makeButton(name,'aia-subtheme-tab');
+  const isActive=name===selected;
+  button.classList.toggle('selected',isActive);
+  button.setAttribute('aria-pressed',String(isActive));
+  button.onclick=()=>{selectedSubtheme.set(key,name);refresh()};
+  bar.append(button);
+ }
+ const create=makeButton('+ Ajouter','aia-subtheme-add');
+ create.onclick=async()=>{
+  const candidate=prompt('Nom du nouveau sous-thème sous F :');
+  if(candidate===null)return;
+  const name=candidate.trim().replace(/\\s+/g,' ').slice(0,45);
+  if(!name){alert('Saisis un nom de sous-thème.');return}
+  if(!/^F/i.test(name.normalize('NFD').replace(/[\\u0300-\\u036f]/g,''))){
+   alert('Pour la lettre F, choisis un sous-thème commençant par F.');return;
+  }
+  const current=unique.find(n=>n.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
+  if(current){selectedSubtheme.set(key,current);refresh();return}
+  const value={id:category+'|F|'+name.toLocaleLowerCase('fr'),category,letter:'F',name};
+  try{
+   await operation('readwrite',store=>store.put(value),extraStore);
+   customSubthemes.push(value);selectedSubtheme.set(key,name);refresh();
+  }catch(error){alert('Impossible d’enregistrer ce sous-thème : '+(error?.message||'erreur'))}
+ };
+ bar.append(create);wrap.append(bar);
+ const title=document.createElement('p');title.className='aia-subtheme-heading';title.textContent=selected;
+ wrap.append(title);
+ const add=makeButton('Importer des images — '+selected,'aia-import-button');
+ add.onclick=()=>{
+  const topic=selected==='Famille'?'La famille':selected==='Foi'?'':topics.includes(selected)?selected:'';
+  request={category,letter:'F',topic,subtheme:selected};
+  replaceId=null;picker.multiple=true;picker.click();
+ };
+ wrap.append(add);area.append(wrap);
  area.querySelector('p.muted')?.remove();
- note(matches.length+' fiche'+(matches.length===1?'':'s')+' enregistrée'+(matches.length===1?'':'s'));
- if(matches.length)area.append(gallery(matches));
+ const matching=items.filter(item=>existingSubtheme(item)===selected);
+ note(matching.length+' fiche'+(matching.length===1?'':'s')+' dans '+selected);
+ if(matching.length)area.append(gallery(matching));
 }
 picker.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
@@ -152,7 +219,7 @@ picker.addEventListener('change',async()=>{
     await save({...current,blob:file,label:labelFrom(file.name)});
    }else if(target){
     const item={id:crypto.randomUUID(),blob:file,label:labelFrom(file.name),
-      topic:target.topic,placements:[{category:target.category,letter:target.letter}]};
+      topic:target.topic,subtheme:target.subtheme||'',placements:[{category:target.category,letter:target.letter}]};
     await save(item);
    }else return;
    saved++;
@@ -191,6 +258,8 @@ window.addEventListener('pagehide',()=>{
  try{
   db=await openDatabase();
   const stored=await operation('readonly',store=>store.getAll());
+  const savedSubthemes=await operation('readonly',store=>store.getAll(),extraStore);
+  for(const item of savedSubthemes){if(item?.name&&item?.category&&item?.letter)customSubthemes.push(item)}
   for(const raw of stored){
    if(raw&&raw.blob instanceof Blob&&Array.isArray(raw.placements))records.push(makeRecord(raw));
   }
