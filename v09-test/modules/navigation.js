@@ -18,14 +18,18 @@ function paint(){
    bar.style.cssText='display:flex;justify-content:flex-start;gap:8px;align-items:center;flex-wrap:nowrap;margin:0 0 14px;width:max-content;max-width:100%';
    const prev=document.createElement('button');prev.type='button';prev.dataset.aiaPrev='1';prev.textContent='〈';prev.setAttribute('aria-label','Page précédente');prev.title='Page précédente';prev.style.cssText='min-width:44px;padding:7px 11px';prev.onclick=goBack;
    const next=document.createElement('button');next.type='button';next.dataset.aiaNext='1';next.textContent='〉';next.setAttribute('aria-label','Page suivante');next.title='Page suivante';next.style.cssText='min-width:44px;padding:7px 11px';next.onclick=goForward;
-   bar.append(prev,next);
+   // Dans le Répertoire, les onglets et l'alphabet assurent la navigation.
+   // Conserver les flèches uniquement sur les autres écrans.
+   if(id!=='indexPanel')bar.append(prev,next);
    if(id!=='home'){
     const home=document.createElement('button');home.type='button';home.dataset.aiaHome='1';home.textContent='⌂ Accueil';home.onclick=goHome;bar.append(home);
    }
    section.prepend(bar);
   }
-  bar.querySelector('[data-aia-prev]').disabled=backStack.length===0;
-  bar.querySelector('[data-aia-next]').disabled=forwardStack.length===0;
+  const previous=bar.querySelector('[data-aia-prev]');
+  const following=bar.querySelector('[data-aia-next]');
+  if(previous)previous.disabled=backStack.length===0;
+  if(following)following.disabled=forwardStack.length===0;
  }
 }
 function showTarget(id){
