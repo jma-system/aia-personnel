@@ -97,7 +97,8 @@ function makeButton(text,cls){
  return button;
 }
 function choicesFor(item,category,letter){
- const wrap=document.createElement('div');wrap.className='aia-gallery-item-actions';
+ const wrap=document.createElement('details');wrap.className='aia-gallery-item-actions';
+ const summary=document.createElement('summary');summary.textContent='Gérer cette fiche';wrap.append(summary);
  const select=document.createElement('select');select.className='aia-gallery-select';
  select.setAttribute('aria-label','Autre onglet');
  for(const cat of categories){
@@ -131,12 +132,26 @@ function thumb(item){
  const title=document.createElement('span');title.textContent=item.label;
  btn.append(image,title);btn.onclick=()=>openImage(item);return btn;
 }
-function gallery(items,category,letter){
+function gallery(items,category,letter,theme){
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
  for(const item of items){
   const cell=document.createElement('div');cell.className='aia-gallery-cell';
   cell.append(thumb(item));
   if(category&&letter)cell.append(choicesFor(item,category,letter));
+  if(theme){
+   const details=document.createElement('details');details.className='aia-gallery-item-actions';
+   const summary=document.createElement('summary');summary.textContent='Gérer cette fiche';details.append(summary);
+   const unlink=controlled(makeButton('Retirer du thème'),async()=>{
+    if(!confirm('Retirer cette fiche du thème '+theme+' ?'))return;
+    await save({...item,topic:''});
+   });
+   const replace=makeButton('Remplacer l’image');replace.onclick=()=>{request=null;replaceId=item.id;picker.multiple=false;picker.click()};
+   const all=controlled(makeButton('Supprimer partout'),async()=>{
+    if(!confirm('Supprimer cette fiche de tous les onglets ?'))return;
+    await removeEverywhere(item);
+   });
+   details.append(unlink,replace,all);cell.append(details);
+  }
   grid.append(cell);
  }
  return grid;
@@ -207,7 +222,7 @@ section.addEventListener('aia:theme-select',e=>{
  e.preventDefault();area.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=theme;
  const back=makeButton('Retour aux thèmes','aia-gallery-back');
- back.onclick=refresh;area.append(heading,back,gallery(matches));
+ back.onclick=refresh;area.append(heading,back,gallery(matches,null,null,theme));
 });
 window.addEventListener('pagehide',()=>{
  closeImage();records.forEach(discard);db?.close();
