@@ -113,11 +113,25 @@ function thumb(item){
  }
  btn.onclick=()=>openImage(item);return btn;
 }
-function gallery(items){
+function gallery(items,category='',letter='',theme=''){
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
  for(const item of items){
   const cell=document.createElement('div');cell.className='aia-gallery-cell';
   cell.append(thumb(item));
+  // Petite corbeille distincte de l'image, pour éviter les suppressions accidentelles.
+  const remove=makeButton('🗑','aia-gallery-trash');
+  remove.setAttribute('aria-label','Supprimer cette fiche de '+(theme||category+' sous '+letter));
+  remove.title='Supprimer cette fiche';
+  controlled(remove,async()=>{
+   const place=theme?'du thème « '+theme+' »':'de '+category+' sous '+letter;
+   if(!confirm('Retirer cette image '+place+' ?'))return;
+   if(theme){
+    await save({...item,topic:''});
+   }else{
+    await removeHere(item,category,letter);
+   }
+  });
+  cell.append(remove);
   grid.append(cell);
  }
  return grid;
@@ -211,7 +225,7 @@ function categoryView(category,letter){
  if(selected){
   const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
   note(matches.length+' fiche'+(matches.length===1?'':'s')+' dans '+selected);
-  if(matches.length)area.append(gallery(matches));
+  if(matches.length)area.append(gallery(matches,category,letter));
  }
 }
 picker.addEventListener('change',async()=>{
@@ -262,7 +276,7 @@ section.addEventListener('aia:theme-select',e=>{
  e.preventDefault();area.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=theme;
  const back=makeButton('Retour aux thèmes','aia-gallery-back');
- back.onclick=refresh;area.append(heading,back,gallery(matches));
+ back.onclick=refresh;area.append(heading,back,gallery(matches,'','',theme));
 });
 window.addEventListener('pagehide',()=>{
  closeImage();records.forEach(discard);db?.close();
