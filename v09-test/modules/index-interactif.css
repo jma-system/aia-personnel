@@ -182,3 +182,18 @@
 }
 #indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count:empty{display:none!important}
 #indexPanel .aia-repertoire-toolbar + .aia-gallery-list{margin-top:0}
+
+/* V21 : bouton de renommage toujours visible à droite des sous-thèmes */
+#indexPanel .aia-subtheme-row{
+ display:flex;align-items:stretch;gap:6px;width:100%;min-width:0;
+}
+#indexPanel .aia-subtheme-row>.aia-subtheme-strip{
+ flex:1 1 0;min-width:0;max-width:none;margin:0;
+}
+#indexPanel .aia-subtheme-row>.aia-subtheme-rename{
+ flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;
+ display:flex;align-items:center;justify-content:center;
+ padding:0;border:1px solid #9fb9d6;border-radius:10px;
+ background:#fff!important;color:#17365e!important;font-size:25px;
+}
+#indexPanel .aia-subtheme-row>.aia-subtheme-rename:disabled{opacity:.35}
