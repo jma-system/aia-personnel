@@ -190,7 +190,14 @@ function gallery(items,category='',letter='',theme=''){
   }
   refresh();
  });
- wrap.append(bar,grid);
+ const heading=area.querySelector('.aia-subtheme-heading')||(theme?area.querySelector('h3'):null);
+ if(heading){
+  const header=document.createElement('div');header.className='aia-gallery-heading-row';
+  heading.replaceWith(header);header.append(heading,bar);
+  wrap.append(grid);
+ }else{
+  wrap.append(bar,grid);
+ }
  update();
  return wrap;
 }
