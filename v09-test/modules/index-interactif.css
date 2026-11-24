@@ -32,3 +32,12 @@
 #indexPanel .aia-index-tile{background:#eaf4ff!important;color:#17365e!important;border-color:#b4cbe5!important}
 #indexPanel .aia-index-tile strong{color:#163760!important}
 #indexPanel .aia-index-placeholder{background:#dcecff!important;color:#426384!important}
+
+/* Module d'import : aperçu temporaire dans le Répertoire uniquement */
+#indexPanel .aia-import-test{margin:0 0 16px;padding:10px;border:1px solid #a9c3dc;border-radius:12px;background:#f0f7ff;color:#193c66}
+#indexPanel .aia-import-button{width:100%;min-height:48px;background:#216cb8;color:#fff;border:1px solid #216cb8;border-radius:9px;font-weight:600}
+#indexPanel .aia-import-status,#indexPanel .aia-import-caption{font-size:13px;line-height:1.45;color:#23456e;margin:8px 0}
+#indexPanel .aia-import-preview[hidden]{display:none!important}
+#indexPanel .aia-import-preview{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+#indexPanel .aia-import-image{display:block;width:100%;max-width:450px;max-height:520px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #a9c3dc}
+#indexPanel .aia-import-preview button{min-height:44px;border:1px solid #a9c3dc;background:#fff;color:#193c66;border-radius:8px}
