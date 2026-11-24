@@ -32,9 +32,13 @@ select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-
 .muted{font-size:13px;color:#596b7e;line-height:1.55}
 #status{font-size:14px;line-height:1.5}
 .error{color:#ad2b2b}.ok{color:#166b42}
-#result[hidden],#summaryBox[hidden]{display:none!important}
+#result[hidden],#summaryBox[hidden],#draftPanel[hidden]{display:none!important}
 #summaryBox{margin-top:8px;background:#eef6ff;border:1px solid #bfd6e9;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.5}
 .small{font-size:12px;color:#65788a}
+#draftPanel{border:2px solid #91b4d1}
+#draftText{display:block;width:100%;min-height:320px;resize:vertical;border:1px solid #a5bbcf;border-radius:8px;padding:12px;font:15px/1.55 Arial,sans-serif;color:#172d44}
+#draftTitle{font-size:17px;font-weight:700}
+#draftNotice{font-size:13px;line-height:1.5;color:#53657a}
 </style>
 </head>
 <body>
@@ -54,8 +58,17 @@ select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-
 <select id="week"></select>
 <p id="weekInfo" class="muted"></p>
 <div class="row"><button id="all" type="button">Tout sélectionner</button><button id="none" type="button">Tout désélectionner</button></div>
-<p class="muted">Chaque sujet peut être sélectionné indépendamment et recevoir son propre format. Ce test ne génère pas encore de fiches.</p>
+<p class="muted">Chaque sujet peut être sélectionné indépendamment et recevoir son propre format. Le bouton ci-dessous prépare un brouillon modifiable à partir des seules indications du programme. Il ne rédige pas encore de réponses avec une IA.</p>
 <div id="summaryBox" aria-live="polite"></div>
+</div>
+<p><button id="createDraft" type="button">Créer la fiche sélectionnée</button></p>
+<div id="draftPanel" class="panel" hidden>
+<h2>Fiche CVM — Brouillon à relire</h2>
+<p id="draftTitle"></p>
+<p id="draftNotice">Ce brouillon reprend uniquement le programme importé. Les réponses et explications ne sont pas générées automatiquement. Aucun enregistrement ni PDF automatique.</p>
+<label for="draftText"><strong>Texte modifiable</strong></label>
+<textarea id="draftText" spellcheck="true"></textarea>
+<p><button id="closeDraft" type="button">Retour au programme</button></p>
 </div>
 <div id="subjects"></div>
 </div>
@@ -67,7 +80,7 @@ select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-
 'use strict';
 const $=id=>document.getElementById(id);
 const mask='11cbb5587e32846d4c26790c633da289f66fe5842a3a585ce1bc3a294af5ada7';
-let database=null,key=null,iv=null,weeks=[];
+let database=null,key=null,iv=null,weeks=[],currentTasks=[];
 const txt=e=>e?.textContent?.replace(/\s+/g,' ').trim()||'';
 function status(message,isError=false){$('status').textContent=message;$('status').className=isError?'error':'ok'}
 function query(sql){const q=database.prepare(sql),rows=[];try{while(q.step())rows.push(q.getAsObject())}finally{q.free()}return rows}
@@ -158,7 +171,7 @@ async function renderWeek(){
  try{
   status('Lecture de la semaine du '+prettyDate(week.FirstDateOffset)+'…');
   const html=await decode(week.Content);
-  const tasks=programFromHTML(html);
+  const tasks=programFromHTML(html);currentTasks=tasks;$('draftPanel').hidden=true;
   let currentGroup='';
   for(const task of tasks){
    if(task.group!==currentGroup){
@@ -204,6 +217,32 @@ $('load').addEventListener('click',async()=>{
  finally{$('load').disabled=false}
 });
 $('week').addEventListener('change',renderWeek);
+$('createDraft').addEventListener('click',()=>{
+ const cards=[...document.querySelectorAll('#subjects .subject')];
+ const picked=cards.map((card,i)=>({card,task:currentTasks[i]})).filter(x=>x.card.querySelector('input[type=checkbox]').checked);
+ if(picked.length!==1){status('Pour ce premier test, coche un seul sujet CVM.',true);return}
+ const {card,task}=picked[0],fmt=card.querySelector('select').value,week=weeks[Number($('week').value)];
+ const lines=[
+  'CVM — '+fmt,
+  'Semaine : '+prettyDate(week.FirstDateOffset)+' au '+prettyDate(week.LastDateOffset),
+  'Sujet '+task.number+' : '+task.title,
+  '',
+  'INDICATIONS DU PROGRAMME',
+  ...task.details,
+  '',
+  'MES NOTES ET RÉPONSES',
+  '[À compléter après consultation des références bibliques et des publications.]',
+  '',
+  'APPLICATION PERSONNELLE',
+  '[À compléter.]'
+ ];
+ $('draftTitle').textContent='Sujet '+task.number+' — '+task.title+' ('+fmt+')';
+ $('draftText').value=lines.join('\n');
+ $('draftPanel').hidden=false;
+ $('draftPanel').scrollIntoView({behavior:'smooth',block:'start'});
+ status('Brouillon modifiable créé à partir du programme. Aucun contenu inventé.');
+});
+$('closeDraft').addEventListener('click',()=>{$('draftPanel').hidden=true;$('subjects').scrollIntoView({behavior:'smooth',block:'start'})});
 $('all').addEventListener('click',()=>{document.querySelectorAll('#subjects input[type=checkbox]').forEach(x=>x.checked=true);updateSelected()});
 $('none').addEventListener('click',()=>{document.querySelectorAll('#subjects input[type=checkbox]').forEach(x=>x.checked=false);updateSelected()});
 })();
