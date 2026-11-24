@@ -1,0 +1,19 @@
+{
+  "id": "/aia-personnel/v09-test/",
+  "name": "AIA — Assistant IA (test)",
+  "short_name": "AIA Test",
+  "description": "Application personnelle AIA, version de test",
+  "start_url": "/aia-personnel/v09-test/index.html",
+  "scope": "/aia-personnel/v09-test/",
+  "display": "standalone",
+  "background_color": "#f3f5f7",
+  "theme_color": "#152031",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
