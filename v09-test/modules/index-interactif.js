@@ -12,11 +12,13 @@ function render(){
 tabs.querySelectorAll('button').forEach(b=>{let on=b.textContent===category;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
 letters.querySelectorAll('button').forEach(b=>{let on=b.textContent===letter;b.classList.toggle('selected',on);b.setAttribute('aria-pressed',String(on))});
 content.replaceChildren();const h=document.createElement('h3');h.textContent=category+(letter?' — '+letter:'');content.append(h);
-if(category!=='THÈMES'){const p=document.createElement('p');p.className='muted';p.textContent='Aucune fiche intégrée pour le moment.';content.append(p);return}
+if(category!=='THÈMES'){const p=document.createElement('p');p.className='muted';p.textContent='Aucune fiche intégrée pour le moment.';content.append(p);section.dispatchEvent(new CustomEvent('aia:index-render',{detail:{category,letter}}));return}
 const grid=document.createElement('div');grid.className='aia-index-grid';
-const items=topics.filter(t=>!letter||t.toLocaleUpperCase('fr-FR').startsWith(letter));
+const key=t=>t.replace(/^(?:La |Le |Les |L’|L')/i,'').toLocaleUpperCase('fr-FR');
+const items=topics.filter(t=>!letter||key(t).startsWith(letter));
 items.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='aia-index-tile';const pic=document.createElement('span');pic.className='aia-index-placeholder';pic.textContent='Illustration à venir';const name=document.createElement('strong');name.textContent=t;b.append(pic,name);b.onclick=()=>{content.replaceChildren();const title=document.createElement('h3');title.textContent=t;const p=document.createElement('p');p.className='muted';p.textContent='Fiche à préparer.';const back=document.createElement('button');back.textContent='Retour aux thèmes';back.onclick=render;content.append(title,p,back);section.dispatchEvent(new CustomEvent('aia:theme-open',{detail:{theme:t}}))};grid.append(b)});
 content.append(grid);if(!items.length){const p=document.createElement('p');p.textContent='Aucun thème pour cette lettre.';content.append(p)}
+section.dispatchEvent(new CustomEvent('aia:index-render',{detail:{category,letter}}));
 }
 ['TRACTS','FICHES','THÈMES'].forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>{category=t;letter='';render()};tabs.append(b)});
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{const b=document.createElement('button');b.type='button';b.textContent=l;b.onclick=()=>{letter=letter===l?'':l;render()};letters.append(b)});
