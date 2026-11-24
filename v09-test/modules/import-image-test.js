@@ -1,148 +1,225 @@
-/* AIA — galerie de fiches, V09-test uniquement.
-   Import d'images depuis les photos, classement par onglet/lettre,
-   association facultative à un thème, aperçu plein écran.
-   AUCUN stockage persistant, aucune transmission serveur. */
+/* AIA — Répertoire permanent (test) : IndexedDB, photos et classements.
+   Stockage local à cet appareil/navigateur. Drive reste sauvegarde externe. */
 (()=>{
 'use strict';
 const section=document.getElementById('indexPanel');
-const content=section?.querySelector('.aia-index-content');
-if(!section||!content)return;
+const area=section?.querySelector('.aia-index-content');
+if(!section||!area)return;
 const topics=['L’avenir','La famille','Dieu','La prière','Jésus','Le Royaume de Dieu','Les souffrances','La mort','La religion','Actualité'];
+const categories=['TRACTS','FICHES'];
 const allowed=new Set(['image/png','image/jpeg','image/webp']);
 const records=[];
-let destination=null,previousFocus=null;
+const dbName='aia-repertoire-v09-test';
+const storeName='fiches';
+let db=null,ready=false,request=null,focusBefore=null,replaceId=null;
 const picker=document.createElement('input');
-picker.type='file';picker.accept='image/png,image/jpeg,image/webp';picker.multiple=true;picker.hidden=true;
+picker.type='file';picker.accept='image/png,image/jpeg,image/webp';picker.hidden=true;picker.multiple=true;
 section.append(picker);
 const viewer=document.createElement('div');
-viewer.className='aia-photo-viewer';viewer.hidden=true;viewer.setAttribute('role','dialog');
-viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Fiche en grand');
+viewer.className='aia-photo-viewer';viewer.hidden=true;
+viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Image agrandie');
 const close=document.createElement('button');close.type='button';close.className='aia-photo-close';
-close.textContent='×';close.setAttribute('aria-label','Fermer la fiche');
-const image=document.createElement('img');image.alt='Fiche sélectionnée';
-viewer.append(close,image);document.body.append(viewer);
-function showPhoto(record){
- previousFocus=document.activeElement;
- image.src=record.url;image.alt='Fiche '+record.label;
+close.textContent='×';close.setAttribute('aria-label','Fermer');
+const large=document.createElement('img');large.alt='Fiche agrandie';
+viewer.append(close,large);document.body.append(viewer);
+function openImage(item){
+ focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
-function hidePhoto(){
- viewer.hidden=true;image.removeAttribute('src');document.body.style.overflow='';
- if(previousFocus?.isConnected)previousFocus.focus();
- previousFocus=null;
+function closeImage(){
+ viewer.hidden=true;large.removeAttribute('src');document.body.style.overflow='';
+ if(focusBefore?.isConnected)focusBefore.focus();
+ focusBefore=null;
 }
-close.addEventListener('click',hidePhoto);
-viewer.addEventListener('click',e=>{if(e.target===viewer)hidePhoto()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)hidePhoto()});
-function cleanLabel(name){
- return name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim()||'Fiche';
+close.onclick=closeImage;
+viewer.addEventListener('click',e=>{if(e.target===viewer)closeImage()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)closeImage()});
+function labelFrom(filename){return filename.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim()||'Fiche'}
+function refresh(){section.dispatchEvent(new Event('aia:refresh-index'))}
+function note(msg){const p=document.createElement('p');p.className='aia-gallery-count';p.textContent=msg;area.append(p)}
+function openDatabase(){
+ return new Promise((resolve,reject)=>{
+  if(!('indexedDB'in window)){reject(new Error('IndexedDB indisponible'));return}
+  const req=indexedDB.open(dbName,1);
+  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(storeName))req.result.createObjectStore(storeName,{keyPath:'id'})};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error||new Error('Ouverture impossible'));
+ });
 }
-function thumb(record){
- const button=document.createElement('button');button.type='button';button.className='aia-gallery-card';
- button.setAttribute('aria-label','Afficher '+record.label+' en grand');
- const img=document.createElement('img');img.src=record.url;img.alt='';
- const caption=document.createElement('span');caption.textContent=record.label;
- button.append(img,caption);button.onclick=()=>showPhoto(record);
+function operation(mode,perform){
+ return new Promise((resolve,reject)=>{
+  if(!db){reject(new Error('Stockage indisponible'));return}
+  const tx=db.transaction(storeName,mode);
+  const object=tx.objectStore(storeName);
+  let result;
+  try{result=perform(object)}catch(error){try{tx.abort()}catch(_){}reject(error);return}
+  if(result&&typeof result==='object'&&'onsuccess'in result){
+   result.onsuccess=()=>{result=result.result};
+  }
+  tx.oncomplete=()=>resolve(result);
+  tx.onerror=()=>reject(tx.error||new Error('Échec de stockage'));
+  tx.onabort=()=>reject(tx.error||new Error('Transaction annulée'));
+ });
+}
+function makeRecord(raw){return {...raw,url:URL.createObjectURL(raw.blob)}}
+function discard(item){if(item?.url)URL.revokeObjectURL(item.url)}
+async function save(item){
+ const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,placements:item.placements};
+ await operation('readwrite',store=>store.put(raw));
+ const index=records.findIndex(r=>r.id===item.id);
+ if(index>=0){discard(records[index]);records[index]=makeRecord(raw)}
+ else records.push(makeRecord(raw));
+ refresh();
+}
+async function removeEverywhere(item){
+ await operation('readwrite',store=>store.delete(item.id));
+ const index=records.findIndex(r=>r.id===item.id);
+ if(index>=0){discard(records[index]);records.splice(index,1)}
+ refresh();
+}
+async function removeHere(item,category,letter){
+ const remain=item.placements.filter(p=>!(p.category===category&&p.letter===letter));
+ if(!remain.length){await removeEverywhere(item);return}
+ await save({...item,placements:remain});
+}
+function controlled(btn,fn){
+ btn.addEventListener('click',async()=>{
+  if(btn.disabled)return;
+  btn.disabled=true;
+  try{await fn()}catch(error){alert('Modification impossible : '+(error?.message||'erreur de stockage'))}
+  finally{if(btn.isConnected)btn.disabled=false}
+ });
+ return btn;
+}
+function makeButton(text,cls){
+ const button=document.createElement('button');
+ button.type='button';button.textContent=text;button.className=cls||'aia-gallery-action';
  return button;
 }
-function gallery(matches){
+function choicesFor(item,category,letter){
+ const wrap=document.createElement('div');wrap.className='aia-gallery-item-actions';
+ const select=document.createElement('select');select.className='aia-gallery-select';
+ select.setAttribute('aria-label','Autre onglet');
+ for(const cat of categories){
+  const option=document.createElement('option');option.value=cat;option.textContent=cat;select.append(option)
+ }
+ select.value=category==='TRACTS'?'FICHES':'TRACTS';
+ const add=controlled(makeButton('Classer aussi dans cet onglet'),async()=>{
+  const dest={category:select.value,letter};
+  if(item.placements.some(p=>p.category===dest.category&&p.letter===dest.letter))return;
+  await save({...item,placements:[...item.placements,dest]});
+ });
+ const replace=makeButton('Remplacer l’image');
+ replace.addEventListener('click',()=>{
+  request=null;replaceId=item.id;picker.multiple=false;picker.click();
+ });
+ const here=controlled(makeButton('Retirer de '+category),async()=>{
+  if(!confirm('Retirer cette fiche de '+category+' sous '+letter+' ?'))return;
+  await removeHere(item,category,letter);
+ });
+ const everywhere=controlled(makeButton('Supprimer partout'),async()=>{
+  if(!confirm('Supprimer cette fiche de tous les onglets du Répertoire AIA ?'))return;
+  await removeEverywhere(item);
+ });
+ wrap.append(select,add,replace,here,everywhere);
+ return wrap;
+}
+function thumb(item){
+ const btn=makeButton('', 'aia-gallery-card');
+ btn.setAttribute('aria-label','Ouvrir '+item.label);
+ const image=document.createElement('img');image.src=item.url;image.alt='';
+ const title=document.createElement('span');title.textContent=item.label;
+ btn.append(image,title);btn.onclick=()=>openImage(item);return btn;
+}
+function gallery(items,category,letter){
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
- matches.forEach(item=>grid.append(thumb(item)));
+ for(const item of items){
+  const cell=document.createElement('div');cell.className='aia-gallery-cell';
+  cell.append(thumb(item));
+  if(category&&letter)cell.append(choicesFor(item,category,letter));
+  grid.append(cell);
+ }
  return grid;
 }
-function deleteRecord(item){
- const index=records.indexOf(item);
- if(index!==-1){records.splice(index,1);URL.revokeObjectURL(item.url)}
- section.dispatchEvent(new Event('aia:refresh-index'));
+function categoryView(category,letter){
+ if(!categories.includes(category)||!letter)return;
+ if(!ready){note('Ouverture du stockage…');return}
+ if(!db){note('Stockage indisponible sur ce navigateur.');return}
+ const wrap=document.createElement('div');wrap.className='aia-gallery-controls';
+ const topicLabel=document.createElement('label');topicLabel.className='aia-gallery-label';topicLabel.textContent='Thème associé (facultatif)';
+ const topic=document.createElement('select');topic.className='aia-gallery-select';
+ const blank=document.createElement('option');blank.value='';blank.textContent='Aucun thème';topic.append(blank);
+ for(const name of topics){const o=document.createElement('option');o.value=name;o.textContent=name;topic.append(o)}
+ topicLabel.append(topic);
+ const add=makeButton('Importer des images sous '+letter,'aia-import-button');
+ add.onclick=()=>{request={category,letter,topic:topic.value};replaceId=null;picker.multiple=true;picker.click()};
+ wrap.append(add,topicLabel);area.append(wrap);
+ const matches=records.filter(r=>r.placements.some(p=>p.category===category&&p.letter===letter));
+ area.querySelector('p.muted')?.remove();
+ note(matches.length+' fiche'+(matches.length===1?'':'s')+' enregistrée'+(matches.length===1?'':'s'));
+ if(matches.length)area.append(gallery(matches,category,letter));
 }
-function renderCategory(category,letter){
- if(!['TRACTS','FICHES'].includes(category))return;
- // Sélection explicite d'une lettre avant import.
- if(!letter)return;
- const selection=document.createElement('div');selection.className='aia-gallery-controls';
- const label=document.createElement('label');label.textContent='Thème associé (facultatif)';
- label.className='aia-gallery-label';
- const select=document.createElement('select');select.className='aia-gallery-select';
- const none=document.createElement('option');none.value='';none.textContent='Aucun thème';select.append(none);
- topics.forEach(topic=>{const option=document.createElement('option');option.value=topic;option.textContent=topic;select.append(option)});
- label.append(select);
- const add=document.createElement('button');add.type='button';add.className='aia-import-button';
- add.textContent='Importer des images sous '+letter;
- add.addEventListener('click',()=>{
-  destination={category,letter,topic:select.value};
-  picker.click();
- });
- selection.append(add,label);content.append(selection);
- const matches=records.filter(item=>item.category===category&&item.letter===letter);
- content.querySelector('p.muted')?.remove();
- if(matches.length){
-  const count=document.createElement('p');count.className='aia-gallery-count';
-  count.textContent=matches.length+' fiche'+(matches.length>1?'s':'');content.append(count);
-  content.append(gallery(matches));
-  const remove=document.createElement('button');remove.type='button';remove.className='aia-gallery-remove';
-  remove.textContent='Retirer une image (test)';
-  remove.addEventListener('click',()=>{
-   const list=content.querySelector('.aia-gallery-delete-list');
-   if(list){list.remove();return}
-   const ul=document.createElement('div');ul.className='aia-gallery-delete-list';
-   matches.forEach(item=>{
-    const btn=document.createElement('button');btn.type='button';btn.textContent='Retirer : '+item.label;
-    btn.addEventListener('click',()=>deleteRecord(item));ul.append(btn);
-   });
-   remove.after(ul);
-  });
-  content.append(remove);
- }
-}
-picker.addEventListener('change',()=>{
+picker.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
- const dest=destination;
  picker.value='';
- if(!dest||!files.length)return;
- let invalid=0;
+ if(!files.length)return;
+ const toReplace=replaceId;
+ const target=request;
+ replaceId=null;request=null;
+ if(!db){alert('Stockage indisponible.');return}
+ let invalid=0,errors=0,saved=0;
  for(const file of files){
   if(!allowed.has(file.type)||file.size>15*1024*1024){invalid++;continue}
-  records.push({
-   url:URL.createObjectURL(file),label:cleanLabel(file.name),
-   category:dest.category,letter:dest.letter,topic:dest.topic
-  });
+  try{
+   if(toReplace){
+    const current=records.find(r=>r.id===toReplace);
+    if(!current)throw new Error('Fiche introuvable');
+    await save({...current,blob:file,label:labelFrom(file.name)});
+   }else if(target){
+    const item={id:crypto.randomUUID(),blob:file,label:labelFrom(file.name),
+      topic:target.topic,placements:[{category:target.category,letter:target.letter}]};
+    await save(item);
+   }else return;
+   saved++;
+  }catch(error){errors++;console.error('AIA import : ',error)}
  }
- destination=null;
- section.dispatchEvent(new Event('aia:refresh-index'));
- if(invalid)alert(invalid+' fichier(s) ignoré(s) : PNG, JPG ou WEBP de 15 Mo maximum.');
+ if(errors||invalid)alert(saved+' fiche(s) enregistrée(s). '+invalid+' format(s) ignoré(s), '+errors+' erreur(s) de stockage.');
 });
 section.addEventListener('aia:index-render',e=>{
  const {category,letter}=e.detail||{};
  if(category==='THÈMES'){
-  // Chaque vignette de thème peut montrer une image liée.
-  for(const tile of content.querySelectorAll('.aia-index-tile')){
+  if(!ready)return;
+  for(const tile of area.querySelectorAll('.aia-index-tile')){
    const name=tile.querySelector('strong')?.textContent;
-   const item=records.find(record=>record.topic===name);
-   if(!item)continue;
+   const item=records.find(r=>r.topic===name);
    const pic=tile.querySelector('.aia-index-placeholder');
-   if(pic){
-    const img=document.createElement('img');img.src=item.url;img.alt='';
-    img.className='aia-family-thumb';pic.replaceWith(img);
-   }
+   if(item&&pic){const img=document.createElement('img');img.src=item.url;img.alt='';img.className='aia-family-thumb';pic.replaceWith(img)}
   }
   return;
  }
- renderCategory(category,letter);
+ categoryView(category,letter);
 });
 section.addEventListener('aia:theme-select',e=>{
- const topic=e.detail?.theme;
- if(!topic||!topics.includes(topic))return;
- const matches=records.filter(item=>item.topic===topic);
- if(!matches.length)return; // conserver l'écran vide prévu pour les thèmes non renseignés
- e.preventDefault();
- content.replaceChildren();
- const heading=document.createElement('h3');heading.textContent=topic;
- const back=document.createElement('button');back.type='button';back.className='aia-gallery-back';
- back.textContent='Retour aux thèmes';back.onclick=()=>section.dispatchEvent(new Event('aia:refresh-index'));
- content.append(heading,back,gallery(matches));
+ const theme=e.detail?.theme;
+ if(!topics.includes(theme))return;
+ const matches=records.filter(r=>r.topic===theme);
+ if(!matches.length)return;
+ e.preventDefault();area.replaceChildren();
+ const heading=document.createElement('h3');heading.textContent=theme;
+ const back=makeButton('Retour aux thèmes','aia-gallery-back');
+ back.onclick=refresh;area.append(heading,back,gallery(matches));
 });
 window.addEventListener('pagehide',()=>{
- hidePhoto();
- records.forEach(item=>URL.revokeObjectURL(item.url));
+ closeImage();records.forEach(discard);db?.close();
 },{once:true});
+(async()=>{
+ try{
+  db=await openDatabase();
+  const stored=await operation('readonly',store=>store.getAll());
+  for(const raw of stored){
+   if(raw&&raw.blob instanceof Blob&&Array.isArray(raw.placements))records.push(makeRecord(raw));
+  }
+ }catch(error){console.error('AIA IndexedDB : ',error);db=null}
+ finally{ready=true;refresh()}
+})();
 })();
