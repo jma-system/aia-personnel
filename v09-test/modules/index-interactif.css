@@ -224,3 +224,8 @@
 
 /* AIA v24 : bouton visible de diagnostic pour le lien biblique Famille */
 .aia-photo-frame>.aia-verse-hotspot{left:50%;top:auto;bottom:4%;transform:translateX(-50%);width:max-content;max-width:92%;height:auto;min-height:48px;padding:12px 16px;border-radius:10px;background:#fff;color:#164f86;border:2px solid #164f86;text-align:center;text-decoration:none;font:bold 14px Arial,sans-serif;box-shadow:0 3px 14px #0008}
+
+/* v26: zone tactile transparente sur la référence imprimée Éphésiens 5:28, 33.
+   Coordonnées relatives à l'image originale de la fiche Famille. */
+.aia-photo-frame>.aia-verse-hotspot{left:53%;top:37.2%;bottom:auto;transform:none;width:40%;max-width:none;height:4.4%;min-height:0;padding:0;border:0;border-radius:3px;background:transparent;color:transparent;box-shadow:none;font-size:0;display:block}
+.aia-photo-frame>.aia-verse-hotspot:focus-visible{outline:2px solid #ffdb43;background:rgba(255,219,67,.12)}
