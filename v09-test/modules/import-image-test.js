@@ -23,8 +23,17 @@ viewer.className='aia-photo-viewer';viewer.hidden=true;
 viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Image agrandie');
 const close=document.createElement('button');close.type='button';close.className='aia-photo-close';
 close.textContent='×';close.setAttribute('aria-label','Fermer');
+const imageFrame=document.createElement('div');imageFrame.className='aia-photo-frame';
 const large=document.createElement('img');large.alt='Fiche agrandie';
-viewer.append(close,large);document.body.append(viewer);
+const verseLink=document.createElement('a');
+verseLink.className='aia-verse-hotspot';
+verseLink.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/';
+verseLink.target='_blank';verseLink.rel='noopener noreferrer';
+verseLink.textContent='';verseLink.setAttribute('aria-label','Lire Éphésiens 5:28 et 33 sur JW.org');
+verseLink.title='Éphésiens 5:28, 33 — ouvrir la Traduction du monde nouveau';
+verseLink.hidden=true;
+imageFrame.append(large,verseLink);
+viewer.append(close,imageFrame);document.body.append(viewer);
 // Bloquer uniquement le menu contextuel natif sur les images du Répertoire.
 // Les clics courts, la sélection multiple et les boutons restent opérationnels.
 function preventImageContextMenu(event){
@@ -37,6 +46,9 @@ viewer.addEventListener('contextmenu',preventImageContextMenu);
 large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
+ // Premier test : zone tactile sur Éphésiens 5:28, 33 de la fiche Famille.
+ // Les autres images ne présentent aucune zone cliquable.
+ verseLink.hidden=!(item.topic==='La famille'||item.subtheme==='Famille');
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
