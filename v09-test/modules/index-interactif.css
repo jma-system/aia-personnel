@@ -145,3 +145,40 @@
 #indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count{min-width:0;font-size:12px;font-weight:600;text-align:center}
 #indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count:empty{display:none}
 #indexPanel .aia-repertoire-toolbar .aia-gallery-batch-trash{height:44px;width:40px;min-width:40px}
+
+/* V20 : une seule ligne dans chaque galerie, y compris lorsqu'elle est vide */
+#indexPanel .aia-repertoire-toolbar{
+ display:flex;align-items:center;flex-wrap:nowrap;gap:6px;width:100%;
+ margin:0 0 10px;min-width:0;
+}
+#indexPanel .aia-repertoire-toolbar>.aia-import-button{
+ width:auto!important;flex:1 1 auto;min-width:0;min-height:44px;
+ padding:8px 6px!important;font-size:14px!important;line-height:1.15;
+ white-space:nowrap;overflow:hidden;
+}
+#indexPanel .aia-repertoire-toolbar>.aia-gallery-selection-bar{
+ display:flex!important;position:relative;align-items:center;gap:6px;
+ flex:0 0 auto;min-width:0;margin:0!important;
+}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-choose{
+ display:flex;align-items:center;justify-content:center;
+ flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;
+ padding:0!important;font-size:19px!important;line-height:1;
+ border:1px solid #9fb9d6;border-radius:9px;background:#fff!important;color:#17365e!important;
+}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-choose[aria-pressed="true"]{
+ background:#216cb8!important;color:#fff!important;border-color:#216cb8!important;
+}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-batch-trash{
+ display:flex;align-items:center;justify-content:center;
+ flex:0 0 44px;width:44px;min-width:44px;height:44px;min-height:44px;
+ border:1px solid #9fb9d6;border-radius:9px;padding:0!important;background:#fff!important;
+}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count{
+ position:absolute;top:-8px;left:31px;z-index:2;pointer-events:none;
+ display:flex;align-items:center;justify-content:center;
+ min-width:18px;height:18px;padding:0 3px;
+ border-radius:12px;background:#216cb8;color:white!important;font-size:11px;
+}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count:empty{display:none!important}
+#indexPanel .aia-repertoire-toolbar + .aia-gallery-list{margin-top:0}
