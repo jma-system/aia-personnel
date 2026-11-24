@@ -173,9 +173,9 @@ function categoryView(category,letter){
  create.onclick=async()=>{
   const candidate=prompt('Nom du nouveau sous-thème sous F :');
   if(candidate===null)return;
-  const name=candidate.trim().replace(/\\s+/g,' ').slice(0,45);
+  const name=candidate.trim().replace(/\s+/g,' ').slice(0,45);
   if(!name){alert('Saisis un nom de sous-thème.');return}
-  if(!/^F/i.test(name.normalize('NFD').replace(/[\\u0300-\\u036f]/g,''))){
+  if(!/^F/i.test(name.normalize('NFD').replace(/[\u0300-\u036f]/g,''))){
    alert('Pour la lettre F, choisis un sous-thème commençant par F.');return;
   }
   const current=unique.find(n=>n.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
