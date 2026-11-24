@@ -25,14 +25,21 @@ const close=document.createElement('button');close.type='button';close.className
 close.textContent='×';close.setAttribute('aria-label','Fermer');
 const imageFrame=document.createElement('div');imageFrame.className='aia-photo-frame';
 const large=document.createElement('img');large.alt='Fiche agrandie';
-const verseLink=document.createElement('a');
-verseLink.className='aia-verse-hotspot';
-verseLink.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028';
-verseLink.target='_blank';verseLink.rel='noopener noreferrer';
-verseLink.textContent='';verseLink.setAttribute('aria-label','Lire Éphésiens 5:28 sur JW.org');
-verseLink.title='Éphésiens 5:28 — ouvrir la Traduction du monde nouveau';
-verseLink.hidden=true;
-imageFrame.append(large,verseLink);
+// Les liens sont des zones transparentes placées exactement sur les textes bleus.
+const familyVerseLinks=[
+ {name:'Éphésiens 5:28, 33',verse:'Éphésiens 5:28',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028',pos:'eph'},
+ {name:'Colossiens 3:18-21',verse:'Colossiens 3:18',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Colossiens/3/#v51003018',pos:'col'},
+ {name:'Psaume 128:1-3',verse:'Psaume 128:1',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/128/#v19128001',pos:'ps'}
+].map(entry=>{
+ const link=document.createElement('a');
+ link.className='aia-verse-hotspot aia-verse-'+entry.pos;
+ link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';
+ link.setAttribute('aria-label','Lire '+entry.verse+' sur JW.org');
+ link.title=entry.name+' — ouvrir la Traduction du monde nouveau';
+ link.hidden=true;
+ return link;
+});
+imageFrame.append(large,...familyVerseLinks);
 viewer.append(close,imageFrame);document.body.append(viewer);
 // Bloquer uniquement le menu contextuel natif sur les images du Répertoire.
 // Les clics courts, la sélection multiple et les boutons restent opérationnels.
@@ -46,9 +53,10 @@ viewer.addEventListener('contextmenu',preventImageContextMenu);
 large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
- // Premier test : zone tactile sur Éphésiens 5:28, 33 de la fiche Famille.
- // Les autres images ne présentent aucune zone cliquable.
- verseLink.hidden=!(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
+ // Ne montrer les liens que sur la fiche illustrée « La famille peut-elle être heureuse ? ».
+ // Cette reconnaissance provisoire concerne uniquement le test personnel Famille.
+ const isFamily=(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
+ familyVerseLinks.forEach(link=>{link.hidden=!isFamily});
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
