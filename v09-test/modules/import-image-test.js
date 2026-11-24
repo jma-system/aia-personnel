@@ -162,7 +162,12 @@ function openImage(item){
  const isFamily=(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
  familyVerseLinks.forEach(link=>{link.hidden=!isFamily});
  // Les deux emplacements (THÈMES/Prière et TRACTS/P/Prière) utilisent la même fiche.
- const isPrayer=item.topic==='La prière'||item.subtheme==='Prière';
+ const isPrayer=item.topic==='La prière'||item.subtheme==='Prière'||
+  activeTheme==='La prière'||
+  (item.placements.some(p=>p.category==='TRACTS'&&p.letter==='P')&&
+   selectedSubtheme.get('TRACTS|P')==='Prière')||
+  (item.placements.some(p=>p.category==='FICHES'&&p.letter==='P')&&
+   selectedSubtheme.get('FICHES|P')==='Prière');
  prayerVerseLinks.forEach(link=>{link.hidden=!isPrayer});
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
