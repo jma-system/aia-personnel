@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIA — Test accès CVM</title>
+<style>body{font:16px/1.5 system-ui,Arial;max-width:640px;margin:auto;padding:20px;color:#172234}button{padding:12px 18px;border-radius:9px;background:#213b5b;color:white;border:0}li{padding:5px 0}#status{white-space:pre-wrap;background:#f2f4f7;padding:12px;border-radius:8px}a{color:#234e7b}</style></head><body>
+<h1>AIA — Test technique CVM</h1><p>23–29 novembre 2026. Ce test vérifie si le navigateur peut lire directement le programme public depuis JW.org. Il n'enregistre aucune donnée.</p>
+<p><button id="test">Tester l'accès direct</button></p><p id="status" role="status">Test non lancé.</p><ol id="subjects"></ol>
+<p><a href="https://www.jw.org/fr/biblioth%C3%A8que/reunion-tj-cahier/mwb-novembre-decembre-2026/Programme-pour-la-r%C3%A9union-Vie-et-minist%C3%A8re-du-23-au-29-novembre-2026/" target="_blank" rel="noopener noreferrer">Ouvrir le programme officiel</a></p>
+<script>
+'use strict';
+const url='https://www.jw.org/fr/biblioth%C3%A8que/reunion-tj-cahier/mwb-novembre-decembre-2026/Programme-pour-la-r%C3%A9union-Vie-et-minist%C3%A8re-du-23-au-29-novembre-2026/';
+document.getElementById('test').onclick=async()=>{
+ const btn=document.getElementById('test'),status=document.getElementById('status'),list=document.getElementById('subjects');
+ btn.disabled=true;list.replaceChildren();status.textContent='Connexion en cours…';
+ try{
+  const response=await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store'});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const html=await response.text();
+  const doc=new DOMParser().parseFromString(html,'text/html');
+  const titles=Array.from(doc.querySelectorAll('h3')).map(h=>h.textContent.trim()).filter(s=>/^([1-8])\.\s/.test(s));
+  status.textContent=titles.length===8?'SUCCÈS : 8 sujets extraits depuis le navigateur.':'Réponse reçue, mais '+titles.length+' sujet(s) détecté(s) sur 8. Structure à vérifier.';
+  titles.forEach(t=>{const li=document.createElement('li');li.textContent=t;list.append(li)});
+ }catch(e){
+  status.textContent='ÉCHEC de lecture directe : '+(e?.message||'erreur inconnue')+'. Cela peut venir des restrictions CORS du navigateur ou du serveur. Le lien officiel reste accessible dans un onglet séparé.';
+ }finally{btn.disabled=false}
+};
+</script></body></html>
