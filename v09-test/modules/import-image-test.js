@@ -122,11 +122,19 @@ function gallery(items){
  }
  return grid;
 }
-// F : sous-thèmes filtrés, défilables horizontalement.
-function existingSubtheme(item){
+// Sous-thèmes horizontaux pour chaque lettre de A à Z.
+function normalized(text){
+ return text.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleUpperCase('fr-FR');
+}
+function startsWithLetter(text,letter){
+ return normalized(text).startsWith(letter);
+}
+function existingSubtheme(item,letter){
  if(item.subtheme)return item.subtheme;
- if(item.topic==='La famille')return 'Famille';
- if(item.topic==='Foi')return 'Foi';
+ if(item.topic){
+  const short=item.topic.replace(/^(?:La |Le |Les |L’|L')/i,'');
+  if(startsWithLetter(short,letter))return short;
+ }
  return 'Autres';
 }
 function isUnder(item,category,letter){
@@ -136,70 +144,75 @@ function categoryView(category,letter){
  if(!categories.includes(category)||!letter)return;
  if(!ready){note('Ouverture du stockage…');return}
  if(!db){note('Stockage indisponible sur ce navigateur.');return}
- const wrap=document.createElement('div');wrap.className='aia-gallery-controls';
- // L'interface habituelle demeure hors de la lettre F.
- if(letter!=='F'){
-  const label=document.createElement('label');label.className='aia-gallery-label';label.textContent='Thème associé (facultatif)';
-  const select=document.createElement('select');select.className='aia-gallery-select';
-  const none=document.createElement('option');none.value='';none.textContent='Aucun thème';select.append(none);
-  topics.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option)});
-  label.append(select);
-  const add=makeButton('Importer des images sous '+letter,'aia-import-button');
-  add.onclick=()=>{request={category,letter,topic:select.value,subtheme:''};replaceId=null;picker.multiple=true;picker.click()};
-  wrap.append(add,label);area.append(wrap);
-  const matches=records.filter(item=>isUnder(item,category,letter));
-  area.querySelector('p.muted')?.remove();
-  note(matches.length+' fiche'+(matches.length===1?'':'s')+' enregistrée'+(matches.length===1?'':'s'));
-  if(matches.length)area.append(gallery(matches));
-  return;
+ const key=category+'|'+letter;
+ const items=records.filter(item=>isUnder(item,category,letter));
+ // Initialiser F avec les sous-thèmes déjà validés. Sur les autres lettres,
+ // les noms sont créés par l'utilisateur ou issus des fiches existantes.
+ const names=letter==='F'?['Famille','Foi']:[];
+ for(const entry of customSubthemes){
+  if(entry.category===category&&entry.letter===letter)names.push(entry.name);
  }
- const key=category+'|F';
- const items=records.filter(item=>isUnder(item,category,'F'));
- const names=['Famille','Foi',...customSubthemes.filter(t=>t.category===category&&t.letter==='F').map(t=>t.name)];
- if(items.some(item=>existingSubtheme(item)==='Autres'))names.push('Autres');
+ for(const item of items)names.push(existingSubtheme(item,letter));
  const unique=[...new Set(names)];
- const selected=unique.includes(selectedSubtheme.get(key))?selectedSubtheme.get(key):'Famille';
+ const selected=unique.includes(selectedSubtheme.get(key))
+  ?selectedSubtheme.get(key):(unique[0]||'');
  selectedSubtheme.set(key,selected);
- const bar=document.createElement('div');bar.className='aia-subtheme-strip';bar.setAttribute('aria-label','Sous-thèmes sous F');
+ const wrap=document.createElement('div');wrap.className='aia-gallery-controls';
+ const bar=document.createElement('div');
+ bar.className='aia-subtheme-strip';
+ bar.setAttribute('aria-label','Sous-thèmes sous '+letter);
  for(const name of unique){
   const button=makeButton(name,'aia-subtheme-tab');
-  const isActive=name===selected;
-  button.classList.toggle('selected',isActive);
-  button.setAttribute('aria-pressed',String(isActive));
+  const active=name===selected;
+  button.classList.toggle('selected',active);
+  button.setAttribute('aria-pressed',String(active));
   button.onclick=()=>{selectedSubtheme.set(key,name);refresh()};
   bar.append(button);
  }
  const create=makeButton('+ Ajouter','aia-subtheme-add');
  create.onclick=async()=>{
-  const candidate=prompt('Nom du nouveau sous-thème sous F :');
-  if(candidate===null)return;
-  const name=candidate.trim().replace(/\s+/g,' ').slice(0,45);
+  const response=prompt('Nouveau sous-thème sous '+letter+' :');
+  if(response===null)return;
+  const name=response.trim().replace(/\s+/g,' ').slice(0,45);
   if(!name){alert('Saisis un nom de sous-thème.');return}
-  if(!/^F/i.test(name.normalize('NFD').replace(/[\u0300-\u036f]/g,''))){
-   alert('Pour la lettre F, choisis un sous-thème commençant par F.');return;
+  if(!startsWithLetter(name,letter)){
+   alert('Choisis un sous-thème commençant par la lettre '+letter+'.');return;
   }
-  const current=unique.find(n=>n.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
+  const current=unique.find(x=>normalized(x)===normalized(name));
   if(current){selectedSubtheme.set(key,current);refresh();return}
-  const value={id:category+'|F|'+name.toLocaleLowerCase('fr'),category,letter:'F',name};
+  const entry={id:category+'|'+letter+'|'+normalized(name),category,letter,name};
   try{
-   await operation('readwrite',store=>store.put(value),extraStore);
-   customSubthemes.push(value);selectedSubtheme.set(key,name);refresh();
-  }catch(error){alert('Impossible d’enregistrer ce sous-thème : '+(error?.message||'erreur'))}
+   await operation('readwrite',store=>store.put(entry),extraStore);
+   customSubthemes.push(entry);
+   selectedSubtheme.set(key,name);
+   refresh();
+  }catch(error){alert('Enregistrement impossible : '+(error?.message||'erreur'))}
  };
  bar.append(create);wrap.append(bar);
- const title=document.createElement('p');title.className='aia-subtheme-heading';title.textContent=selected;
- wrap.append(title);
- const add=makeButton('Importer des images — '+selected,'aia-import-button');
- add.onclick=()=>{
-  const topic=selected==='Famille'?'La famille':selected==='Foi'?'':topics.includes(selected)?selected:'';
-  request={category,letter:'F',topic,subtheme:selected};
-  replaceId=null;picker.multiple=true;picker.click();
- };
- wrap.append(add);area.append(wrap);
+ if(selected){
+  const title=document.createElement('p');
+  title.className='aia-subtheme-heading';title.textContent=selected;
+  wrap.append(title);
+  const add=makeButton('Importer des images — '+selected,'aia-import-button');
+  add.onclick=()=>{
+   const topic=selected==='Famille'?'La famille'
+    :topics.find(t=>normalized(t.replace(/^(?:La |Le |Les |L’|L')/i,''))===normalized(selected))||'';
+   request={category,letter,topic,subtheme:selected};
+   replaceId=null;picker.multiple=true;picker.click();
+  };
+  wrap.append(add);
+ }else{
+  const info=document.createElement('p');info.className='muted';
+  info.textContent='Appuie sur + Ajouter pour créer ton premier sous-thème sous '+letter+'.';
+  wrap.append(info);
+ }
+ area.append(wrap);
  area.querySelector('p.muted')?.remove();
- const matching=items.filter(item=>existingSubtheme(item)===selected);
- note(matching.length+' fiche'+(matching.length===1?'':'s')+' dans '+selected);
- if(matching.length)area.append(gallery(matching));
+ if(selected){
+  const matches=items.filter(item=>existingSubtheme(item,letter)===selected);
+  note(matches.length+' fiche'+(matches.length===1?'':'s')+' dans '+selected);
+  if(matches.length)area.append(gallery(matches));
+ }
 }
 picker.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
