@@ -24,12 +24,15 @@
  const workflow=home.querySelector('.aia-workflow');
  const quick=home.querySelector('.aia-search-panel');
  if(workflow)workflow.before(section);else if(quick)quick.before(section);else home.append(section);
- const oldTrigger=[...home.querySelectorAll('button')].find(b=>b.textContent.trim()==='Programme CVM · choisir les sujets');
+ const oldTrigger=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Programme CVM · choisir les sujets');
+ // L'ancien bouton CVM se trouve hors de #home, juste après la rangée des publications.
+ // Le masquer avant toute interaction évite l'ouverture du dialogue obsolète.
+ if(oldTrigger)oldTrigger.hidden=true;
  function sync(){
   const active=cvm.classList.contains('selected');
   section.hidden=!active;
   if(workflow)workflow.style.display=active?'none':'';
-  if(oldTrigger)oldTrigger.style.display='none';
+  if(oldTrigger){oldTrigger.hidden=true;oldTrigger.style.display='none';}
  }
  cvm.addEventListener('click',()=>queueMicrotask(sync));
  tg.addEventListener('click',()=>queueMicrotask(sync));
