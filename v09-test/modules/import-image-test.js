@@ -27,9 +27,9 @@ const imageFrame=document.createElement('div');imageFrame.className='aia-photo-f
 const large=document.createElement('img');large.alt='Fiche agrandie';
 const verseLink=document.createElement('a');
 verseLink.className='aia-verse-hotspot';
-verseLink.href='https://www.jw.org/finder?srcid=jwlshare&wtlocale=F&prefer=lang&bible=49005028&pub=nwt';
+verseLink.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028';
 verseLink.target='_blank';verseLink.rel='noopener noreferrer';
-verseLink.textContent='Lire Éphésiens 5:28 sur JW.org';verseLink.setAttribute('aria-label','Lire Éphésiens 5:28 sur JW.org');
+verseLink.textContent='';verseLink.setAttribute('aria-label','Lire Éphésiens 5:28 sur JW.org');
 verseLink.title='Éphésiens 5:28 — ouvrir la Traduction du monde nouveau';
 verseLink.hidden=true;
 imageFrame.append(large,verseLink);
