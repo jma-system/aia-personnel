@@ -80,3 +80,10 @@
 #indexPanel .aia-gallery-item-actions>button,#indexPanel .aia-gallery-item-actions>select{width:100%;margin:4px 0;min-height:40px;font-size:12px}
 #indexPanel .aia-gallery-item-actions>button{background:#edf5ff;color:#17365e;border:1px solid #a9c3dc;border-radius:8px}
 #indexPanel .aia-gallery-item-actions>button:disabled{opacity:.5}
+
+/* Barre de sous-thèmes F : glissement horizontal tactile */
+#indexPanel .aia-subtheme-strip{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;padding:4px 1px 9px;max-width:100%}
+#indexPanel .aia-subtheme-strip button{flex:0 0 auto;min-height:44px;padding:8px 15px;white-space:nowrap;border:1px solid #9fb9d6;border-radius:999px;background:#fff!important;color:#204975!important;font-weight:600;font-size:14px;scroll-snap-align:start}
+#indexPanel .aia-subtheme-strip button.selected{background:#216cb8!important;color:#fff!important;border-color:#216cb8!important}
+#indexPanel .aia-subtheme-strip .aia-subtheme-add{border-style:dashed!important}
+#indexPanel .aia-subtheme-heading{font-size:17px;font-weight:700;color:#163b6a;margin:2px 0 0}
