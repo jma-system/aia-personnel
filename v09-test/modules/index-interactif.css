@@ -242,11 +242,3 @@
 .aia-photo-frame>.aia-verse-col{left:53%;top:56.4%}
 .aia-photo-frame>.aia-verse-ps{left:53%;top:75.2%}
 .aia-photo-frame>.aia-verse-hotspot:focus-visible{outline:2px solid #ffd43b;background:rgba(255,212,59,.12)}
-
-/* AIA v28 — repère de diagnostic visible UNIQUEMENT sur Colossiens. */
-.aia-photo-frame>.aia-verse-col{
- left:51%;top:55.7%;width:45%;height:6%;
- background:rgba(255,210,0,.30)!important;
- outline:2px solid #ffb000!important;
- border-radius:4px;
-}
