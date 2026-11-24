@@ -131,3 +131,17 @@
 .aia-photo-viewer:fullscreen .aia-photo-close{top:12px;right:12px}
 /* Contrôles de sélection alignés à droite, sous les onglets sans titre répété */
 #indexPanel .aia-gallery-list>.aia-gallery-selection-bar{justify-content:flex-end}
+
+/* Navigation Répertoire : seuls les onglets et Accueil sont utiles.
+   Les flèches globales gardent leur rôle dans les autres écrans AIA. */
+#indexPanel .aia-navigation [data-aia-prev],
+#indexPanel .aia-navigation [data-aia-next]{display:none!important}
+
+/* Barre compacte : Importer + Sélectionner + compteur bref + corbeille */
+#indexPanel .aia-repertoire-toolbar{display:flex;align-items:center;gap:5px;width:100%;min-width:0}
+#indexPanel .aia-repertoire-toolbar .aia-import-button{flex:1 1 0;width:auto;min-width:0;min-height:44px;padding:7px 5px;font-size:13px;white-space:nowrap}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-selection-bar{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex:0 0 auto}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-choose{min-height:44px;padding:6px 7px;font-size:12px;white-space:nowrap}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count{min-width:0;font-size:12px;font-weight:600;text-align:center}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-selected-count:empty{display:none}
+#indexPanel .aia-repertoire-toolbar .aia-gallery-batch-trash{height:44px;width:40px;min-width:40px}
