@@ -96,35 +96,6 @@ function makeButton(text,cls){
  button.type='button';button.textContent=text;button.className=cls||'aia-gallery-action';
  return button;
 }
-function choicesFor(item,category,letter){
- const wrap=document.createElement('details');wrap.className='aia-gallery-item-actions';
- const summary=document.createElement('summary');summary.textContent='Gérer cette fiche';wrap.append(summary);
- const select=document.createElement('select');select.className='aia-gallery-select';
- select.setAttribute('aria-label','Autre onglet');
- for(const cat of categories){
-  const option=document.createElement('option');option.value=cat;option.textContent=cat;select.append(option)
- }
- select.value=category==='TRACTS'?'FICHES':'TRACTS';
- const add=controlled(makeButton('Classer aussi dans cet onglet'),async()=>{
-  const dest={category:select.value,letter};
-  if(item.placements.some(p=>p.category===dest.category&&p.letter===dest.letter))return;
-  await save({...item,placements:[...item.placements,dest]});
- });
- const replace=makeButton('Remplacer l’image');
- replace.addEventListener('click',()=>{
-  request=null;replaceId=item.id;picker.multiple=false;picker.click();
- });
- const here=controlled(makeButton('Retirer de '+category),async()=>{
-  if(!confirm('Retirer cette fiche de '+category+' sous '+letter+' ?'))return;
-  await removeHere(item,category,letter);
- });
- const everywhere=controlled(makeButton('Supprimer partout'),async()=>{
-  if(!confirm('Supprimer cette fiche de tous les onglets du Répertoire AIA ?'))return;
-  await removeEverywhere(item);
- });
- wrap.append(select,add,replace,here,everywhere);
- return wrap;
-}
 function thumb(item){
  const btn=makeButton('', 'aia-gallery-card');
  btn.setAttribute('aria-label','Ouvrir '+item.label);
@@ -132,26 +103,11 @@ function thumb(item){
  const title=document.createElement('span');title.textContent=item.label;
  btn.append(image,title);btn.onclick=()=>openImage(item);return btn;
 }
-function gallery(items,category,letter,theme){
+function gallery(items){
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
  for(const item of items){
   const cell=document.createElement('div');cell.className='aia-gallery-cell';
   cell.append(thumb(item));
-  if(category&&letter)cell.append(choicesFor(item,category,letter));
-  if(theme){
-   const details=document.createElement('details');details.className='aia-gallery-item-actions';
-   const summary=document.createElement('summary');summary.textContent='Gérer cette fiche';details.append(summary);
-   const unlink=controlled(makeButton('Retirer du thème'),async()=>{
-    if(!confirm('Retirer cette fiche du thème '+theme+' ?'))return;
-    await save({...item,topic:''});
-   });
-   const replace=makeButton('Remplacer l’image');replace.onclick=()=>{request=null;replaceId=item.id;picker.multiple=false;picker.click()};
-   const all=controlled(makeButton('Supprimer partout'),async()=>{
-    if(!confirm('Supprimer cette fiche de tous les onglets ?'))return;
-    await removeEverywhere(item);
-   });
-   details.append(unlink,replace,all);cell.append(details);
-  }
   grid.append(cell);
  }
  return grid;
@@ -172,7 +128,7 @@ function categoryView(category,letter){
  const matches=records.filter(r=>r.placements.some(p=>p.category===category&&p.letter===letter));
  area.querySelector('p.muted')?.remove();
  note(matches.length+' fiche'+(matches.length===1?'':'s')+' enregistrée'+(matches.length===1?'':'s'));
- if(matches.length)area.append(gallery(matches,category,letter));
+ if(matches.length)area.append(gallery(matches));
 }
 picker.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
@@ -222,7 +178,7 @@ section.addEventListener('aia:theme-select',e=>{
  e.preventDefault();area.replaceChildren();
  const heading=document.createElement('h3');heading.textContent=theme;
  const back=makeButton('Retour aux thèmes','aia-gallery-back');
- back.onclick=refresh;area.append(heading,back,gallery(matches,null,null,theme));
+ back.onclick=refresh;area.append(heading,back,gallery(matches));
 });
 window.addEventListener('pagehide',()=>{
  closeImage();records.forEach(discard);db?.close();
