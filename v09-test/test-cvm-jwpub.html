@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIA Test — Programme CVM JWPUB</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#172d44;background:#f3f6fa}
+*{box-sizing:border-box}
+body{margin:0}
+main{max-width:760px;margin:auto;padding:16px 14px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:22px;line-height:1.25;margin:12px 0}h2{font-size:18px;margin:0 0 9px}h3{font-size:16px;margin:0}
+a{color:#135b92}
+.panel,.subject{background:#fff;border:1px solid #c9d9e8;border-radius:12px;padding:14px;margin:12px 0}
+.desc{color:#53657a;font-size:13px;line-height:1.5}
+label{display:block;margin:8px 0}
+input[type=file]{width:100%;padding:9px;background:white;border:1px dashed #92abc3;border-radius:8px}
+button{background:#17639a;border:0;border-radius:8px;color:white;font-size:15px;padding:11px 14px;min-height:44px}
+button:disabled{opacity:.55}
+select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-radius:8px;font-size:15px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.subject-title{display:flex;align-items:flex-start;gap:10px}
+.subject-title input{width:21px;height:21px;flex:0 0 21px;margin:0}
+.subject-title span{line-height:1.35;font-weight:700}
+.format{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px}
+.format select{width:auto;max-width:100%;flex:1}
+.details{margin:12px 0 0;border-top:1px solid #e8edf2;padding-top:10px}
+.details summary{font-size:14px;color:#225781;cursor:pointer}
+.details p{font-size:14px;line-height:1.5;margin:9px 0;color:#2c4256;white-space:pre-wrap}
+.section-title{font-weight:bold;font-size:15px;margin:17px 0 5px;border-left:4px solid #5989b3;padding:7px 10px;background:#eaf1f7;border-radius:4px}
+.muted{font-size:13px;color:#596b7e;line-height:1.55}
+#status{font-size:14px;line-height:1.5}
+.error{color:#ad2b2b}.ok{color:#166b42}
+#result[hidden],#summaryBox[hidden]{display:none!important}
+#summaryBox{margin-top:8px;background:#eef6ff;border:1px solid #bfd6e9;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.5}
+.small{font-size:12px;color:#65788a}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><h1>AIA — Test CVM JWPUB</h1><a href="./index.html">AIA Test</a></div>
+<p class="desc">Test privé sur ton téléphone. Le programme est lu localement depuis ton fichier JWPUB. Aucun contenu CVM n’est envoyé à GitHub ni enregistré dans AIA. Une connexion Internet est nécessaire pour charger les outils de lecture.</p>
+<div class="panel">
+<label for="file"><strong>1. Choisir le fichier CVM</strong></label>
+<input id="file" type="file" accept=".jwpub,.zip,application/zip,application/octet-stream">
+<p><button id="load" type="button">Lire le programme CVM</button></p>
+<p id="status" role="status">Prêt pour l’importation.</p>
+</div>
+<div id="result" hidden>
+<div class="panel">
+<h2>2. Choisir une semaine</h2>
+<label for="week" class="small">Semaines trouvées dans ton fichier :</label>
+<select id="week"></select>
+<p id="weekInfo" class="muted"></p>
+<div class="row"><button id="all" type="button">Tout sélectionner</button><button id="none" type="button">Tout désélectionner</button></div>
+<p class="muted">Chaque sujet peut être sélectionné indépendamment et recevoir son propre format. Ce test ne génère pas encore de fiches.</p>
+<div id="summaryBox" aria-live="polite"></div>
+</div>
+<div id="subjects"></div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"></script>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const mask='11cbb5587e32846d4c26790c633da289f66fe5842a3a585ce1bc3a294af5ada7';
+let database=null,key=null,iv=null,weeks=[];
+const txt=e=>e?.textContent?.replace(/\s+/g,' ').trim()||'';
+function status(message,isError=false){$('status').textContent=message;$('status').className=isError?'error':'ok'}
+function query(sql){const q=database.prepare(sql),rows=[];try{while(q.step())rows.push(q.getAsObject())}finally{q.free()}return rows}
+async function decode(blob){
+ const source=blob instanceof Uint8Array?blob:new Uint8Array(blob);
+ const data=await crypto.subtle.decrypt({name:'AES-CBC',iv},key,source);
+ if(!('DecompressionStream' in window))throw Error('Ce navigateur ne prend pas en charge la décompression de ce fichier.');
+ const stream=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate'));
+ return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+}
+function prettyDate(n){
+ const t=String(n);if(!/^\d{8}$/.test(t))return t;
+ return t.slice(6,8)+'/'+t.slice(4,6)+'/'+t.slice(0,4);
+}
+async function openJwpub(file){
+ if(typeof JSZip==='undefined'||typeof initSqlJs==='undefined')throw Error('Outils de lecture indisponibles. Vérifie ta connexion Internet.');
+ const outer=await JSZip.loadAsync(await file.arrayBuffer());
+ const manifestFile=outer.file('manifest.json');
+ const contentFile=outer.file('contents');
+ if(!manifestFile||!contentFile)throw Error('Archive JWPUB incomplète.');
+ const manifest=JSON.parse(await manifestFile.async('string'));
+ const inner=await JSZip.loadAsync(await contentFile.async('uint8array'));
+ const dbName=Object.keys(inner.files).find(n=>n.endsWith('.db'));
+ if(!dbName)throw Error('Base de données JWPUB absente.');
+ const SQL=await initSqlJs({locateFile:f=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/'+f});
+ database?.close();
+ database=new SQL.Database(await inner.file(dbName).async('uint8array'));
+ const pub=query('SELECT MepsLanguageIndex, Symbol, Year, IssueTagNumber FROM Publication LIMIT 1')[0];
+ if(!pub||!String(pub.Symbol).startsWith('mwb'))throw Error('Ce fichier ne contient pas un programme CVM.');
+ const parts=[pub.MepsLanguageIndex,pub.Symbol,pub.Year];
+ if(pub.IssueTagNumber)parts.push(pub.IssueTagNumber);
+ const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(parts.join('_'))));
+ const bytes=Uint8Array.from(mask.match(/../g),v=>parseInt(v,16)).map((b,i)=>b^digest[i]);
+ key=await crypto.subtle.importKey('raw',bytes.slice(0,16),{name:'AES-CBC'},false,['decrypt']);
+ iv=bytes.slice(16);
+ weeks=query('SELECT d.DocumentId,d.MepsDocumentId,d.Title,d.Subtitle,d.Content,t.FirstDateOffset,t.LastDateOffset FROM DatedText t JOIN Document d ON d.DocumentId=t.DocumentId WHERE d.Content IS NOT NULL ORDER BY t.FirstDateOffset');
+ if(!weeks.length)throw Error('Aucun programme hebdomadaire trouvé.');
+ const selector=$('week');
+ selector.replaceChildren();
+ weeks.forEach((w,i)=>{
+  const opt=document.createElement('option');opt.value=i;
+  opt.textContent=prettyDate(w.FirstDateOffset)+' – '+prettyDate(w.LastDateOffset)+' · '+txt({textContent:w.Subtitle||''});
+  selector.append(opt);
+ });
+ const today=Number(new Date().toLocaleDateString('en-CA').replace(/-/g,''));
+ const idx=weeks.findIndex(w=>Number(w.FirstDateOffset)<=today&&Number(w.LastDateOffset)>=today);
+ selector.value=String(idx<0?0:idx);
+ $('result').hidden=false;
+ status('Fichier CVM reconnu : '+weeks.length+' semaines trouvées.');
+ $('weekInfo').textContent=manifest.publication?.title||'Cahier Vie et ministère';
+ await renderWeek();
+}
+function programFromHTML(html){
+ const doc=new DOMParser().parseFromString(html,'text/html');
+ const blocks=doc.querySelectorAll('.bodyTxt h2,.bodyTxt h3,.bodyTxt p');
+ const result=[];
+ let group='',active=null;
+ for(const block of blocks){
+  const value=txt(block);
+  if(!value)continue;
+  if(block.matches('h2')){
+   if(/JOYAUX DE LA PAROLE DE DIEU|APPLIQUE-TOI AU MINISTÈRE|VIE CHRÉTIENNE/i.test(value))group=value;
+   active=null;
+  }else if(block.matches('h3')){
+   const match=value.match(/^(\d{1,2})\.\s+(.+)$/);
+   if(match){
+    active={number:Number(match[1]),title:match[2],group,details:[]};
+    result.push(active);
+   }else active=null;
+  }else if(active&&block.matches('p')){
+   // Les notes d'illustration ne doivent pas passer pour des consignes de réunion.
+   if(!block.closest('figure,figcaption'))active.details.push(value);
+  }
+ }
+ return result;
+}
+function updateSelected(){
+ const cards=[...document.querySelectorAll('#subjects .subject')];
+ const picked=cards.filter(card=>card.querySelector('input[type=checkbox]')?.checked);
+ $('summaryBox').textContent=picked.length+' sujet(s) sélectionné(s) sur '+cards.length+
+  (picked.length?' — formats choisis : '+picked.map(c=>c.querySelector('select').value).join(', '):'');
+}
+async function renderWeek(){
+ const i=Number($('week').value),week=weeks[i];
+ if(!week)return;
+ $('subjects').replaceChildren();
+ $('weekInfo').textContent='Programme : '+week.Title+' — '+week.Subtitle+'.';
+ try{
+  status('Lecture de la semaine du '+prettyDate(week.FirstDateOffset)+'…');
+  const html=await decode(week.Content);
+  const tasks=programFromHTML(html);
+  let currentGroup='';
+  for(const task of tasks){
+   if(task.group!==currentGroup){
+    currentGroup=task.group;
+    const heading=document.createElement('h3');
+    heading.className='section-title';heading.textContent=currentGroup||'Programme';
+    $('subjects').append(heading);
+   }
+   const panel=document.createElement('section');panel.className='subject';
+   const title=document.createElement('label');title.className='subject-title';
+   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=false;
+   checkbox.setAttribute('aria-label','Sélectionner le sujet '+task.number);
+   checkbox.addEventListener('change',updateSelected);
+   const name=document.createElement('span');name.textContent=task.number+'. '+task.title;
+   title.append(checkbox,name);panel.append(title);
+   const formats=document.createElement('label');formats.className='format';
+   const formatLabel=document.createElement('span');formatLabel.textContent='Format :';
+   const select=document.createElement('select');select.setAttribute('aria-label','Format du sujet '+task.number);
+   for(const fmt of ['Tract','Fiche','Étude approfondie']){
+    const opt=document.createElement('option');opt.value=fmt;opt.textContent=fmt;opt.selected=fmt==='Fiche';select.append(opt);
+   }
+   select.addEventListener('change',updateSelected);
+   formats.append(formatLabel,select);panel.append(formats);
+   if(task.details.length){
+    const details=document.createElement('details');details.className='details';
+    const summary=document.createElement('summary');summary.textContent='Voir les indications du programme';details.append(summary);
+    for(const line of task.details){
+     const para=document.createElement('p');para.textContent=line;details.append(para);
+    }
+    panel.append(details);
+   }
+   $('subjects').append(panel);
+  }
+  status(tasks.length+' sujets numérotés affichés pour cette semaine.');
+  updateSelected();
+ }catch(e){status('Impossible de lire cette semaine : '+e.message,true);$('summaryBox').textContent=''}
+}
+$('load').addEventListener('click',async()=>{
+ const file=$('file').files?.[0];
+ if(!file){status('Choisis d’abord ton fichier CVM JWPUB.',true);return}
+ $('load').disabled=true;$('result').hidden=true;status('Lecture locale du fichier en cours…');
+ try{await openJwpub(file)}catch(e){status('Erreur : '+e.message,true)}
+ finally{$('load').disabled=false}
+});
+$('week').addEventListener('change',renderWeek);
+$('all').addEventListener('click',()=>{document.querySelectorAll('#subjects input[type=checkbox]').forEach(x=>x.checked=true);updateSelected()});
+$('none').addEventListener('click',()=>{document.querySelectorAll('#subjects input[type=checkbox]').forEach(x=>x.checked=false);updateSelected()});
+})();
+</script>
+</body>
+</html>
