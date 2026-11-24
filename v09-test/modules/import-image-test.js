@@ -400,7 +400,7 @@ function renderTheme(theme){
   const current=themeLabel(theme);
   const response=prompt('Nouveau nom pour « '+current+' » :',current);
   if(response===null)return;
-  const newName=response.trim().replace(/\\s+/g,' ').slice(0,45);
+  const newName=response.trim().replace(/\s+/g,' ').slice(0,45);
   if(!newName){alert('Saisis un nom.');return}
   const base=theme.replace(/^(?:La |Le |Les |L’|L')/i,'');
   const newBase=newName.replace(/^(?:La |Le |Les |L’|L')/i,'');
