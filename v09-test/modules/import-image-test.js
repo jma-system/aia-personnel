@@ -100,8 +100,12 @@ function thumb(item){
  const btn=makeButton('', 'aia-gallery-card');
  btn.setAttribute('aria-label','Ouvrir '+item.label);
  const image=document.createElement('img');image.src=item.url;image.alt='';
- const title=document.createElement('span');title.textContent=item.label;
- btn.append(image,title);btn.onclick=()=>openImage(item);return btn;
+ btn.append(image);
+ // Masquer les noms purement numériques attribués aux photos (ex. 40495).
+ if(!/^\d+$/.test(item.label.trim())){
+  const title=document.createElement('span');title.textContent=item.label;btn.append(title);
+ }
+ btn.onclick=()=>openImage(item);return btn;
 }
 function gallery(items){
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
