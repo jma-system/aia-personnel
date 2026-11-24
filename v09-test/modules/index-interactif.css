@@ -242,3 +242,13 @@
 .aia-photo-frame>.aia-verse-col{left:53%;top:56.4%}
 .aia-photo-frame>.aia-verse-ps{left:53%;top:75.2%}
 .aia-photo-frame>.aia-verse-hotspot:focus-visible{outline:2px solid #ffd43b;background:rgba(255,212,59,.12)}
+
+/* AIA v31 : éditeur manuel de liens bibliques sur les images importées. */
+.aia-photo-viewer{padding-bottom:68px}
+.aia-link-editor-button{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:6;background:#fff;color:#19456e;border:1px solid #80aac9;border-radius:10px;padding:11px 14px;font:bold 14px Arial,sans-serif;white-space:nowrap;min-height:44px}
+.aia-link-editor-status{position:absolute;bottom:70px;left:12px;right:12px;z-index:6;padding:10px;background:#fff;color:#19364f;border-radius:9px;text-align:center;font:14px Arial,sans-serif}
+.aia-link-editor-status[hidden]{display:none!important}
+.aia-custom-links{position:absolute;inset:0;pointer-events:none;z-index:4}
+.aia-custom-links>.aia-user-verse-target{display:block;position:absolute;width:40%;height:4.2%;transform:translate(-50%,-50%);pointer-events:auto;background:transparent;border:0;box-shadow:none}
+.aia-custom-links>.aia-user-verse-target:focus-visible{outline:3px solid #ffdb43}
+.aia-photo-frame.aia-placing-link>img{cursor:crosshair}
