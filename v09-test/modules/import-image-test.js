@@ -114,27 +114,85 @@ function thumb(item){
  btn.onclick=()=>openImage(item);return btn;
 }
 function gallery(items,category='',letter='',theme=''){
+ const wrap=document.createElement('div');wrap.className='aia-gallery-list';
+ const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
+ const choose=makeButton('Sélectionner','aia-gallery-choose');
+ choose.setAttribute('aria-pressed','false');
+ const count=document.createElement('span');count.className='aia-gallery-selected-count';
+ count.setAttribute('aria-live','polite');
+ const trash=makeButton('🗑','aia-gallery-batch-trash');
+ trash.setAttribute('aria-label','Supprimer les images sélectionnées');
+ trash.title='Supprimer la sélection';trash.disabled=true;
+ bar.append(choose,count,trash);
  const grid=document.createElement('div');grid.className='aia-gallery-grid';
+ const selectedIds=new Set();
+ let selectionActive=false;
+ const cells=[];
+ function update(){
+  choose.textContent=selectionActive?'Annuler':'Sélectionner';
+  choose.setAttribute('aria-pressed',String(selectionActive));
+  count.textContent=selectionActive?selectedIds.size+' sélectionnée'+(selectedIds.size>1?'s':''):'';
+  trash.disabled=!selectionActive||selectedIds.size===0;
+  grid.classList.toggle('is-selecting',selectionActive);
+  for(const {item,button,tick} of cells){
+   const checked=selectedIds.has(item.id);
+   button.classList.toggle('is-selected',checked);
+   button.setAttribute('aria-pressed',selectionActive?String(checked):'false');
+   button.setAttribute('aria-label',selectionActive?(checked?'Désélectionner ':'Sélectionner ')+item.label:'Ouvrir '+item.label);
+   tick.hidden=!selectionActive;
+   tick.textContent=checked?'✓':'';
+  }
+ }
  for(const item of items){
   const cell=document.createElement('div');cell.className='aia-gallery-cell';
-  cell.append(thumb(item));
-  // Petite corbeille distincte de l'image, pour éviter les suppressions accidentelles.
-  const remove=makeButton('Supprimer cette image','aia-gallery-delete-button');
-  remove.setAttribute('aria-label','Supprimer cette fiche de '+(theme||category+' sous '+letter));
-  remove.title='Retirer cette image de cet emplacement';
-  controlled(remove,async()=>{
-   const place=theme?'du thème « '+theme+' »':'de '+category+' sous '+letter;
-   if(!confirm('Retirer cette image '+place+' ?'))return;
-   if(theme){
-    await save({...item,topic:''});
-   }else{
-    await removeHere(item,category,letter);
-   }
-  });
-  cell.append(remove);
-  grid.append(cell);
+  const button=thumb(item);
+  const tick=document.createElement('span');tick.className='aia-gallery-tick';
+  tick.hidden=true;tick.setAttribute('aria-hidden','true');
+  button.append(tick);
+  button.onclick=()=>{
+   if(!selectionActive){openImage(item);return}
+   if(selectedIds.has(item.id))selectedIds.delete(item.id);
+   else selectedIds.add(item.id);
+   update();
+  };
+  cell.append(button);grid.append(cell);cells.push({item,button,tick});
  }
- return grid;
+ choose.onclick=()=>{
+  selectionActive=!selectionActive;
+  selectedIds.clear();
+  update();
+ };
+ controlled(trash,async()=>{
+  if(!selectionActive||!selectedIds.size)return;
+  const targets=items.filter(item=>selectedIds.has(item.id));
+  const place=theme?'du thème '+theme:'de '+category+' sous '+letter;
+  if(!confirm('Supprimer '+targets.length+' image(s) '+place+' ?'))return;
+  // Une seule transaction : toutes les suppressions réussissent ou aucune.
+  const edits=targets.map(item=>{
+   if(theme)return {...item,topic:''};
+   const remaining=item.placements.filter(p=>!(p.category===category&&p.letter===letter));
+   return remaining.length?{...item,placements:remaining}:null;
+  });
+  await operation('readwrite',store=>{
+   edits.forEach((edit,i)=>{
+    if(edit){
+     store.put({id:edit.id,blob:edit.blob,label:edit.label,topic:edit.topic,
+       subtheme:edit.subtheme||'',placements:edit.placements});
+    }else store.delete(targets[i].id);
+   });
+  });
+  for(let i=0;i<targets.length;i++){
+   const item=targets[i],index=records.findIndex(r=>r.id===item.id);
+   if(index<0)continue;
+   discard(records[index]);
+   if(edits[i])records[index]=makeRecord(edits[i]);
+   else records.splice(index,1);
+  }
+  refresh();
+ });
+ wrap.append(bar,grid);
+ update();
+ return wrap;
 }
 // Sous-thèmes horizontaux pour chaque lettre de A à Z.
 function normalized(text){
