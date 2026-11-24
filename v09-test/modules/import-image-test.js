@@ -47,7 +47,77 @@ const familyVerseLinks=[
  return link;
 });
 imageFrame.append(large,...familyVerseLinks);
-viewer.append(close,imageFrame);document.body.append(viewer);
+const linkButton=document.createElement('button');
+linkButton.type='button';linkButton.className='aia-link-editor-button';
+linkButton.textContent='Ajouter un verset';
+linkButton.setAttribute('aria-label','Ajouter un lien biblique sur cette image');
+const statusLink=document.createElement('div');statusLink.className='aia-link-editor-status';statusLink.hidden=true;
+const userLinks=document.createElement('div');userLinks.className='aia-custom-links';
+imageFrame.append(userLinks);
+viewer.append(close,imageFrame,linkButton,statusLink);document.body.append(viewer);
+let currentPhoto=null,placingLink=false;
+function parseVerseReference(input){
+ const match=input.trim().match(/^(.+?)\\s+(\\d{1,3})\\s*:\\s*(\\d{1,3})(?:\\s*[-–,].*)?$/u);
+ if(!match)return null;
+ const names={
+  'ephesiens':{slug:'%C3%89ph%C3%A9siens',book:49},
+  'colossiens':{slug:'Colossiens',book:51},
+  'psaume':{slug:'Psaumes',book:19},
+  'psaumes':{slug:'Psaumes',book:19}
+ };
+ const norm=match[1].normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase();
+ const book=names[norm],ch=Number(match[2]),vs=Number(match[3]);
+ if(!book||!ch||!vs||ch>150||vs>176)return null;
+ const anchor=String(book.book).padStart(2,'0')+String(ch).padStart(3,'0')+String(vs).padStart(3,'0');
+ const url='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+book.slug+'/'+ch+'/#v'+anchor;
+ return {reference:input.trim(),url};
+}
+function showSavedLinks(item){
+ userLinks.replaceChildren();
+ const links=Array.isArray(item.links)?item.links:[];
+ for(const entry of links){
+  if(typeof entry.x!=='number'||typeof entry.y!=='number'||typeof entry.url!=='string')continue;
+  const link=document.createElement('a');
+  link.className='aia-user-verse-target';link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';
+  link.setAttribute('aria-label','Lire '+entry.reference+' sur JW.org');
+  link.title=entry.reference;
+  link.style.left=entry.x+'%';link.style.top=entry.y+'%';
+  link.style.setProperty('pointer-events',placingLink?'none':'auto');
+  userLinks.append(link);
+ }
+}
+linkButton.addEventListener('click',()=>{
+ if(!currentPhoto)return;
+ placingLink=!placingLink;
+ linkButton.textContent=placingLink?'Annuler le placement':'Ajouter un verset';
+ statusLink.hidden=!placingLink;
+ statusLink.textContent='Touche maintenant le texte du verset sur l’image.';
+ imageFrame.classList.toggle('aia-placing-link',placingLink);
+ familyVerseLinks.forEach(link=>link.style.pointerEvents=placingLink?'none':'auto');
+ showSavedLinks(currentPhoto);
+});
+large.addEventListener('click',async event=>{
+ if(!placingLink||!currentPhoto)return;
+ const rect=large.getBoundingClientRect();
+ if(!rect.width||!rect.height)return;
+ const x=Math.max(4,Math.min(96,100*(event.clientX-rect.left)/rect.width));
+ const y=Math.max(2,Math.min(98,100*(event.clientY-rect.top)/rect.height));
+ const entry=prompt('Référence biblique (ex. Psaume 128:1) :');
+ if(entry===null)return;
+ const parsed=parseVerseReference(entry);
+ if(!parsed){alert('Pour ce premier test, utilise une référence de Psaume(s), Éphésiens ou Colossiens, par exemple Psaume 128:1.');return}
+ const updated={...currentPhoto,links:[...(currentPhoto.links||[]),{...parsed,x,y}]};
+ try{
+  await save(updated);
+  currentPhoto=records.find(r=>r.id===updated.id)||updated;
+  placingLink=false;linkButton.textContent='Ajouter un verset';statusLink.hidden=true;
+  imageFrame.classList.remove('aia-placing-link');
+  familyVerseLinks.forEach(link=>link.style.pointerEvents='auto');
+  showSavedLinks(currentPhoto);
+  alert('Lien enregistré. Touche le verset pour vérifier son ouverture.');
+ }catch(error){alert('Lien non enregistré : '+error.message)}
+});
+
 // Bloquer uniquement le menu contextuel natif sur les images du Répertoire.
 // Les clics courts, la sélection multiple et les boutons restent opérationnels.
 function preventImageContextMenu(event){
@@ -60,6 +130,11 @@ viewer.addEventListener('contextmenu',preventImageContextMenu);
 large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
+ currentPhoto=item;placingLink=false;statusLink.hidden=true;
+ linkButton.textContent='Ajouter un verset';
+ imageFrame.classList.remove('aia-placing-link');
+ familyVerseLinks.forEach(link=>link.style.pointerEvents='auto');
+ showSavedLinks(item);
  // Ne montrer les liens que sur la fiche illustrée « La famille peut-elle être heureuse ? ».
  // Cette reconnaissance provisoire concerne uniquement le test personnel Famille.
  const isFamily=(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
@@ -67,7 +142,7 @@ function openImage(item){
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
- viewer.hidden=true;large.removeAttribute('src');document.body.style.overflow='';
+ viewer.hidden=true;large.removeAttribute('src');document.body.style.overflow='';currentPhoto=null;placingLink=false;
  if(focusBefore?.isConnected)focusBefore.focus();
  focusBefore=null;
 }
@@ -111,7 +186,7 @@ function operation(mode,perform,store=storeName){
 function makeRecord(raw){return {...raw,url:URL.createObjectURL(raw.blob)}}
 function discard(item){if(item?.url)URL.revokeObjectURL(item.url)}
 async function save(item){
- const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,subtheme:item.subtheme||'',placements:item.placements};
+ const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,subtheme:item.subtheme||'',placements:item.placements,links:Array.isArray(item.links)?item.links:[]};
  await operation('readwrite',store=>store.put(raw));
  const index=records.findIndex(r=>r.id===item.id);
  if(index>=0){discard(records[index]);records[index]=makeRecord(raw)}
@@ -222,7 +297,7 @@ function gallery(items,category='',letter='',theme=''){
    edits.forEach((edit,i)=>{
     if(edit){
      store.put({id:edit.id,blob:edit.blob,label:edit.label,topic:edit.topic,
-       subtheme:edit.subtheme||'',placements:edit.placements});
+       subtheme:edit.subtheme||'',placements:edit.placements,links:Array.isArray(edit.links)?edit.links:[]});
     }else store.delete(targets[i].id);
    });
   });
