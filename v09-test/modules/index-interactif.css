@@ -71,3 +71,12 @@
 #indexPanel .aia-gallery-remove{margin-top:12px;min-height:44px;width:100%;background:#fff;color:#193c66;border:1px solid #a9c3dc;border-radius:9px}
 #indexPanel .aia-gallery-delete-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 #indexPanel .aia-gallery-delete-list button{min-height:44px;background:#fff;border:1px solid #a9c3dc;color:#193c66;border-radius:8px}
+
+/* Gestion permanente des fiches : commandes repliées sous chaque miniature */
+#indexPanel .aia-gallery-cell{min-width:0}
+#indexPanel .aia-gallery-cell>.aia-gallery-card{width:100%}
+#indexPanel .aia-gallery-item-actions{margin-top:5px;border:1px solid #a9c3dc;background:#fff;border-radius:9px;padding:5px;color:#17365e}
+#indexPanel .aia-gallery-item-actions summary{cursor:pointer;min-height:32px;padding:6px 2px;font-size:12px;font-weight:600}
+#indexPanel .aia-gallery-item-actions>button,#indexPanel .aia-gallery-item-actions>select{width:100%;margin:4px 0;min-height:40px;font-size:12px}
+#indexPanel .aia-gallery-item-actions>button{background:#edf5ff;color:#17365e;border:1px solid #a9c3dc;border-radius:8px}
+#indexPanel .aia-gallery-item-actions>button:disabled{opacity:.5}
