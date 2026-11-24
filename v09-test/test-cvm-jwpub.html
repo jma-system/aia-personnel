@@ -196,6 +196,15 @@ async function renderWeek(){
    }
    select.addEventListener('change',updateSelected);
    formats.append(formatLabel,select);panel.append(formats);
+   const make=document.createElement('button');
+   make.type='button';make.textContent='Créer la fiche de ce sujet';
+   make.style.cssText='display:block;width:100%;margin:12px 0 4px;background:#17639a';
+   make.addEventListener('click',()=>{
+     document.querySelectorAll('#subjects .subject input[type=checkbox]').forEach(x=>{x.checked=false});
+     checkbox.checked=true;updateSelected();
+     $('createDraft').click();
+   });
+   panel.append(make);
    if(task.details.length){
     const details=document.createElement('details');details.className='details';
     const summary=document.createElement('summary');summary.textContent='Voir les indications du programme';details.append(summary);
