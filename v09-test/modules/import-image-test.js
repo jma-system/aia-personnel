@@ -47,9 +47,31 @@ const familyVerseLinks=[
  return link;
 });
 imageFrame.append(large,...familyVerseLinks);
+// Fiche Prière : trois liens directs, sans modification de l'image.
+const prayerVerseLinks=[
+ {name:'Psaume 65:2',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/65/#v19065002',coords:[48.5,39.8,25,3.3]},
+ {name:'Matthieu 6:7-13',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Matthieu/6/#v40006007',coords:[48.5,54,33,3.6]},
+ {name:'Matthieu 7:7, 8',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Matthieu/7/#v40007007',coords:[48.5,71.4,33,3.5]}
+].map(entry=>{
+ const link=document.createElement('a');
+ link.className='aia-verse-hotspot aia-prayer-verse';
+ link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';
+ link.setAttribute('aria-label','Lire '+entry.name+' sur JW.org');
+ link.title=entry.name+' — Traduction du monde nouveau';
+ const [left,top,width,height]=entry.coords;
+ const paint={left:left+'%',top:top+'%',width:width+'%',height:height+'%',bottom:'auto',transform:'none',background:'transparent',outline:'none',border:'0',boxShadow:'none',padding:'0',minHeight:'0',fontSize:'0'};
+ for(const [property,value] of Object.entries(paint)){
+  link.style.setProperty(property.replace(/[A-Z]/g,c=>'-'+c.toLowerCase()),value,'important');
+ }
+ link.hidden=true;
+ return link;
+});
+imageFrame.append(...prayerVerseLinks);
+
 const linkButton=document.createElement('button');
 linkButton.type='button';linkButton.className='aia-link-editor-button';
 linkButton.textContent='Ajouter un verset';
+linkButton.hidden=true; // Éditeur différé : aucun bouton nouveau dans la visionneuse.
 linkButton.setAttribute('aria-label','Ajouter un lien biblique sur cette image');
 const statusLink=document.createElement('div');statusLink.className='aia-link-editor-status';statusLink.hidden=true;
 const userLinks=document.createElement('div');userLinks.className='aia-custom-links';
@@ -139,6 +161,9 @@ function openImage(item){
  // Cette reconnaissance provisoire concerne uniquement le test personnel Famille.
  const isFamily=(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
  familyVerseLinks.forEach(link=>{link.hidden=!isFamily});
+ // Les deux emplacements (THÈMES/Prière et TRACTS/P/Prière) utilisent la même fiche.
+ const isPrayer=item.topic==='La prière'||item.subtheme==='Prière';
+ prayerVerseLinks.forEach(link=>{link.hidden=!isPrayer});
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
