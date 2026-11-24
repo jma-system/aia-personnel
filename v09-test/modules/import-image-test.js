@@ -323,8 +323,16 @@ function categoryView(category,letter){
    refresh();
   }catch(error){alert('Impossible de renommer : '+(error?.message||'erreur de stockage'))}
  };
- const barRow=document.createElement('div');barRow.className='aia-subtheme-row';
- barRow.append(bar,rename);wrap.append(barRow);
+ // Le crayon est désormais dans la ligne du titre TRACTS/FICHES,
+ // jamais dans le défilement horizontal des sous-thèmes.
+ const heading=area.querySelector(':scope > h3');
+ if(heading){
+  const headingRow=document.createElement('div');
+  headingRow.className='aia-repertoire-header';
+  heading.replaceWith(headingRow);
+  headingRow.append(heading,rename);
+ }
+ wrap.append(bar);
  if(selected){
   const add=makeButton('Importer','aia-import-button');
   add.setAttribute('aria-label','Importer des images dans '+named(selected)+' sous '+letter);
@@ -377,9 +385,41 @@ picker.addEventListener('change',async()=>{
  }
  if(errors||invalid)alert(saved+' fiche(s) enregistrée(s). '+invalid+' format(s) ignoré(s), '+errors+' erreur(s) de stockage.');
 });
+function themeLabel(theme){
+ const alias=customSubthemes.find(t=>t.category==='THÈMES'&&t.source===theme);
+ return alias?.name||theme;
+}
 function renderTheme(theme){
  area.replaceChildren();
- const heading=document.createElement('h3');heading.textContent=theme;
+ const heading=document.createElement('h3');heading.textContent=themeLabel(theme);
+ const headingRow=document.createElement('div');headingRow.className='aia-repertoire-header';
+ const rename=makeButton('✎','aia-subtheme-rename');
+ rename.setAttribute('aria-label','Renommer le thème '+themeLabel(theme));
+ rename.title='Renommer « '+themeLabel(theme)+' »';
+ rename.onclick=async()=>{
+  const current=themeLabel(theme);
+  const response=prompt('Nouveau nom pour « '+current+' » :',current);
+  if(response===null)return;
+  const newName=response.trim().replace(/\\s+/g,' ').slice(0,45);
+  if(!newName){alert('Saisis un nom.');return}
+  const base=theme.replace(/^(?:La |Le |Les |L’|L')/i,'');
+  const newBase=newName.replace(/^(?:La |Le |Les |L’|L')/i,'');
+  if(!startsWithLetter(newBase,normalized(base).charAt(0))){
+   alert('Le thème doit rester classé sous la même lettre.');return;
+  }
+  if(newName===current)return;
+  const collision=topics.some(t=>t!==theme&&normalized(themeLabel(t))===normalized(newName));
+  if(collision){alert('Un thème porte déjà ce nom.');return}
+  const existing=customSubthemes.find(t=>t.category==='THÈMES'&&t.source===theme);
+  const updated=existing?{...existing,name:newName}:{id:'theme-label|'+normalized(theme),category:'THÈMES',letter:'',source:theme,name:newName,kind:'theme-name'};
+  try{
+   await operation('readwrite',store=>store.put(updated),extraStore);
+   const index=customSubthemes.findIndex(t=>t.id===updated.id);
+   if(index>=0)customSubthemes[index]=updated;else customSubthemes.push(updated);
+   refresh();
+  }catch(error){alert('Renommage impossible : '+(error?.message||'erreur'))}
+ };
+ headingRow.append(heading,rename);
  const items=records.filter(item=>item.topic===theme);
  const view=gallery(items,'','',theme);
  const add=makeButton('Importer','aia-import-button');
@@ -388,7 +428,7 @@ function renderTheme(theme){
   request={category:'THÈMES',letter:'',topic:theme,subtheme:''};
   replaceId=null;picker.multiple=true;picker.click();
  };
- area.append(heading,toolbar(add,view),view);
+ area.append(headingRow,toolbar(add,view),view);
 }
 section.addEventListener('aia:index-render',e=>{
  activeTheme=null;
@@ -400,6 +440,8 @@ section.addEventListener('aia:index-render',e=>{
    const item=records.find(r=>r.topic===name);
    const pic=tile.querySelector('.aia-index-placeholder');
    if(item&&pic){const img=document.createElement('img');img.src=item.url;img.alt='';img.className='aia-family-thumb';pic.replaceWith(img)}
+   const title=tile.querySelector('strong');
+   if(title&&name)title.textContent=themeLabel(name);
   }
   return;
  }
