@@ -221,3 +221,6 @@
 .aia-verse-hotspot{position:absolute;left:53%;top:37.5%;width:40%;height:5%;border-radius:5px;display:block;z-index:2;touch-action:manipulation}
 .aia-verse-hotspot[hidden]{display:none!important}
 .aia-verse-hotspot:focus-visible{outline:3px solid #ffd43b;background:rgba(255,212,59,.2)}
+
+/* AIA v24 : bouton visible de diagnostic pour le lien biblique Famille */
+.aia-photo-frame>.aia-verse-hotspot{left:50%;top:auto;bottom:4%;transform:translateX(-50%);width:max-content;max-width:92%;height:auto;min-height:48px;padding:12px 16px;border-radius:10px;background:#fff;color:#164f86;border:2px solid #164f86;text-align:center;text-decoration:none;font:bold 14px Arial,sans-serif;box-shadow:0 3px 14px #0008}
