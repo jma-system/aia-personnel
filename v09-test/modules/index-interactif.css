@@ -121,3 +121,13 @@
  user-select:none;
  -webkit-user-drag:none;
 }
+
+/* Visionneuse seule en vrai mode plein écran quand le navigateur l'autorise */
+.aia-photo-viewer:fullscreen{
+ width:100vw;height:100vh;height:100dvh;inset:0;margin:0;padding:8px;
+ background:#111;box-sizing:border-box;
+}
+.aia-photo-viewer:fullscreen>img{max-width:100%;max-height:100%;object-fit:contain}
+.aia-photo-viewer:fullscreen .aia-photo-close{top:12px;right:12px}
+/* Contrôles de sélection alignés à droite, sous les onglets sans titre répété */
+#indexPanel .aia-gallery-list>.aia-gallery-selection-bar{justify-content:flex-end}
