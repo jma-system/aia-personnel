@@ -229,3 +229,16 @@
    Coordonnées relatives à l'image originale de la fiche Famille. */
 .aia-photo-frame>.aia-verse-hotspot{left:53%;top:37.2%;bottom:auto;transform:none;width:40%;max-width:none;height:4.4%;min-height:0;padding:0;border:0;border-radius:3px;background:transparent;color:transparent;box-shadow:none;font-size:0;display:block}
 .aia-photo-frame>.aia-verse-hotspot:focus-visible{outline:2px solid #ffdb43;background:rgba(255,219,67,.12)}
+
+/* AIA v27 — trois références bleues cliquables, aucun bouton supplémentaire.
+   Positions relatives à l'image de la fiche Famille (pas à l'écran). */
+.aia-photo-frame>.aia-verse-hotspot{
+ position:absolute;display:block;z-index:3;transform:none;bottom:auto;
+ width:39%;height:4%;min-height:0;max-width:none;padding:0;margin:0;
+ border:0;outline:none;border-radius:3px;background:transparent;
+ color:transparent;box-shadow:none;font-size:0;touch-action:manipulation
+}
+.aia-photo-frame>.aia-verse-eph{left:53%;top:37.9%}
+.aia-photo-frame>.aia-verse-col{left:53%;top:56.4%}
+.aia-photo-frame>.aia-verse-ps{left:53%;top:75.2%}
+.aia-photo-frame>.aia-verse-hotspot:focus-visible{outline:2px solid #ffd43b;background:rgba(255,212,59,.12)}
