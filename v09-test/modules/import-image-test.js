@@ -119,9 +119,9 @@ function gallery(items,category='',letter='',theme=''){
   const cell=document.createElement('div');cell.className='aia-gallery-cell';
   cell.append(thumb(item));
   // Petite corbeille distincte de l'image, pour éviter les suppressions accidentelles.
-  const remove=makeButton('🗑','aia-gallery-trash');
+  const remove=makeButton('Supprimer cette image','aia-gallery-delete-button');
   remove.setAttribute('aria-label','Supprimer cette fiche de '+(theme||category+' sous '+letter));
-  remove.title='Supprimer cette fiche';
+  remove.title='Retirer cette image de cet emplacement';
   controlled(remove,async()=>{
    const place=theme?'du thème « '+theme+' »':'de '+category+' sous '+letter;
    if(!confirm('Retirer cette image '+place+' ?'))return;
