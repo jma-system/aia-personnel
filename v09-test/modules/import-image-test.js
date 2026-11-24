@@ -36,6 +36,13 @@ const familyVerseLinks=[
  link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';
  link.setAttribute('aria-label','Lire '+entry.verse+' sur JW.org');
  link.title=entry.name+' — ouvrir la Traduction du monde nouveau';
+ // Neutraliser même une ancienne règle de diagnostic CSS encore en cache Android.
+ // Les zones sont invisibles mais restent directement tactiles sur le texte imprimé.
+ const coords={eph:['53%','37.9%','39%','4%'],col:['53%','56.4%','39%','4%'],ps:['53%','75.2%','39%','4%']}[entry.pos];
+ const paint={left:coords[0],top:coords[1],width:coords[2],height:coords[3],bottom:'auto',transform:'none',background:'transparent',outline:'none',border:'0',boxShadow:'none',padding:'0',minHeight:'0',fontSize:'0'};
+ for(const [property,value] of Object.entries(paint)){
+  link.style.setProperty(property.replace(/[A-Z]/g,c=>'-'+c.toLowerCase()),value,'important');
+ }
  link.hidden=true;
  return link;
 });
