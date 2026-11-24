@@ -24,15 +24,17 @@
  const workflow=home.querySelector('.aia-workflow');
  const quick=home.querySelector('.aia-search-panel');
  if(workflow)workflow.before(section);else if(quick)quick.before(section);else home.append(section);
- const oldTrigger=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Programme CVM · choisir les sujets');
+ const oldTrigger=[...document.querySelectorAll('button')].find(b=>/Programme CVM\s*[·•]\s*choisir les sujets/i.test(b.textContent.trim()));
  // L'ancien bouton CVM se trouve hors de #home, juste après la rangée des publications.
  // Le masquer avant toute interaction évite l'ouverture du dialogue obsolète.
- if(oldTrigger)oldTrigger.hidden=true;
+ if(oldTrigger){oldTrigger.hidden=true;oldTrigger.style.setProperty('display','none','important');oldTrigger.remove();}
  function sync(){
   const active=cvm.classList.contains('selected');
+  document.querySelectorAll('dialog[aria-label="Programme CVM"]').forEach(d=>{if(d.open)d.close();d.remove();});
+  document.querySelectorAll('button').forEach(b=>{if(/Programme CVM\s*[·•]\s*choisir les sujets/i.test(b.textContent.trim()))b.remove();});
   section.hidden=!active;
   if(workflow)workflow.style.display=active?'none':'';
-  if(oldTrigger){oldTrigger.hidden=true;oldTrigger.style.display='none';}
+  if(oldTrigger){oldTrigger.remove();}
  }
  cvm.addEventListener('click',()=>queueMicrotask(sync));
  tg.addEventListener('click',()=>queueMicrotask(sync));
