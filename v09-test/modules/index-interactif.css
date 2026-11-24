@@ -197,3 +197,20 @@
  background:#fff!important;color:#17365e!important;font-size:25px;
 }
 #indexPanel .aia-subtheme-row>.aia-subtheme-rename:disabled{opacity:.35}
+
+/* V22 : crayon au niveau du titre TRACTS — lettre, FICHES — lettre ou thème ouvert */
+#indexPanel .aia-repertoire-header{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ width:100%;min-width:0;margin:0 0 10px;
+}
+#indexPanel .aia-repertoire-header>h3{
+ margin:0!important;flex:1 1 auto;min-width:0;
+}
+#indexPanel .aia-repertoire-header>.aia-subtheme-rename{
+ display:flex;align-items:center;justify-content:center;
+ width:44px;min-width:44px;height:44px;min-height:44px;flex:0 0 44px;
+ padding:0;border:1px solid #9fb9d6;border-radius:10px;
+ background:#fff!important;color:#17365e!important;font-size:25px;
+}
+#indexPanel .aia-repertoire-header>.aia-subtheme-rename:disabled{opacity:.35}
+#indexPanel .aia-gallery-controls>.aia-subtheme-strip{width:100%;max-width:100%;min-width:0}
