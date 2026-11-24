@@ -35,35 +35,15 @@ section.addEventListener('contextmenu',event=>{
 });
 viewer.addEventListener('contextmenu',preventImageContextMenu);
 large.draggable=false;
-let hasEnteredFullscreen=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
- viewer.hidden=false;document.body.style.overflow='hidden';
- // Requête faite directement pendant le clic pour permettre le plein écran Android.
- if(viewer.requestFullscreen){
-  try{
-   const result=viewer.requestFullscreen({navigationUI:'hide'});
-   if(result&&typeof result.then==='function'){
-    result.then(()=>{hasEnteredFullscreen=true}).catch(()=>{hasEnteredFullscreen=false});
-   }
-  }catch(error){hasEnteredFullscreen=false}
- }
- close.focus();
+ viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
- const wasFullscreen=document.fullscreenElement===viewer;
  viewer.hidden=true;large.removeAttribute('src');document.body.style.overflow='';
- hasEnteredFullscreen=false;
- if(wasFullscreen&&document.exitFullscreen){
-  const result=document.exitFullscreen();
-  if(result&&typeof result.catch==='function')result.catch(()=>{});
- }
  if(focusBefore?.isConnected)focusBefore.focus();
  focusBefore=null;
 }
-document.addEventListener('fullscreenchange',()=>{
- if(hasEnteredFullscreen&&document.fullscreenElement!==viewer&&!viewer.hidden)closeImage();
-});
 close.onclick=closeImage;
 viewer.addEventListener('click',e=>{if(e.target===viewer)closeImage()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)closeImage()});
