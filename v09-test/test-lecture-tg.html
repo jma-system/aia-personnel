@@ -1,0 +1,22 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIA — Test lecture TG</title><style>body{font:16px/1.5 system-ui,Arial;max-width:660px;margin:auto;padding:16px;background:#f4f6f9;color:#172234}main{background:white;border:1px solid #d9e0e7;border-radius:14px;padding:18px}button{font:inherit;font-weight:600;padding:12px;border:0;border-radius:9px;background:#213b5b;color:white}button:disabled{opacity:.6}input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #b8c3cc;border-radius:8px;font:inherit}#result{margin-top:14px;padding:12px;border-radius:9px;background:#eef2f6;white-space:pre-wrap;overflow-wrap:anywhere}li{margin:8px 0}a{color:#234e7b}</style></head><body><main><h2>AIA — Lecture d'un article TG</h2><p>Test isolé : vérifie si AIA peut lire les questions du document 2026565 sur JW.org. Aucune donnée n'est enregistrée.</p><label for="link">Lien JW Library</label><input id="link" value="https://www.jw.org/finder?srcid=jwlshare&amp;wtlocale=F&amp;prefer=lang&amp;docid=2026565"><p><button id="go">Tester la lecture TG</button></p><div id="result" role="status">En attente du test.</div><ol id="questions"></ol><p><a href="index.html">Retour à AIA Test</a></p></main><script>
+'use strict';
+const article='https://www.jw.org/fr/biblioth%C3%A8que/revues/tour-de-garde-etude-septembre-2026/La-pr%C3%AAtrise-r%C3%A9v%C3%A8le-lamour-de-J%C3%A9hovah/';
+document.getElementById('go').onclick=async()=>{
+ const btn=document.getElementById('go'),status=document.getElementById('result'),list=document.getElementById('questions');btn.disabled=true;list.replaceChildren();
+ try{
+ const u=new URL(document.getElementById('link').value.trim());
+ if(u.protocol!=='https:'||!['jw.org','www.jw.org'].includes(u.hostname)||u.pathname!=='/finder'||!/^\d{5,12}$/.test(u.searchParams.get('docid')||''))throw Error('Lien JW Library non reconnu.');
+ const id=u.searchParams.get('docid');
+ status.textContent='Lien reconnu : '+id+'.\nTentative de lecture du contenu en cours…';
+ // La page cible est fixée uniquement pour le document de référence du test.
+ if(id!=='2026565')throw Error('Ce test de lecture est limité au document 2026565.');
+ const r=await fetch(article,{mode:'cors',credentials:'omit',cache:'no-store'});
+ if(!r.ok)throw Error('Réponse HTTP '+r.status);
+ const html=await r.text(),doc=new DOMParser().parseFromString(html,'text/html');
+ const headings=[...doc.querySelectorAll('h2,h3,h4')].map(x=>x.textContent.trim()).filter(x=>/^(?:\d{1,2}(?:[-–]\d{1,2})?)\.\s.+\?/.test(x));
+ status.textContent=headings.length?'SUCCÈS : '+headings.length+' questions repérées. À vérifier visuellement.':'Connexion réussie mais aucune question reconnue par ce test. Structure de la page à adapter.';
+ headings.forEach(s=>{const li=document.createElement('li');li.textContent=s;list.append(li)});
+ }catch(e){status.textContent='ÉCHEC : '+e.message+'\n\nSi le message est « Failed to fetch », cela peut être lié à CORS ou à l’accès réseau. Le lien est reconnu, mais la lecture automatique n’est pas démontrée.'}
+ finally{btn.disabled=false}
+};
+</script></body></html>
