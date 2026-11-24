@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIA — Test WOL</title>
+<style>body{font:16px/1.5 system-ui,Arial;max-width:650px;margin:auto;padding:18px;background:#f3f5f8;color:#172234}main{background:white;border:1px solid #dce1e8;border-radius:14px;padding:18px}input{width:100%;box-sizing:border-box;font:inherit;padding:12px;border:1px solid #bac4d0;border-radius:8px}button{font:inherit;font-weight:600;border:0;border-radius:9px;background:#213b5b;color:white;padding:12px 16px}button:disabled{opacity:.6}#result{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf1f5;border-radius:8px;padding:12px;margin-top:12px}li{margin:9px 0}a{color:#23547f}</style></head><body><main>
+<h2>AIA — Test de lecture WOL</h2><p>Nous vérifions si AIA peut lire directement les questions de l'article TG depuis la Bibliothèque en ligne Watchtower. Aucun contenu n'est enregistré.</p>
+<label for="url">Adresse de l'article</label><input id="url" type="url" value="https://wol.jw.org/fr/wol/d/r30/lp-f/2026565">
+<p><button id="run">Tester la lecture WOL</button></p><div id="result" role="status">En attente.</div><ol id="questions"></ol><p><a href="./index.html">Retour à AIA Test</a></p>
+</main><script>
+'use strict';
+document.getElementById('run').onclick=async()=>{
+const b=document.getElementById('run'),out=document.getElementById('result'),list=document.getElementById('questions');b.disabled=true;list.replaceChildren();
+try{
+ const target=new URL(document.getElementById('url').value.trim());
+ if(target.protocol!=='https:'||target.hostname!=='wol.jw.org'||!/^\/fr\/wol\/d\/.+\/\d{5,12}$/.test(target.pathname))throw new Error('Lien WOL non reconnu.');
+ out.textContent='Lien WOL reconnu. Tentative de lecture…';
+ const r=await fetch(target.href,{method:'GET',mode:'cors',credentials:'omit',cache:'no-store'});
+ if(!r.ok)throw new Error('HTTP '+r.status);
+ const html=await r.text(),doc=new DOMParser().parseFromString(html,'text/html');
+ const body=doc.body?.innerText||doc.body?.textContent||'';
+ const matches=[...body.matchAll(/(?:^|\n)\s*(\d{1,2}(?:[-–]\d{1,2})?)\.\s*([^\n?]{8,220}\?)/g)].slice(0,40);
+ if(!matches.length){out.textContent='CONNEXION RÉUSSIE mais aucune question reconnue automatiquement. Le parseur devra être adapté.';return}
+ for(const m of matches){const li=document.createElement('li');li.textContent=m[1]+'. '+m[2].trim();list.append(li)}
+ out.textContent='LECTURE RÉUSSIE : '+matches.length+' question(s) candidates extraites. Vérifier leur exactitude ci-dessous.';
+}catch(e){out.textContent='ÉCHEC DE LECTURE : '+(e.message||e)+'\n\nUn lien valide ne garantit pas l’accès à son contenu depuis AIA. « Failed to fetch » peut notamment indiquer une restriction CORS.'}
+finally{b.disabled=false}
+};
+</script></body></html>
