@@ -24,10 +24,20 @@
  const workflow=home.querySelector('.aia-workflow');
  const quick=home.querySelector('.aia-search-panel');
  if(workflow)workflow.before(section);else if(quick)quick.before(section);else home.append(section);
+ // Neutraliser les anciens composants CVM même si un module les recrée après chargement.
+ function removeLegacy(){
+  document.querySelectorAll('button').forEach(b=>{
+   if(/Programme CVM\\s*[·•]\\s*choisir les sujets/i.test(b.textContent.trim()))b.remove();
+  });
+  document.querySelectorAll('dialog[aria-label="Programme CVM"]').forEach(d=>{if(d.open)d.close();d.remove();});
+ }
+ const observer=new MutationObserver(()=>removeLegacy());
+ observer.observe(document.body,{childList:true,subtree:true});
  const oldTrigger=[...document.querySelectorAll('button')].find(b=>/Programme CVM\s*[·•]\s*choisir les sujets/i.test(b.textContent.trim()));
  // L'ancien bouton CVM se trouve hors de #home, juste après la rangée des publications.
  // Le masquer avant toute interaction évite l'ouverture du dialogue obsolète.
  if(oldTrigger){oldTrigger.hidden=true;oldTrigger.style.setProperty('display','none','important');oldTrigger.remove();}
+ removeLegacy();
  function sync(){
   const active=cvm.classList.contains('selected');
   document.querySelectorAll('dialog[aria-label="Programme CVM"]').forEach(d=>{if(d.open)d.close();d.remove();});
