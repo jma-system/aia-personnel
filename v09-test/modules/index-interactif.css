@@ -112,3 +112,12 @@
 #indexPanel .aia-gallery-tick{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:2px solid #216cb8;background:#fff;color:#fff;font-size:19px;line-height:24px;font-weight:700}
 #indexPanel .aia-gallery-card.is-selected{outline:3px solid #216cb8;outline-offset:-3px}
 #indexPanel .aia-gallery-card.is-selected .aia-gallery-tick{background:#216cb8}
+
+/* Bloquer le menu natif de Chrome sur les images AIA sans bloquer leur clic */
+#indexPanel .aia-gallery-card img,
+.aia-photo-viewer>img{
+ -webkit-touch-callout:none;
+ -webkit-user-select:none;
+ user-select:none;
+ -webkit-user-drag:none;
+}
