@@ -34,13 +34,28 @@ btn.addEventListener('click',async()=>{
   function query(sql){const stmt=db.prepare(sql),rows=[];try{while(stmt.step())rows.push(stmt.getAsObject())}finally{stmt.free()}return rows}
   const pub=query('SELECT Symbol,Year FROM Publication LIMIT 1')[0];
   if(!pub)throw Error('Publication non reconnue.');
-  const docs=query('SELECT Title,Subtitle FROM Document WHERE Title IS NOT NULL LIMIT 250');
-  const names=docs.map(d=>[d.Title,d.Subtitle].filter(Boolean).join(' — ').replace(/<[^>]*>/g,'').trim()).filter(Boolean);
-  const title=document.createElement('h3');title.textContent='Publication reconnue : '+pub.Symbol+(pub.Year?' ('+pub.Year+')':'');
-  const count=document.createElement('p');count.textContent=names.length+' titre(s) de documents détecté(s). Aperçu uniquement : aucune fiche n’est encore enregistrée.';
+  const docs=query('SELECT DISTINCT Title,Subtitle FROM Document WHERE Title IS NOT NULL LIMIT 250');
+  const names=[...new Set(docs.map(d=>[d.Title,d.Subtitle].filter(Boolean).join(' — ').replace(/<[^>]*>/g,'').trim()).filter(Boolean))];
+  const manifest=JSON.parse(await outer.file('manifest.json').async('string'));
+  const type=manifest.publication?.publicationType||'Publication';
+  const title=document.createElement('h3');title.textContent=type+' — '+(manifest.publication?.title||pub.Symbol);
+  const count=document.createElement('p');count.textContent=names.length+' titre(s) distinct(s). Aperçu des illustrations originales du JWPUB, sans enregistrement dans le Répertoire.';
   result.append(title,count);
   if(names.length){const list=document.createElement('ol');list.style.cssText='max-height:270px;overflow:auto;padding-left:24px';names.forEach(n=>{const li=document.createElement('li');li.textContent=n;list.append(li)});result.append(list)}
-  result.hidden=false;say('Lecture terminée. Vérifie les titres avant toute intégration.');
+  const photos=Object.keys(inner.files).filter(n=>/\.(jpe?g|png|webp)$/i.test(n)&&!/-120x120|-270x270|-600x600/.test(n));
+  if(photos.length){
+   const gallery=document.createElement('div');
+   gallery.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px';
+   for(const name of photos){
+    const blob=new Blob([await inner.file(name).async('uint8array')],{type:/png$/i.test(name)?'image/png':'image/jpeg'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.title='Ouvrir l’illustration originale';
+    const img=document.createElement('img');img.src=url;img.alt='Illustration originale '+name;img.style.cssText='width:100%;height:190px;object-fit:contain;border:1px solid #b7ccdf;border-radius:8px;background:#f4f8fc';
+    a.append(img);gallery.append(a);
+   }
+   result.append(gallery);
+  }
+  result.hidden=false;say('Publication lue. Illustrations originales affichées.');
  }catch(e){say('Importation impossible : '+e.message,true)}
  finally{db?.close();btn.disabled=false}
 });
