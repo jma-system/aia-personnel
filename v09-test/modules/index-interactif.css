@@ -265,3 +265,6 @@
  body[data-aia-layout="compact"] > header > #aia-home-top {grid-column:3;grid-row:1;width:72px;min-width:0!important;max-width:72px;padding:8px 4px!important;font-size:12px!important;overflow:visible;white-space:nowrap;text-align:center}
  body[data-aia-layout="compact"] > header > #aia-theme-toggle {grid-column:4!important;grid-row:1!important;width:44px!important;min-width:44px!important;margin:0!important}
 }
+
+/* Fiche illustrée complète : le titre est déjà dans l'image ; aucune légende sous la vignette. */
+#indexPanel .aia-gallery-card.aia-approved-thumb>span{display:none!important}
