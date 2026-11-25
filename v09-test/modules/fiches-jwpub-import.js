@@ -74,7 +74,7 @@ btn.addEventListener('click',async()=>{
   const sourceNodes=[...article.querySelectorAll('.openingContent p,.bodyTxt li p')];
   const books={19:'psaumes',23:'isa%C3%AFe',66:'r%C3%A9v%C3%A9lation'};
   function bibleLink(href){
-   const m=href.match(/^jwpub:\\/\\/b\\/NWTR\\/(\\d+):(\\d+):(\\d+)/i);
+   const m=href.startsWith('jwpub://b/NWTR/')?href.slice(16).match(/^([0-9]+):([0-9]+):([0-9]+)/):null;
    if(!m||!books[Number(m[1])])return null;
    const anchor=String(m[1]).padStart(2,'0')+String(m[2]).padStart(3,'0')+String(m[3]).padStart(3,'0');
    return 'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+books[Number(m[1])]+'/'+m[2]+'/#v'+anchor;
