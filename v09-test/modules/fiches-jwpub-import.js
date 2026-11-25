@@ -39,23 +39,29 @@ btn.addEventListener('click',async()=>{
   const manifest=JSON.parse(await outer.file('manifest.json').async('string'));
   const type=manifest.publication?.publicationType||'Publication';
   const title=document.createElement('h3');title.textContent=type+' — '+(manifest.publication?.title||pub.Symbol);
-  const count=document.createElement('p');count.textContent=names.length+' titre(s) distinct(s). Aperçu des illustrations originales du JWPUB, sans enregistrement dans le Répertoire.';
+  const count=document.createElement('p');count.textContent=names.length+' titre(s) distinct(s). '+(type.toLowerCase()==='tract'?'Classement proposé : TRACTS — A (Avenir).':'Classement à confirmer selon la publication.')+' Lecture des visuels originaux, sans enregistrement.';
   result.append(title,count);
   if(names.length){const list=document.createElement('ol');list.style.cssText='max-height:270px;overflow:auto;padding-left:24px';names.forEach(n=>{const li=document.createElement('li');li.textContent=n;list.append(li)});result.append(list)}
   const photos=Object.keys(inner.files).filter(n=>/\.(jpe?g|png|webp)$/i.test(n)&&!/-120x120|-270x270|-600x600/.test(n));
+  const full=document.createElement('div');full.hidden=true;full.style.cssText='position:fixed;inset:0;z-index:999999;background:#111;overflow:auto;padding:64px 14px 24px;text-align:center';
+  const close=document.createElement('button');close.textContent='× Fermer';close.style.cssText='position:fixed;top:12px;right:12px;background:#fff;color:#13243b;padding:10px 15px;z-index:2';
+  const big=document.createElement('img');big.alt='Illustration originale du JWPUB';big.style.cssText='display:block;margin:auto;max-width:100%;max-height:calc(100dvh - 100px);object-fit:contain';
+  close.onclick=()=>{full.hidden=true;big.removeAttribute('src')};full.append(close,big);document.body.append(full);
+  function openPicture(url,name){big.src=url;big.alt=name;full.hidden=false}
   if(photos.length){
    const gallery=document.createElement('div');
    gallery.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px';
    for(const name of photos){
     const blob=new Blob([await inner.file(name).async('uint8array')],{type:/png$/i.test(name)?'image/png':'image/jpeg'});
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.title='Ouvrir l’illustration originale';
+    const a=document.createElement('button');a.type='button';a.title='Afficher l’illustration originale en grand';a.style.cssText='padding:0;border:0;background:transparent;min-width:0';a.onclick=()=>openPicture(url,name);
     const img=document.createElement('img');img.src=url;img.alt='Illustration originale '+name;img.style.cssText='width:100%;height:190px;object-fit:contain;border:1px solid #b7ccdf;border-radius:8px;background:#f4f8fc';
     a.append(img);gallery.append(a);
    }
-   result.append(gallery);
+   const h=document.createElement('h4');h.textContent='Illustrations de la publication — toucher pour agrandir';result.append(h,gallery);
+   const note=document.createElement('p');note.style.cssText='font-size:13px;line-height:1.45;color:#596b7e';note.textContent='Le texte intégral du JWPUB est chiffré dans sa base de données. Il ne peut pas encore être affiché ici : aucune transcription n’est inventée.';result.append(note);
   }
-  result.hidden=false;say('Publication lue. Illustrations originales affichées.');
+  result.hidden=false;say('Publication reconnue : '+type+'. Illustrations consultables en grand.');
  }catch(e){say('Importation impossible : '+e.message,true)}
  finally{db?.close();btn.disabled=false}
 });
