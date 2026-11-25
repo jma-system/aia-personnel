@@ -472,7 +472,10 @@ function categoryView(category,letter){
    const topic=selected==='Famille'?'La famille'
     :topics.find(t=>normalized(t.replace(/^(?:La |Le |Les |L’|L')/i,''))===normalized(selected))||'';
    request={category,letter,topic,subtheme:selected};
-   replaceId=null;picker.multiple=true;picker.click();
+   // Un seul fichier Jésus remplace le pilote pour TRACTS/J et THÈMES/Jésus.
+   replaceId=(category==='TRACTS'&&letter==='J'&&selected==='Jésus')
+    ?(records.find(item=>item.id==='aia-tract-jesus-jworg-t-jss')?.id||null):null;
+   picker.multiple=!replaceId;picker.click();
   };
   wrap.append(add);
  }else{
@@ -596,7 +599,13 @@ window.addEventListener('pagehide',()=>{
   const savedSubthemes=await operation('readonly',store=>store.getAll(),extraStore);
   for(const item of savedSubthemes){if(item?.name&&item?.category&&item?.letter)customSubthemes.push(item)}
   for(const raw of stored){
-   if(raw&&raw.blob instanceof Blob&&Array.isArray(raw.placements))records.push(makeRecord(raw));
+   if(raw&&raw.blob instanceof Blob&&Array.isArray(raw.placements)){
+    if(raw.id==='aia-tract-jesus-jworg-t-jss'&&raw.topic!=='Jésus'){
+     raw.topic='Jésus';
+     try{await operation('readwrite',store=>store.put(raw))}catch(error){console.warn('AIA Jésus : classement différé',error)}
+    }
+    records.push(makeRecord(raw));
+   }
   }
   // Tract Jésus : afficher immédiatement le pilote, même si le CDN refuse fetch.
   // L'enregistrement local est tenté séparément, sans bloquer le Répertoire.
@@ -604,7 +613,7 @@ window.addEventListener('pagehide',()=>{
   if(!records.some(item=>item.id===jesusId)){
    const imageUrl='https://cms-imgp.jw-cdn.org/img/p/t-jss/F/pt/t-jss_F_lg.jpg';
    const starter={id:jesusId,label:'Jésus — Les conseils de Jésus sont-ils efficaces aujourd’hui ?',
-    topic:'',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],links:[]};
+    topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],links:[]};
    records.push({...starter,url:imageUrl,remotePilot:true});
    // Tentative non bloquante ; si le navigateur refuse CORS, la fiche reste visible.
    const controller=new AbortController();
