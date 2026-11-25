@@ -67,6 +67,27 @@ const prayerVerseLinks=[
  return link;
 });
 imageFrame.append(...prayerVerseLinks);
+// Fiche Jésus : trois zones tactiles sur les références imprimées.
+// Coordonnées mesurées sur la capture de référence Jésus, à vérifier sur téléphone.
+const jesusVerseLinks=[
+ {name:'Matthieu 7:12',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Matthieu/7/#v40007012',coords:[57,37.7,35,3.6]},
+ {name:'Jean 13:34, 35',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Jean/13/#v43013034',coords:[57,54.3,35,3.6]},
+ {name:'Matthieu 11:28-30',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Matthieu/11/#v40011028',coords:[57,74.3,36,3.6]}
+].map(entry=>{
+ const link=document.createElement('a');
+ link.className='aia-verse-hotspot aia-jesus-verse';
+ link.href=entry.url;link.target='_blank';link.rel='noopener noreferrer';
+ link.setAttribute('aria-label','Lire '+entry.name+' sur JW.org');
+ link.title=entry.name;
+ const [left,top,width,height]=entry.coords;
+ for(const [property,value] of Object.entries({left:left+'%',top:top+'%',width:width+'%',height:height+'%',bottom:'auto',transform:'none',background:'transparent',outline:'none',border:'0',boxShadow:'none',padding:'0',minHeight:'0',fontSize:'0'})){
+  link.style.setProperty(property.replace(/[A-Z]/g,c=>'-'+c.toLowerCase()),value,'important');
+ }
+ link.hidden=true;
+ return link;
+});
+imageFrame.append(...jesusVerseLinks);
+
 
 const linkButton=document.createElement('button');
 linkButton.type='button';linkButton.className='aia-link-editor-button';
@@ -169,6 +190,12 @@ function openImage(item){
   (item.placements.some(p=>p.category==='FICHES'&&p.letter==='P')&&
    selectedSubtheme.get('FICHES|P')==='Prière');
  prayerVerseLinks.forEach(link=>{link.hidden=!isPrayer});
+ // Uniquement la fiche Jésus : conserver les autres fiches inchangées.
+ const isJesus=item.topic==='Jésus'||item.subtheme==='Jésus'||
+  activeTheme==='Jésus'||/conseils de Jésus/i.test(item.label);
+ jesusVerseLinks.forEach(link=>{link.hidden=!isJesus});
+ imageFrame.classList.toggle('aia-jesus-enlarged',isJesus);
+
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
 }
 function closeImage(){
