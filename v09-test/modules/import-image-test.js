@@ -281,7 +281,7 @@ function thumb(item){
  const image=document.createElement('img');image.src=item.url;image.alt='';image.draggable=false;
  btn.append(image);
  // Masquer les noms purement numériques attribués aux photos (ex. 40495).
- if(!/^\d+$/.test(item.label.trim())){
+ if(!item.readOnly && !/^\d+$/.test(item.label.trim())){
   const title=document.createElement('span');title.textContent=item.label;btn.append(title);
  }
  btn.onclick=()=>openImage(item);return btn;
