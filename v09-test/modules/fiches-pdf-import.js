@@ -17,11 +17,11 @@ tabs.before(box);
 const input=box.querySelector('#aia-pdf-file'),btn=box.querySelector('#aia-pdf-go'),status=box.querySelector('#aia-pdf-status');
 function say(msg,err=false){status.textContent=msg;status.style.color=err?'#aa2525':'#166b42'}
 const viewer=document.createElement('div');viewer.id='aia-pdf-modal';viewer.hidden=true;viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');
-const x=document.createElement('button');x.className='aia-x';x.textContent='×';x.setAttribute('aria-label','Fermer');
-const sheet=document.createElement('article');sheet.id='aia-pdf-sheet';viewer.append(x,sheet);document.body.append(viewer);
+
+const sheet=document.createElement('article');sheet.id='aia-pdf-sheet';viewer.append(sheet);document.body.append(viewer);
 const qrModal=document.createElement('div');qrModal.id='aia-qr-modal';qrModal.hidden=true;document.body.append(qrModal);
 function close(){viewer.hidden=true;qrModal.hidden=true;document.body.style.overflow='';document.body.classList.remove('aia-pdf-print')}
-x.onclick=close;viewer.onclick=e=>{if(e.target===viewer)close()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)close()});
+viewer.onclick=e=>{if(e.target===viewer)close()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!viewer.hidden)close()});
 function element(tag,cls,txt){const el=document.createElement(tag);if(cls)el.className=cls;if(txt!==undefined)el.textContent=txt;return el}
 async function pdfLib(){if(window.pdfjsLib)return window.pdfjsLib;await new Promise((yes,no)=>{const js=document.createElement('script');js.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';js.onload=yes;js.onerror=()=>no(Error('Impossible de charger PDF.js. Vérifie la connexion Internet.'));document.head.append(js)});return window.pdfjsLib}
 async function renderPage(page,scale){const v=page.getViewport({scale});const canvas=document.createElement('canvas');canvas.width=Math.ceil(v.width);canvas.height=Math.ceil(v.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:v}).promise;return canvas}
