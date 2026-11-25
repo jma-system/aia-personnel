@@ -34,34 +34,76 @@ btn.addEventListener('click',async()=>{
   function query(sql){const stmt=db.prepare(sql),rows=[];try{while(stmt.step())rows.push(stmt.getAsObject())}finally{stmt.free()}return rows}
   const pub=query('SELECT Symbol,Year FROM Publication LIMIT 1')[0];
   if(!pub)throw Error('Publication non reconnue.');
-  const docs=query('SELECT DISTINCT Title,Subtitle FROM Document WHERE Title IS NOT NULL LIMIT 250');
-  const names=[...new Set(docs.map(d=>[d.Title,d.Subtitle].filter(Boolean).join(' — ').replace(/<[^>]*>/g,'').trim()).filter(Boolean))];
   const manifest=JSON.parse(await outer.file('manifest.json').async('string'));
   const type=manifest.publication?.publicationType||'Publication';
-  const title=document.createElement('h3');title.textContent=type+' — '+(manifest.publication?.title||pub.Symbol);
-  const count=document.createElement('p');count.textContent=names.length+' titre(s) distinct(s). '+(type.toLowerCase()==='tract'?'Classement proposé : TRACTS — A (Avenir).':'Classement à confirmer selon la publication.')+' Lecture des visuels originaux, sans enregistrement.';
-  result.append(title,count);
-  if(names.length){const list=document.createElement('ol');list.style.cssText='max-height:270px;overflow:auto;padding-left:24px';names.forEach(n=>{const li=document.createElement('li');li.textContent=n;list.append(li)});result.append(list)}
-  const photos=Object.keys(inner.files).filter(n=>/\.(jpe?g|png|webp)$/i.test(n)&&!/-120x120|-270x270|-600x600/.test(n));
-  const full=document.createElement('div');full.hidden=true;full.style.cssText='position:fixed;inset:0;z-index:999999;background:#111;overflow:auto;padding:64px 14px 24px;text-align:center';
-  const close=document.createElement('button');close.textContent='× Fermer';close.style.cssText='position:fixed;top:12px;right:12px;background:#fff;color:#13243b;padding:10px 15px;z-index:2';
-  const big=document.createElement('img');big.alt='Illustration originale du JWPUB';big.style.cssText='display:block;margin:auto;max-width:100%;max-height:calc(100dvh - 100px);object-fit:contain';
-  close.onclick=()=>{full.hidden=true;big.removeAttribute('src')};full.append(close,big);document.body.append(full);
-  function openPicture(url,name){big.src=url;big.alt=name;full.hidden=false}
-  if(photos.length){
-   const gallery=document.createElement('div');
-   gallery.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px';
-   for(const name of photos){
-    const blob=new Blob([await inner.file(name).async('uint8array')],{type:/png$/i.test(name)?'image/png':'image/jpeg'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('button');a.type='button';a.title='Afficher l’illustration originale en grand';a.style.cssText='padding:0;border:0;background:transparent;min-width:0';a.onclick=()=>openPicture(url,name);
-    const img=document.createElement('img');img.src=url;img.alt='Illustration originale '+name;img.style.cssText='width:100%;height:190px;object-fit:contain;border:1px solid #b7ccdf;border-radius:8px;background:#f4f8fc';
-    a.append(img);gallery.append(a);
-   }
-   const h=document.createElement('h4');h.textContent='Illustrations de la publication — toucher pour agrandir';result.append(h,gallery);
-   const note=document.createElement('p');note.style.cssText='font-size:13px;line-height:1.45;color:#596b7e';note.textContent='Le texte intégral du JWPUB est chiffré dans sa base de données. Il ne peut pas encore être affiché ici : aucune transcription n’est inventée.';result.append(note);
+  const pubInfo=query('SELECT MepsLanguageIndex,Symbol,Year,IssueTagNumber FROM Publication LIMIT 1')[0];
+  const parts=[pubInfo.MepsLanguageIndex,pubInfo.Symbol,pubInfo.Year];
+  if(pubInfo.IssueTagNumber&&String(pubInfo.IssueTagNumber)!=='0')parts.push(pubInfo.IssueTagNumber);
+  const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(parts.join('_'))));
+  const mask=Uint8Array.from('11cbb5587e32846d4c26790c633da289f66fe5842a3a585ce1bc3a294af5ada7'.match(/../g),v=>parseInt(v,16));
+  const keybytes=mask.map((v,i)=>v^digest[i]);
+  const key=await crypto.subtle.importKey('raw',keybytes.slice(0,16),{name:'AES-CBC'},false,['decrypt']);
+  const iv=keybytes.slice(16);
+  if(!('DecompressionStream' in window))throw Error('Décompression non prise en charge par ce navigateur.');
+  async function decode(bytes){
+   const decrypted=await crypto.subtle.decrypt({name:'AES-CBC',iv},key,bytes);
+   const stream=new Blob([decrypted]).stream().pipeThrough(new DecompressionStream('deflate'));
+   return new TextDecoder().decode(await new Response(stream).arrayBuffer());
   }
-  result.hidden=false;say('Publication reconnue : '+type+'. Illustrations consultables en grand.');
+  const docs=query('SELECT DocumentId,Title,Content FROM Document WHERE Content IS NOT NULL ORDER BY DocumentId LIMIT 100');
+  if(!docs.length)throw Error('Aucun document à lire.');
+  const pages=[];
+  for(const d of docs){try{pages.push(new DOMParser().parseFromString(await decode(d.Content),'text/html'))}catch(e){throw Error('Déchiffrement du contenu impossible : '+e.message)}}
+  const media=new Map();
+  for(const name of Object.keys(inner.files).filter(n=>/\\.(jpg|jpeg|png|webp)$/i.test(n))){
+   const bytes=await inner.file(name).async('uint8array');
+   media.set(name,URL.createObjectURL(new Blob([bytes],{type:/png$/i.test(name)?'image/png':'image/jpeg'})));
+  }
+  const article=pages.find(d=>d.querySelector('.openingContent,.bodyTxt'))||pages[pages.length-1];
+  const cover=pages[0].querySelector('img')?.getAttribute('src')?.replace('jwpub-media://','');
+  const illustration=article.querySelector('header img')?.getAttribute('src')?.replace('jwpub-media://','')||cover;
+  const originalTitle=manifest.publication?.title||docs[0].Title||'Publication';
+  const sheet=document.createElement('article');
+  sheet.style.cssText='font-family:Verdana,Geneva,sans-serif;background:#e8f6ff;border-radius:16px;overflow:hidden;color:#071425;margin:12px 0';
+  const header=document.createElement('div');header.style.cssText='background:#073a79;color:white;padding:12px 14px;font-size:16px;font-weight:bold';header.textContent=type+' — '+(manifest.publication?.shortTitle||originalTitle);sheet.append(header);
+  const body=document.createElement('div');body.style.cssText='padding:12px';
+  const heading=document.createElement('h3');heading.textContent=originalTitle;heading.style.cssText='font-size:18px;background:#cce9ff;padding:12px;border-left:6px solid #00cde7;border-radius:10px;margin:0 0 14px';body.append(heading);
+  const columns=document.createElement('div');columns.style.cssText='display:grid;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);gap:8px;align-items:start';
+  if(illustration&&media.has(illustration)){const photo=document.createElement('img');photo.src=media.get(illustration);photo.alt=article.querySelector('header img')?.alt||'Illustration originale';photo.style.cssText='width:100%;border-radius:10px;display:block';columns.append(photo)}
+  const texts=document.createElement('div');texts.style.cssText='display:flex;flex-direction:column;gap:7px;min-width:0';
+  const sourceNodes=[...article.querySelectorAll('.openingContent p,.bodyTxt li p')];
+  const books={19:'psaumes',23:'isa%C3%AFe',66:'r%C3%A9v%C3%A9lation'};
+  function bibleLink(href){
+   const m=href.match(/^jwpub:\\/\\/b\\/NWTR\\/(\\d+):(\\d+):(\\d+)/i);
+   if(!m||!books[Number(m[1])])return null;
+   const anchor=String(m[1]).padStart(2,'0')+String(m[2]).padStart(3,'0')+String(m[3]).padStart(3,'0');
+   return 'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+books[Number(m[1])]+'/'+m[2]+'/#v'+anchor;
+  }
+  for(const source of sourceNodes){
+   const card=document.createElement('div');card.style.cssText='border:1px solid #9cd6ef;border-radius:10px;padding:8px;background:#e9f6ff;font-size:12px;line-height:1.32;overflow-wrap:anywhere';
+   for(const node of source.childNodes){
+    if(node.nodeType===3){card.append(document.createTextNode(node.textContent))}
+    else if(node.nodeType===1&&node.matches('a')){
+     const url=bibleLink(node.getAttribute('href')||'');
+     const link=document.createElement(url?'a':'span');link.textContent=node.textContent;
+     if(url){link.href=url;link.target='_blank';link.rel='noopener noreferrer';link.style.cssText='color:#0661c4;text-decoration:underline;font-weight:bold'}
+     card.append(link);
+    }else card.append(document.createTextNode(node.textContent));
+   }
+   texts.append(card);
+  }
+  columns.append(texts);body.append(columns);
+  const actions=document.createElement('div');actions.style.cssText='display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:14px';
+  const qr=document.createElement('a');qr.href='https://www.jw.org/fr/';qr.target='_blank';qr.rel='noopener noreferrer';qr.style.cssText='background:#d9edff;border:1px solid #67b7e2;border-radius:10px;display:flex;align-items:center;justify-content:center;min-height:48px';
+  const qrImg=article.querySelector('img[src*="cnt_2"]');const qrName=qrImg?.getAttribute('src')?.replace('jwpub-media://','');
+  if(qrName&&media.has(qrName)){const image=document.createElement('img');image.src=media.get(qrName);image.alt='QR officiel';image.style.cssText='width:44px;height:44px;object-fit:contain';qr.append(image)}else qr.textContent='JW.org';
+  const pdf=document.createElement('button');pdf.textContent='↓ PDF';pdf.onclick=()=>window.print();
+  const share=document.createElement('button');share.textContent='Partager';share.onclick=()=>{if(navigator.share)navigator.share({title:originalTitle,url:location.href}).catch(()=>{});else navigator.clipboard?.writeText(location.href)};
+  for(const b of [pdf,share])b.style.cssText='background:#d9edff;border:1px solid #67b7e2;border-radius:10px;min-height:48px;font-size:12px;padding:4px';
+  actions.append(qr,pdf,share);body.append(actions);sheet.append(body);
+  const info=document.createElement('p');info.style.cssText='font-size:12px;color:#53657a';info.textContent='Lecture temporaire depuis le JWPUB original. Aucun enregistrement dans le Répertoire.';
+  result.append(sheet,info);
+  result.hidden=false;say('Publication lue : texte, illustration et références bibliques extraits.');
  }catch(e){say('Importation impossible : '+e.message,true)}
  finally{db?.close();btn.disabled=false}
 });
