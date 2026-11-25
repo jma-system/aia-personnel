@@ -12,7 +12,7 @@ css.textContent='#aia-fiches-pdf-import{padding:14px;margin:0 0 14px;background:
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
-box.innerHTML='<h2>Importer une fiche depuis un PDF</h2><label for="aia-pdf-file">1. Choisir le fichier PDF</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Créer la fiche illustrée</button><p id="aia-pdf-status" role="status">Prêt pour l’importation.</p>';
+box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche FAMILLE</button><p id="aia-pdf-status" role="status">Prêt pour l’importation.</p>';
 tabs.before(box);
 const input=box.querySelector('#aia-pdf-file'),btn=box.querySelector('#aia-pdf-go'),status=box.querySelector('#aia-pdf-status');
 function say(msg,err=false){status.textContent=msg;status.style.color=err?'#aa2525':'#166b42'}
@@ -62,16 +62,16 @@ try{
  pdf=await lib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
  if(pdf.numPages<2)throw Error('Le modèle pilote attend les deux pages du tract.');
  const p1=await pdf.getPage(1),p2=await pdf.getPage(2);
- const t1=(await p1.getTextContent()).items.map(x=>x.str).join('');
- const t2=(await p2.getTextContent()).items.map(x=>x.str).join('');
+ const t1=(await p1.getTextContent()).items.map(x=>x.str).join(' ');
+ const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
- if(!txt.includes('pourtoujours')||!txt.includes('psaume3729')||!txt.includes('isaie3324'))throw Error('Ce modèle n’est pas encore configuré pour ce PDF. Aucune fiche inventée.');
+ const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!sourceEvidence||!(officialFilename||officialText))throw Error('Ce PDF ne correspond pas au tract pilote vérifié. Aucun texte n’est inventé.');
  const c1=await renderPage(p1,3),c2=await renderPage(p2,3);
  const photoHeight=Math.round(c1.height*(128/306.14));
  const photo=crop(c1,0,0,c1.width,photoHeight,720);
- const qr=crop(c2,c2.width*(154/233.86),c2.height*(239/306.14),c2.width*(56/233.86),c2.height*(56/306.14),360);
+ const qr=crop(c2,c2.width*(156/233.86),c2.height*(238/306.14),c2.width*(55/233.86),c2.height*(59/306.14),360);
  build(photo,qr,f);
- say('Fiche créée : vérifie l’image et les cinq liens bibliques.');
+ say('Fiche préparée depuis le PDF original : vérifie l’image, le QR et les cinq liens bibliques.');
 }catch(e){say('Conversion impossible : '+e.message,true)}
 finally{try{await pdf?.destroy()}catch(e){}btn.disabled=false}
 });
