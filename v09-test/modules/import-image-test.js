@@ -23,49 +23,6 @@ viewer.className='aia-photo-viewer';viewer.hidden=true;
 viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');viewer.setAttribute('aria-label','Image agrandie');
 const close=document.createElement('button');close.type='button';close.className='aia-photo-close';
 close.textContent='×';close.setAttribute('aria-label','Fermer');
-// Signets temporaires : un bouton commun à toutes les fiches consultées.
-const bookmarkBtn=document.createElement('button');
-bookmarkBtn.type='button';bookmarkBtn.className='aia-photo-bookmark';
-bookmarkBtn.textContent='♧';bookmarkBtn.setAttribute('aria-label','Ajouter cette fiche aux signets');
-bookmarkBtn.setAttribute('aria-pressed','false');
-bookmarkBtn.style.cssText='position:absolute;top:12px;right:69px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid white;background:#17365e;color:white;font-size:26px;padding:0';
-const bookmarkList=document.createElement('details');bookmarkList.className='aia-bookmark-list';
-bookmarkList.style.cssText='margin:8px 0 12px';
-const bookmarkSummary=document.createElement('summary');bookmarkSummary.textContent='Mes signets';
-bookmarkSummary.style.cssText='cursor:pointer;padding:10px 12px;background:#e9f6ff;border:1px solid #9bc9e5;border-radius:10px;font-weight:700;color:#17365e';
-const bookmarkItems=document.createElement('div');bookmarkItems.style.cssText='padding:8px;display:grid;gap:7px';
-bookmarkList.append(bookmarkSummary,bookmarkItems);
-section.querySelector('.aia-index-tabs')?.before(bookmarkList);
-function paintBookmarkButton(){
- if(!currentPhoto)return;
- const saved=window.AIABookmarks?.has(currentPhoto.id)||false;
- bookmarkBtn.textContent=saved?'♥':'♡';
- bookmarkBtn.setAttribute('aria-pressed',String(saved));
- bookmarkBtn.setAttribute('aria-label',saved?'Retirer cette fiche des signets':'Ajouter cette fiche aux signets');
-}
-function renderBookmarkList(){
- const ids=window.AIABookmarks?.ids()||[];
- bookmarkSummary.textContent='Mes signets ('+ids.length+')';
- bookmarkItems.replaceChildren();
- if(!ids.length){const note=document.createElement('span');note.textContent='Aucun signet pour cette session.';bookmarkItems.append(note);return}
- for(const id of ids){
-  const item=id==='jesus'?{label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',id}:records.find(x=>x.id===id);
-  if(!item)continue;
-  const button=document.createElement('button');button.type='button';
-  button.style.cssText='width:100%;text-align:left;padding:10px;background:#fff;border:1px solid #b3cfe6;border-radius:9px;color:#17365e';
-  button.textContent=item.label;
-  button.onclick=()=>{if(id==='jesus')location.href='./fiches/jesus.html';else openImage(item)};
-  bookmarkItems.append(button);
- }
-}
-bookmarkBtn.onclick=()=>{
- if(!currentPhoto)return;
- window.AIABookmarks?.toggle(currentPhoto.id);
- paintBookmarkButton();renderBookmarkList();
-};
-bookmarkList.addEventListener('toggle',()=>{if(bookmarkList.open)renderBookmarkList()});
-window.addEventListener('aia:bookmarks-changed',renderBookmarkList);
-renderBookmarkList();
 const imageFrame=document.createElement('div');imageFrame.className='aia-photo-frame';
 const large=document.createElement('img');large.alt='Fiche agrandie';
 // Les liens sont des zones transparentes placées exactement sur les textes bleus.
@@ -140,7 +97,7 @@ linkButton.setAttribute('aria-label','Ajouter un lien biblique sur cette image')
 const statusLink=document.createElement('div');statusLink.className='aia-link-editor-status';statusLink.hidden=true;
 const userLinks=document.createElement('div');userLinks.className='aia-custom-links';
 imageFrame.append(userLinks);
-viewer.append(close,bookmarkBtn,imageFrame,linkButton,statusLink);document.body.append(viewer);
+viewer.append(close,imageFrame,linkButton,statusLink);document.body.append(viewer);
 let currentPhoto=null,placingLink=false;
 function parseVerseReference(input){
  const match=input.trim().match(/^(.+?)\\s+(\\d{1,3})\\s*:\\s*(\\d{1,3})(?:\\s*[-–,].*)?$/u);
@@ -217,7 +174,7 @@ large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
  currentPhoto=item;placingLink=false;statusLink.hidden=true;
- paintBookmarkButton();
+
  linkButton.textContent='Ajouter un verset';
  imageFrame.classList.remove('aia-placing-link');
  familyVerseLinks.forEach(link=>link.style.pointerEvents='auto');
@@ -375,7 +332,7 @@ function gallery(items,category='',letter='',theme=''){
   tick.hidden=true;tick.setAttribute('aria-hidden','true');
   button.append(tick);
   button.onclick=()=>{
-   if(!selectionActive){if(item.id==='aia-jesus-approved')window.location.href='./fiches/jesus.html?v=9';else openImage(item);return}
+   if(!selectionActive){if(item.id==='aia-jesus-approved')window.location.href='./fiches/jesus.html?v=13';else openImage(item);return}
    if(item.readOnly)return;
    if(selectedIds.has(item.id))selectedIds.delete(item.id);
    else selectedIds.add(item.id);
