@@ -1,0 +1,116 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AIA — Thème L’avenir</title><style>
+*{box-sizing:border-box}body{margin:0;background:#111;color:#071425;font-family:Arial,sans-serif}.sheet{width:calc(100% - 24px);max-width:640px;margin:24px auto;background:#e8f6ff;border-radius:22px;overflow:hidden}.top{height:54px;background:#073a79;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:22px}.top a{color:white;text-decoration:none;font-size:32px}.body{padding:20px 14px 24px}.heading{background:#cce9ff;border-radius:18px;padding:16px 16px 16px 40px;position:relative;font-size:clamp(20px,4.2vw,28px);font-weight:bold;line-height:1.18}.heading:before{content:"";position:absolute;left:18px;top:18px;bottom:18px;width:8px;border-radius:8px;background:#00cde7}.content{display:grid;grid-template-columns:minmax(0,0.95fr) minmax(0,1.05fr);gap:10px;margin-top:20px;align-items:stretch}.photo{border-radius:18px;overflow:hidden;min-width:0;min-height:0;width:100%;aspect-ratio:0.56;align-self:start;background:#dceaff;position:relative}.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}.photo small{position:absolute;bottom:0;left:0;right:0;background:#ffffffdf;padding:4px;font-size:10px;text-align:center}.verses{display:flex;flex-direction:column;gap:8px;min-width:0}.verse{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0;border:1px solid #9cd6ef;border-radius:16px;padding:10px 12px;background:#e9f6ff;font-size:clamp(12px,2.6vw,17px);line-height:1.22}.verse a{color:#0661c4;text-decoration:underline;font-weight:bold;display:inline-block;padding:3px 0;min-height:26px}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}.actions button,.actions a{font:inherit;font-size:20px;border:1px solid #67b7e2;background:#d9edff;border-radius:16px;min-height:70px;color:#071425;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}@media(max-width:420px){.sheet{width:calc(100% - 16px);margin:10px auto;border-radius:18px}.body{padding:12px 8px 16px}.top{height:55px;font-size:18px}.heading{padding:12px 10px 12px 30px}.heading:before{left:12px}.content{gap:7px;margin-top:13px}.photo{min-height:0}.verse{padding:7px 8px;font-size:12px}.actions button,.actions a{font-size:14px;min-height:52px}.actions .qr img{width:54px;height:54px;object-fit:contain}}@media print{body{background:white}.sheet{margin:0;max-width:100%;break-inside:avoid}.actions{display:none}.top a{display:none}.photo{min-height:0}a{color:#0661c4!important}}
+ .actions .qr{padding:4px}.actions .qr img{display:block;width:64px;height:64px;max-width:90%;object-fit:contain}.verse{overflow-wrap:break-word}.aia-close{position:fixed;z-index:20;top:calc(env(safe-area-inset-top, 0px) + 14px);right:14px;display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:#183554;border:2px solid white;color:white;font:700 34px/1 Arial;text-decoration:none;box-shadow:0 1px 6px #0006}.top .back-theme{color:white;text-decoration:none}.top .back-theme:focus-visible,.aia-close:focus-visible{outline:3px solid #00cde7}@media print{.aia-close{display:none}}
+/* AIA : gabarit FAMILLE de référence — cadre, proportions et typographie. */
+html,body{min-height:100%;background:#111}
+body{min-height:100dvh;padding-top:clamp(110px,15dvh,190px);padding-bottom:80px}
+.sheet{width:calc(100% - 24px);max-width:640px;margin:0 auto;background:#e8f6ff;border-radius:22px}
+.top{height:52px;padding:0 20px;font-size:clamp(15px,3vw,20px)}
+.top .bookmark{font-size:23px}
+.body{padding:14px 14px 22px}
+.heading{border-radius:17px;padding:14px 14px 14px 37px;font-size:clamp(19px,4.2vw,29px);line-height:1.12}
+.heading:before{left:16px;top:13px;bottom:13px;width:7px}
+.content{grid-template-columns:minmax(0,.98fr) minmax(0,1.02fr);gap:12px;margin-top:15px}
+.photo{aspect-ratio:.56;border-radius:14px;align-self:stretch;min-height:0}
+.photo img{object-fit:cover;object-position:center}
+.verses{gap:7px}
+.verse{font-size:clamp(12px,2.75vw,17px);line-height:1.18;padding:7px 10px;border-radius:14px}
+.verse a{font-size:inherit;min-height:0;padding:3px 0 0}
+.actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:19px}
+.actions button,.actions a{min-height:57px;border-radius:13px;font-size:clamp(13px,2.8vw,18px)}
+.actions .qr img{width:52px;height:52px;max-width:90%}
+.aia-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 70px);right:max(16px,calc((100vw - 640px)/2 + 6px));height:44px;width:44px;min-height:44px;min-width:44px;border:1px solid #fff;background:#183554;color:#fff;font-size:31px;z-index:1000}
+@media(max-width:420px){
+ body{padding-top:118px;padding-bottom:46px}
+ .sheet{width:calc(100% - 24px);margin:0 auto;border-radius:19px}
+ .top{height:43px;padding:0 14px;font-size:15px}
+ .body{padding:9px 9px 17px}
+ .heading{padding:10px 10px 10px 26px;font-size:clamp(17px,4.25vw,21px);border-radius:12px}
+ .heading:before{left:11px;top:10px;bottom:10px;width:6px}
+ .content{gap:7px;margin-top:12px}
+ .photo{aspect-ratio:.56;border-radius:10px}
+ .verses{gap:5px}
+ .verse{padding:5px 6px;border-radius:10px;font-size:clamp(11px,2.75vw,13px);line-height:1.14}
+ .verse a{padding:2px 0 0;min-height:0}
+ .actions{margin-top:16px;gap:7px}
+ .actions button,.actions a{min-height:48px;font-size:13px;border-radius:10px}
+ .actions .qr img{height:42px;width:42px}
+ .aia-close{top:65px;right:15px;width:44px;height:44px}
+}
+@media print{body{padding:0;background:#fff}.sheet{max-width:100%;width:100%}.aia-close{display:none}}
+
+/* Correction ciblée : typographie Verdana et versets accolés aux textes.
+   Les encadrés restent à hauteur égale, mais leur contenu démarre en haut. */
+.sheet{font-family:Verdana,Geneva,sans-serif}
+.verse{display:block;justify-content:initial}
+.verse a{display:block;width:fit-content;margin-top:4px;padding:0;min-height:0;line-height:1.2}
+@media(max-width:420px){.verse a{margin-top:0}}
+/* Ajustements demandés : références jointives, image et carte plus hautes. */
+.verse a{margin-top:0!important;line-height:1.13!important;padding:0!important}
+.photo{aspect-ratio:0.50!important}
+.content{align-items:stretch}
+.actions .share-icon{width:23px;height:23px;flex:none;margin-right:7px}
+@media(max-width:420px){.photo{aspect-ratio:0.50!important}.actions .share-icon{width:20px;height:20px;margin-right:5px}}
+
+/* Correctif v2 isolé : le lien suit le texte sans espace distribué. */
+.verses{display:grid!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:7px!important;min-height:0}
+.verse{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:0!important;min-width:0;min-height:0}
+.verse a{display:inline-block!important;flex:none!important;align-self:flex-start!important;margin:0!important;padding:0!important;min-height:0!important;line-height:1.15!important}
+.actions button:last-child{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:7px!important}
+.actions button:last-child svg.share-icon{display:inline-block!important;visibility:visible!important;opacity:1!important;width:25px!important;height:25px!important;min-width:25px!important;stroke:#10253b!important}
+@media(max-width:420px){.verse{font-size:12px!important}.verse a{margin-top:0!important}.actions button:last-child svg.share-icon{width:20px!important;height:20px!important;min-width:20px!important}}
+
+/* Gabarit JÉSUS — ajustement géométrique d'après FAMILLE (capture 688 × 1536). */
+@media screen {
+  .sheet{font-family:Verdana,Geneva,sans-serif}
+  .photo{aspect-ratio:291 / 519!important;align-self:start!important}
+  .verses{display:flex!important;flex-direction:column!important;gap:10px!important;min-width:0}
+  .verse{display:block!important;flex:0 0 auto!important;justify-content:flex-start!important;align-items:initial!important;min-height:0!important;font-family:Verdana,Geneva,sans-serif!important;line-height:1.19!important;padding:10px 13px!important}
+  .verse a{display:block!important;width:fit-content!important;margin:1px 0 0 0!important;padding:0!important;min-height:0!important;line-height:1.16!important}
+  .actions button:last-child svg.share-icon{display:inline-block!important;width:23px!important;height:23px!important;min-width:23px!important;opacity:1!important;visibility:visible!important}
+}
+@media screen and (max-width:420px) {
+  body{padding-top:86px!important}
+  .sheet{width:calc(100% - 24px)!important}
+  .body{padding:11px 10px 18px!important}
+  .heading{font-family:Verdana,Geneva,sans-serif!important}
+  .content{grid-template-columns:minmax(0, 0.96fr) minmax(0,1.04fr)!important;gap:7px!important;margin-top:17px!important}
+  .photo{aspect-ratio:291 / 519!important}
+  .verses{gap:5px!important}
+  .verse{padding:7px 9px!important;border-radius:10px!important;font-size:12px!important;line-height:1.20!important}
+  .verse a{margin-top:1px!important;line-height:1.16!important}
+  .aia-close{top:65px!important;right:15px!important}
+  .actions{margin-top:17px!important}
+}
+
+/* Fermeture distincte du signet : au-dessus de la carte, sur fond noir. */
+@media screen{
+ .aia-close{position:fixed!important;top:calc(env(safe-area-inset-top,0px) + 12px)!important;right:16px!important;z-index:9999!important;transform:none!important}
+}
+@media print{.aia-close{display:none!important}}
+
+/* Commandes séparées : fermeture sur bande noire, signet dans le bandeau. */
+@media screen{
+ .aia-close{position:absolute!important;top:18px!important;right:22px!important;z-index:100!important;transform:none!important}
+ .top .bookmark-btn{flex:0 0 42px;display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#fff;border:0;box-shadow:none;border-radius:7px;padding:5px;min-width:42px;min-height:42px;cursor:pointer}
+ .top .bookmark-btn[aria-pressed="true"] svg path{fill:#fff}
+ .top .bookmark-btn:focus-visible{outline:3px solid #00cde7}
+}
+@media print{.top .bookmark-btn{border:0;background:none}}
+
+/* Navigation validée : croix sur la zone noire, signet visible mais désactivé. */
+@media screen{
+ .aia-close{
+   position:fixed!important;
+   top:20px!important;
+   right:16px!important;
+   left:auto!important;
+   width:44px!important;
+   height:44px!important;
+   z-index:10000!important;
+   transform:none!important;
+ }
+ .top .bookmark-placeholder{display:inline-flex;align-items:center;justify-content:center;flex:0 0 42px;width:42px;height:42px;pointer-events:none}
+ .top .bookmark-placeholder svg{display:block}
+}
+</style></head><body><a class="aia-close" href="../index.html?aia=themes" aria-label="Fermer la fiche et revenir à tous les thèmes">×</a><main class="sheet"><header class="top"><a class="back-theme" href="../index.html?aia=themes" aria-label="Retour aux thèmes">‹</a><span>Thème – L’avenir</span><span class="bookmark-placeholder" aria-label="Signets à activer ultérieurement"><svg class="bookmark" width="24" height="28" viewBox="0 0 24 28" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 2.5H20V25L12 19.5L4 25V2.5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/></svg></span></header><section class="body"><div class="heading">Peut-on vivre pour toujours ?</div><div class="content"><div class="photo"><img src="https://cms-imgp.jw-cdn.org/img/p/1102024301/univ/art/1102024301_univ_sqr_xl.jpg" alt="Illustration officielle du tract « Peut-on vivre pour toujours ? »" loading="eager"></div><div class="verses"><div class="verse">La Bible promet que les justes vivront éternellement sur la terre.<a target="_blank" rel="noopener noreferrer" href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/psaumes/37/#v19037029">Psaume 37:29</a></div><div class="verse">Dans l’avenir, personne ne souffrira de maladie.<a target="_blank" rel="noopener noreferrer" href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/isa%C3%AFe/33/#v23033024">Isaïe 33:24 ; 35:5, 6</a></div><div class="verse">La terre sera restaurée et les dégâts causés à l’environnement seront réparés.<a target="_blank" rel="noopener noreferrer" href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/isa%C3%AFe/35/#v23035001">Isaïe 35:1, 2 ; Révélation 11:18</a></div></div></div><div class="actions"><a class="qr" id="qr-link" href="./avenir.html" aria-label="Code QR — ouvrir la fiche L’avenir"><img id="qr" alt="Code QR de la fiche L’avenir"></a><button onclick="window.print()">↓ PDF</button><button onclick="if(navigator.share){navigator.share({title:document.title,url:location.href}).catch(()=>{})}else{navigator.clipboard?.writeText(location.href);alert('Lien copié si autorisé par le navigateur')}"><svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4M8.7 13.5l6.6 4"/></svg><span>Partager</span></button></div></section></main><script>const qrTarget=new URL('./avenir.html',location.href).href;document.getElementById('qr').src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=4&data='+encodeURIComponent(qrTarget);document.getElementById('qr-link').href=qrTarget;</script></body></html>
