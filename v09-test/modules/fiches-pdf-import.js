@@ -41,7 +41,7 @@ const signet=element('span');signet.innerHTML='<svg width="24" height="28" viewB
 bar.append(back,title,signet);
 const body=element('section','aia-body');
 body.append(element('div','aia-heading','Peut-on vivre pour toujours ?'));
-const cols=element('div','aia-cols'),pic=element('div','aia-photo'),im=document.createElement('img');im.src=photo;im.alt='Photographie originale : une femme regarde par la fenêtre';pic.append(im);
+const cols=element('div','aia-cols'),pic=element('div','aia-photo'),im=document.createElement('img');im.src=photo;im.alt='Illustration : un homme en montagne avec un ourson et sa mère';pic.append(im);
 const verses=element('div','aia-verses');
 passage(verses,'« Les justes posséderont la terre et ils y vivront éternellement »',[['Psaume 37:29',19,37,29]]);
 passage(verses,'Tout le monde sera en parfaite santé.',[['Isaïe 33:24',23,33,24],['Isaïe 35:5, 6',23,35,5]]);
@@ -49,7 +49,7 @@ passage(verses,'Les dégâts faits à l’environnement seront réparés.',[['Is
 cols.append(pic,verses);body.append(cols);
 const acts=element('div','aia-actions'),qrBtn=element('button'),qrImg=document.createElement('img');qrImg.src=qr;qrImg.alt='QR code';qrBtn.title='Agrandir le QR original';qrBtn.append(qrImg);qrBtn.onclick=()=>qrLarge(qr);
 const pdfBtn=element('button','','↓ PDF');pdfBtn.onclick=()=>{document.body.classList.add('aia-pdf-print');window.addEventListener('afterprint',()=>document.body.classList.remove('aia-pdf-print'),{once:true});window.print()};
-const shareBtn=element('button','','Partager');shareBtn.onclick=()=>share(pdfFile);
+const shareBtn=element('button','','♧ Partager');shareBtn.onclick=()=>share(pdfFile);
 acts.append(qrBtn,pdfBtn,shareBtn);body.append(acts);sheet.append(bar,body);viewer.hidden=false;viewer.scrollTop=0;document.body.style.overflow='hidden';
 }
 btn.addEventListener('click',async()=>{
@@ -66,9 +66,9 @@ try{
  const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
  const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!sourceEvidence||!(officialFilename||officialText))throw Error('Ce PDF ne correspond pas au tract pilote vérifié. Aucun texte n’est inventé.');
- const c1=await renderPage(p1,3),c2=await renderPage(p2,3);
- const photoHeight=Math.round(c1.height*(128/306.14));
- const photo=crop(c1,0,0,c1.width,photoHeight,720);
+ const c2=await renderPage(p2,3);
+ 
+ const photo='./fiches/avenir-ours.svg?v=1';
  const qr=crop(c2,c2.width*(156/233.86),c2.height*(238/306.14),c2.width*(55/233.86),c2.height*(59/306.14),360);
  build(photo,qr,f);
  say('Fiche préparée depuis le PDF original : vérifie l’image, le QR et les cinq liens bibliques.');
