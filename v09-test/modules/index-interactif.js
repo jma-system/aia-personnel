@@ -27,4 +27,9 @@ section.querySelector('#aia-index-home').onclick=()=>window.showHome?window.show
 const openButton=document.getElementById('aia-repertoire-open');
 if(openButton)openButton.addEventListener('click',()=>window.show('indexPanel'));
 render();
+// Retour depuis une fiche : ouvrir directement la liste des thèmes, pas l’accueil AIA.
+if(new URLSearchParams(location.search).get('aia')==='themes'){
+ category='THÈMES';letter='';render();
+ if(typeof window.show==='function')window.show('indexPanel');
+}
 })();
