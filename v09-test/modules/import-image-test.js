@@ -286,16 +286,9 @@ function thumb(item){
  }
  btn.onclick=()=>openImage(item);return btn;
 }
-// Accès commun à la fiche Jésus dans TRACTS et THÈMES, sans stockage dupliqué.
-function jesusSharedEntry(){
- const link=document.createElement('a');
- link.href='./fiches/jesus.html';
- link.textContent='Jésus — Les conseils de Jésus sont-ils efficaces aujourd’hui ?';
- link.className='aia-jesus-shared-entry';
- link.style.cssText='display:block;margin:10px 0;padding:12px;border:1px solid #80b9df;border-radius:12px;background:#e9f6ff;color:#164a81;font-weight:700;text-decoration:underline';
- link.setAttribute('aria-label','Ouvrir la fiche Jésus et ses trois références bibliques');
- return link;
-}
+// Fiche illustrée Jésus validée : un seul fichier partagé par TRACTS et THÈMES.
+// Le fichier n'est pas enregistré dans IndexedDB.
+const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp',readOnly:true};
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
  const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
@@ -337,7 +330,8 @@ function gallery(items,category='',letter='',theme=''){
   tick.hidden=true;tick.setAttribute('aria-hidden','true');
   button.append(tick);
   button.onclick=()=>{
-   if(!selectionActive){openImage(item);return}
+   if(!selectionActive){if(item.id==='aia-jesus-approved')window.location.href='./fiches/jesus.html';else openImage(item);return}
+   if(item.readOnly)return;
    if(selectedIds.has(item.id))selectedIds.delete(item.id);
    else selectedIds.add(item.id);
    update();
@@ -410,11 +404,11 @@ function isUnder(item,category,letter){
 }
 function categoryView(category,letter){
  if(!categories.includes(category)||!letter)return;
- if(category==='TRACTS'&&letter==='J')area.append(jesusSharedEntry());
  if(!ready){note('Ouverture du stockage…');return}
  if(!db){note('Stockage indisponible sur ce navigateur.');return}
  const key=category+'|'+letter;
- const items=records.filter(item=>isUnder(item,category,letter));
+ const items=records.filter(item=>isUnder(item,category,letter)&&item.id!=='aia-tract-jesus-jworg-t-jss');
+ if(category==='TRACTS'&&letter==='J')items.unshift(jesusApproved);
  // Initialiser F avec les sous-thèmes déjà validés. Sur les autres lettres,
  // les noms sont créés par l'utilisateur ou issus des fiches existantes.
  // Les noms d'origine restent les identifiants : renommer n'altère aucune photo.
@@ -593,8 +587,8 @@ function renderTheme(theme){
   }catch(error){alert('Renommage impossible : '+(error?.message||'erreur'))}
  };
  headingRow.append(heading,rename);
- const items=records.filter(item=>item.topic===theme);
- if(theme==='Jésus')area.append(jesusSharedEntry());
+ const items=records.filter(item=>item.topic===theme&&item.id!=='aia-tract-jesus-jworg-t-jss');
+ if(theme==='Jésus')items.unshift(jesusApproved);
  const view=gallery(items,'','',theme);
  const add=makeButton('Importer','aia-import-button');
  add.setAttribute('aria-label','Importer des images dans le thème '+theme);
@@ -611,7 +605,7 @@ section.addEventListener('aia:index-render',e=>{
   if(!ready)return;
   for(const tile of area.querySelectorAll('.aia-index-tile')){
    const name=tile.querySelector('strong')?.textContent;
-   const item=records.find(r=>r.topic===name);
+   const item=name==='Jésus'?jesusApproved:records.find(r=>r.topic===name);
    const pic=tile.querySelector('.aia-index-placeholder');
    if(item&&pic){const img=document.createElement('img');img.src=item.url;img.alt='';img.className='aia-family-thumb';pic.replaceWith(img)}
    const title=tile.querySelector('strong');
@@ -646,31 +640,7 @@ window.addEventListener('pagehide',()=>{
     records.push(makeRecord(raw));
    }
   }
-  // Tract Jésus : afficher immédiatement le pilote, même si le CDN refuse fetch.
-  // L'enregistrement local est tenté séparément, sans bloquer le Répertoire.
-  const jesusId='aia-tract-jesus-jworg-t-jss';
-  if(!records.some(item=>item.id===jesusId)){
-   const imageUrl='https://cms-imgp.jw-cdn.org/img/p/t-jss/F/pt/t-jss_F_lg.jpg';
-   const starter={id:jesusId,label:'Jésus — Les conseils de Jésus sont-ils efficaces aujourd’hui ?',
-    topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],links:[]};
-   records.push({...starter,url:imageUrl,remotePilot:true});
-   // Tentative non bloquante ; si le navigateur refuse CORS, la fiche reste visible.
-   const controller=new AbortController();
-   const timer=setTimeout(()=>controller.abort(),7000);
-   fetch(imageUrl,{signal:controller.signal}).then(response=>{
-    if(!response.ok)throw new Error('Image indisponible');
-    return response.blob();
-   }).then(async blob=>{
-    if(!blob.type.startsWith('image/'))return;
-    await operation('readwrite',store=>store.put({...starter,blob}));
-    const index=records.findIndex(item=>item.id===jesusId);
-    if(index>=0&&records[index].remotePilot){
-     records[index]=makeRecord({...starter,blob});
-     refresh();
-    }
-   }).catch(error=>console.warn('AIA Jésus : mode image distante',error))
-     .finally(()=>clearTimeout(timer));
-  }
+
  }catch(error){console.error('AIA IndexedDB : ',error);db=null}
  finally{ready=true;refresh()}
 })();
