@@ -598,6 +598,27 @@ window.addEventListener('pagehide',()=>{
   for(const raw of stored){
    if(raw&&raw.blob instanceof Blob&&Array.isArray(raw.placements))records.push(makeRecord(raw));
   }
+  // Tract pilote Jésus : ajout indépendant, sans modifier Famille ni Prière.
+  // Illustration officielle de la rubrique JW.org / Bibliothèque / Tracts.
+  const jesusId='aia-tract-jesus-jworg-t-jss';
+  if(!records.some(item=>item.id===jesusId)){
+   const imageUrl='https://cms-imgp.jw-cdn.org/img/p/t-jss/F/pt/t-jss_F_lg.jpg';
+   const starter={id:jesusId,label:'Jésus — Les conseils de Jésus sont-ils efficaces aujourd’hui ?',
+    topic:'',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],links:[]};
+   try{
+    const response=await fetch(imageUrl);
+    if(!response.ok)throw new Error('Image JW.org indisponible : '+response.status);
+    const blob=await response.blob();
+    if(!blob.type.startsWith('image/'))throw new Error('Réponse non image');
+    await operation('readwrite',store=>store.add({...starter,blob}));
+    records.push(makeRecord({...starter,blob}));
+   }catch(error){
+    // Repli pour le test : l'image distante apparaît quand même si le CDN
+    // bloque le téléchargement inter-origines. Aucun autre dossier n'est touché.
+    console.warn('AIA Jésus : image non enregistrée localement',error);
+    records.push({...starter,url:imageUrl,remotePilot:true});
+   }
+  }
  }catch(error){console.error('AIA IndexedDB : ',error);db=null}
  finally{ready=true;refresh()}
 })();
