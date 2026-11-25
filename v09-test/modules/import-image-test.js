@@ -286,6 +286,16 @@ function thumb(item){
  }
  btn.onclick=()=>openImage(item);return btn;
 }
+// Accès commun à la fiche Jésus dans TRACTS et THÈMES, sans stockage dupliqué.
+function jesusSharedEntry(){
+ const link=document.createElement('a');
+ link.href='./fiches/jesus.html';
+ link.textContent='Jésus — Les conseils de Jésus sont-ils efficaces aujourd’hui ?';
+ link.className='aia-jesus-shared-entry';
+ link.style.cssText='display:block;margin:10px 0;padding:12px;border:1px solid #80b9df;border-radius:12px;background:#e9f6ff;color:#164a81;font-weight:700;text-decoration:underline';
+ link.setAttribute('aria-label','Ouvrir la fiche Jésus et ses trois références bibliques');
+ return link;
+}
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
  const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
@@ -400,6 +410,7 @@ function isUnder(item,category,letter){
 }
 function categoryView(category,letter){
  if(!categories.includes(category)||!letter)return;
+ if(category==='TRACTS'&&letter==='J')area.append(jesusSharedEntry());
  if(!ready){note('Ouverture du stockage…');return}
  if(!db){note('Stockage indisponible sur ce navigateur.');return}
  const key=category+'|'+letter;
@@ -583,6 +594,7 @@ function renderTheme(theme){
  };
  headingRow.append(heading,rename);
  const items=records.filter(item=>item.topic===theme);
+ if(theme==='Jésus')area.append(jesusSharedEntry());
  const view=gallery(items,'','',theme);
  const add=makeButton('Importer','aia-import-button');
  add.setAttribute('aria-label','Importer des images dans le thème '+theme);
