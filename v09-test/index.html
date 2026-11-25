@@ -39,19 +39,8 @@ function byId(id){return document.getElementById(id)}function show(id){for(const
 <script type="module" src="modules/parcours-aia.js?v=1"></script>
 <link rel="stylesheet" href="modules/index-interactif.css?v=32">
 <script type="module" src="modules/index-interactif.js?v=10"></script>
-<script type="module" src="modules/import-image-test.js?v=38"></script>
-<script>
-/* Accès isolé au prototype Jésus ; ne touche pas aux fiches IndexedDB. */
-document.addEventListener('DOMContentLoaded',()=>{
- const panel=document.getElementById('indexPanel');
- if(!panel)return;
- const link=document.createElement('a');
- link.href='./fiches/jesus.html';
- link.textContent='Voir la fiche Jésus — test';
- link.style.cssText='display:block;padding:12px;margin:12px 0;background:#e8f6ff;border:1px solid #67b7e2;border-radius:12px;color:#064a93;font-weight:700;text-align:center';
- panel.insertBefore(link,panel.firstChild);
-});
-</script>
+<script type="module" src="modules/import-image-test.js?v=39"></script>
+
 <script type="module" src="modules/cvm-jwpub-home.js?v=6"></script>
 </body></html>
 
