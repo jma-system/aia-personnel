@@ -278,6 +278,7 @@ function makeButton(text,cls){
 function thumb(item){
  const btn=makeButton('', 'aia-gallery-card');
  btn.setAttribute('aria-label','Ouvrir '+item.label);
+ if(item.readOnly)btn.classList.add('aia-approved-thumb');
  const image=document.createElement('img');image.src=item.url;image.alt='';image.draggable=false;
  btn.append(image);
  // Masquer les noms purement numériques attribués aux photos (ex. 40495).
@@ -288,7 +289,7 @@ function thumb(item){
 }
 // Fiche illustrée Jésus validée : un seul fichier partagé par TRACTS et THÈMES.
 // Le fichier n'est pas enregistré dans IndexedDB.
-const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp',readOnly:true};
+const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp?v=2',readOnly:true};
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
  const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
