@@ -331,7 +331,7 @@ function gallery(items,category='',letter='',theme=''){
   tick.hidden=true;tick.setAttribute('aria-hidden','true');
   button.append(tick);
   button.onclick=()=>{
-   if(!selectionActive){if(item.id==='aia-jesus-approved')window.location.href='./fiches/jesus.html';else openImage(item);return}
+   if(!selectionActive){if(item.id==='aia-jesus-approved')window.location.href='./fiches/jesus.html?v=8';else openImage(item);return}
    if(item.readOnly)return;
    if(selectedIds.has(item.id))selectedIds.delete(item.id);
    else selectedIds.add(item.id);
