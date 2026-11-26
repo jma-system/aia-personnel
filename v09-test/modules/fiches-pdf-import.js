@@ -118,7 +118,12 @@ function extractTract(p1,p2,items1,items2){
   if(!description)continue;
   entries.push({text:description+'.',citation,refs:parsedReferences(citation)});
  }
- if(entries.length<3||entries.some(e=>!e.refs.length))throw Error('Références bibliques non reconnues : vérification nécessaire avant la conversion.');
+ if(entries.length<3)throw Error('Le tract ne contient pas assez de passages exploitables : vérification nécessaire.');
+ // Conserver les citations imprimées même lorsqu'un livre n'est pas encore reconnu.
+ // Aucun lien n'est fabriqué pour une référence incertaine.
+ for(const entry of entries){
+  if(!entry.refs.length)entry.unverified=true;
+ }
  return {title,entries};
 }
 function passageExtracted(parent,entry){
@@ -127,6 +132,11 @@ function passageExtracted(parent,entry){
   const a=element('a','',r.label);
   a.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+r.slug+'/'+r.chapter+'/#v'+String(r.book).padStart(2,'0')+String(r.chapter).padStart(3,'0')+String(r.verse).padStart(3,'0');
   a.target='_blank';a.rel='noopener noreferrer';card.append(a);
+ }
+ if(entry.unverified){
+  const note=element('span','aia-ref-warning','Référence à vérifier : '+entry.citation);
+  note.style.cssText='display:block;color:#9b4c00;font-size:11px;margin-top:3px';
+  card.append(note);
  }
  parent.append(card);
 }
