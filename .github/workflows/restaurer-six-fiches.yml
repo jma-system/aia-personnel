@@ -1,11 +1,15 @@
-name: Restaurer les six fiches AIA
+name: Restaurer six fiches AIA corrigées
 on:
   push:
+    branches: [main]
     paths:
-      - aia-six-fiches-sauvegarde.zip
+      - 'aia-six-fiches-corrigees-VALIDATION.zip'
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: aia-six-fiches-restore
+  cancel-in-progress: false
 jobs:
   restaurer:
     runs-on: ubuntu-latest
@@ -13,19 +17,53 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Extraire les six illustrations
+      - name: Contrôler et extraire sans écraser les fiches
+        shell: bash
         run: |
           set -euo pipefail
-          test -f aia-six-fiches-sauvegarde.zip
-          unzip -o aia-six-fiches-sauvegarde.zip -d .
-          for fiche in avenir-restaure famille-restauree dieu-restaure priere-restauree jesus-restaure royaume-restaure; do
-            test -s "v09-test/fiches/${fiche}.webp"
-          done
-      - name: Publier les fiches dans le code permanent
+          python3 - <<'PY'
+          import zipfile, hashlib, pathlib, sys
+          archive = pathlib.Path('aia-six-fiches-corrigees-VALIDATION.zip')
+          expected = {
+            'v09-test/fiches/avenir-restaure.webp': '45d9eced141af71011719fd196b9dbe70a92350af57921d22153ea8b22768708',
+            'v09-test/fiches/priere-restauree.webp': 'b03aeb08046d646cfdf257879ad2f72e134b12da4b86fcd9735a5b8e1f60e8a3',
+            'v09-test/fiches/dieu-restaure.webp': 'adc287e1f5ba5c4a5d98a7863bf2e73bc6d397f0f8cfdd6213ab8dd4f65f41af',
+            'v09-test/fiches/jesus-restaure.webp': 'ba9007427cbecf092b335922b3cc389c227d47b38f56697f9b4add85a63c5c84',
+            'v09-test/fiches/famille-restauree.webp': '97ea7f711f56ab9d7a92d1aed1a1f643838599584e8ce51d37d7705de9f6d0fb',
+            'v09-test/fiches/royaume-restaure.webp': 'a4e72e02e38c167ce772cd52752d4c0a184d1e3f0bd565c50e1a30efe947a761',
+          }
+          if not archive.is_file():
+              sys.exit('Archive validée absente')
+          with zipfile.ZipFile(archive) as z:
+              members=[n for n in z.namelist() if not n.endswith('/')]
+              if sorted(members)!=sorted(expected):
+                  sys.exit('Archive non conforme: six fichiers exacts requis')
+              data={}
+              for name,digest in expected.items():
+                  dest=pathlib.Path(name)
+                  if dest.exists():
+                      sys.exit('Protection: fichier déjà présent, rien ne sera écrasé: '+name)
+                  raw=z.read(name)
+                  if hashlib.sha256(raw).hexdigest()!=digest:
+                      sys.exit('Empreinte invalide: '+name)
+                  if not raw.startswith(b'RIFF') or raw[8:12]!=b'WEBP':
+                      sys.exit('Format WebP non conforme: '+name)
+                  data[name]=raw
+          for name,raw in data.items():
+              dest=pathlib.Path(name)
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              with dest.open('xb') as fd:
+                  fd.write(raw)
+              print('OK',name,len(raw),'octets')
+          PY
+      - name: Ajouter seulement les six images et retirer le ZIP de transit
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add v09-test/fiches/avenir-restaure.webp v09-test/fiches/famille-restauree.webp v09-test/fiches/dieu-restaure.webp v09-test/fiches/priere-restauree.webp v09-test/fiches/jesus-restaure.webp v09-test/fiches/royaume-restaure.webp
-          git rm aia-six-fiches-sauvegarde.zip
-          git diff --cached --quiet || git commit -m "AIA: restaurer six fiches illustrees permanentes"
+          git add -- v09-test/fiches/avenir-restaure.webp v09-test/fiches/famille-restauree.webp v09-test/fiches/dieu-restaure.webp v09-test/fiches/priere-restauree.webp v09-test/fiches/jesus-restaure.webp v09-test/fiches/royaume-restaure.webp
+          git rm -- aia-six-fiches-corrigees-VALIDATION.zip
+          git diff --cached --check
+          git commit -m "AIA: ajouter les six fiches illustrées validées sans écrasement"
           git push
