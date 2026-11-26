@@ -376,8 +376,23 @@ function thumb(item){
 // Le fichier n'est pas enregistré dans IndexedDB.
 const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp?v=2',readOnly:true};
 
-// Afficher uniquement les fiches réellement disponibles, sans vignettes fantômes.
-function allFiches(){return records}
+// Six fiches illustrées validées, versionnées dans GitHub et indépendantes du stockage local.
+// Lecture seule : aucune création de doublon IndexedDB et aucune suppression possible.
+const sixApproved=[
+ {id:'aia-approved-avenir',label:'Peut-on vivre pour toujours ?',topic:'L’avenir',subtheme:'Avenir',placements:[{category:'TRACTS',letter:'A'}],url:'./fiches/avenir-restaure.webp',readOnly:true},
+ {id:'aia-approved-dieu',label:'Qui est le vrai Dieu ?',topic:'Dieu',subtheme:'Dieu',placements:[{category:'TRACTS',letter:'D'}],url:'./fiches/dieu-restaure.webp',readOnly:true},
+ {id:'aia-approved-famille',label:'La famille peut-elle être heureuse ?',topic:'La famille',subtheme:'Famille',placements:[],url:'./fiches/famille-restauree.webp',readOnly:true},
+ {id:'aia-approved-jesus',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-restaure.webp',readOnly:true},
+ {id:'aia-approved-priere',label:'Est-ce que quelqu’un écoute nos prières ?',topic:'La prière',subtheme:'Prière',placements:[],url:'./fiches/priere-restauree.webp',readOnly:true},
+ {id:'aia-approved-royaume',label:'Comment le royaume de Dieu résoudra-t-il nos problèmes ?',topic:'Le Royaume de Dieu',subtheme:'Royaume',placements:[{category:'TRACTS',letter:'R'}],url:'./fiches/royaume-restaure.webp',readOnly:true}
+];
+// Fiches locales conservées telles quelles. Une ressource statique n'est pas ajoutée
+// si une fiche enregistrée porte déjà le même intitulé dans le même thème.
+function allFiches(){
+ return records.concat(sixApproved.filter(approved=>!records.some(r=>
+  r.topic===approved.topic&&String(r.label||'').trim().toLocaleLowerCase('fr-FR')===approved.label.toLocaleLowerCase('fr-FR')
+ )));
+}
 
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
@@ -497,7 +512,7 @@ function categoryView(category,letter){
  if(!ready){note('Ouverture du stockage…');return}
  const key=category+'|'+letter;
  const items=allFiches().filter(item=>isUnder(item,category,letter)&&item.id!=='aia-tract-jesus-jworg-t-jss');
- if(category==='TRACTS'&&letter==='J'&&!items.some(item=>item.topic==='Jésus'))items.unshift(jesusApproved);
+ // Jésus est désormais présent dans sixApproved, sans vignette de secours.
  // Initialiser F avec les sous-thèmes déjà validés. Sur les autres lettres,
  // les noms sont créés par l'utilisateur ou issus des fiches existantes.
  // Les noms d'origine restent les identifiants : renommer n'altère aucune photo.
@@ -676,7 +691,7 @@ function renderTheme(theme){
  };
  headingRow.append(heading,rename);
  const items=allFiches().filter(item=>item.topic===theme&&item.id!=='aia-tract-jesus-jworg-t-jss');
- if(theme==='Jésus'&&!items.length)items.unshift(jesusApproved);
+ // Jésus est désormais présent dans sixApproved, sans vignette de secours.
  const view=gallery(items,'','',theme);
  const add=nativeImportLabel('Importer des images dans le thème '+theme);
  add.onclick=()=>{
@@ -714,7 +729,7 @@ section.addEventListener('aia:index-render',e=>{
   if(!ready)return;
   for(const tile of area.querySelectorAll('.aia-index-tile')){
    const name=tile.querySelector('strong')?.textContent;
-   const item=allFiches().find(r=>r.topic===name)|| (name==='Jésus'?jesusApproved:null);
+   const item=allFiches().find(r=>r.topic===name)||null;
    const pic=tile.querySelector('.aia-index-placeholder');
    if(item&&pic){const img=document.createElement('img');img.src=item.url;img.alt='';img.className='aia-family-thumb';pic.replaceWith(img)}
    const title=tile.querySelector('strong');
