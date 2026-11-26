@@ -12,6 +12,7 @@ css.textContent='#aia-fiches-pdf-import{padding:14px;margin:0 0 14px;background:
 
 /* Fiche Dieu : typographie de référence FAMILLE, sans modifier Royaume. */
 css.textContent += '#aia-pdf-sheet.aia-dieu .aia-heading{font-family:Verdana,Geneva,sans-serif;font-weight:700;letter-spacing:0}#aia-pdf-sheet.aia-dieu .aia-verse{font-family:Verdana,Geneva,sans-serif;font-size:clamp(13px,3.3vw,16px);line-height:1.22;letter-spacing:0;font-weight:400}#aia-pdf-sheet.aia-dieu .aia-verse a{font-family:Verdana,Geneva,sans-serif;font-size:inherit;font-weight:700;letter-spacing:0;line-height:1.2}@media(max-width:420px){#aia-pdf-sheet.aia-dieu .aia-verse{font-size:clamp(12px,3.15vw,14px)}}';
+css.textContent += '#aia-pdf-sheet.aia-dieu .aia-verses{align-self:stretch;justify-content:space-between;min-height:0}#aia-pdf-sheet.aia-dieu .aia-cols{align-items:stretch}';
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
