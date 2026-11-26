@@ -682,7 +682,13 @@ window.addEventListener('aia:save-pdf-fiche',async event=>{
   if(!(detail.blob instanceof Blob)||!detail.blob.type.startsWith('image/'))throw Error('Image de fiche invalide');
   const topic=String(detail.topic||'').trim();
   if(!topics.includes(topic))throw Error('Thème non reconnu : choisis un thème existant');
-  const item={id:crypto.randomUUID(),blob:detail.blob,label:String(detail.label||topic).slice(0,100),topic,subtheme:'',placements:[],links:[],references:Array.isArray(detail.references)?detail.references:[]};
+  // Mettre à jour la fiche PDF déjà importée plutôt que garder son ancien PNG recadré.
+  // Une correspondance exacte titre + thème seulement : préserver les autres fiches.
+  const label=String(detail.label||topic).slice(0,100);
+  const existing=records.find(item=>item.topic===topic&&item.label===label&&!item.readOnly);
+  const item=existing
+   ?{...existing,blob:detail.blob,references:Array.isArray(detail.references)?detail.references:existing.references}
+   :{id:crypto.randomUUID(),blob:detail.blob,label,topic,subtheme:'',placements:[],links:[],references:Array.isArray(detail.references)?detail.references:[]};
   await save(item);
   window.dispatchEvent(new CustomEvent('aia:pdf-fiche-saved',{detail:{requestId:detail.requestId,id:item.id}}));
  }catch(error){
