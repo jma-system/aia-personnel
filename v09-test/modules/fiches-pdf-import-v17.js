@@ -114,6 +114,8 @@ function parsedReferences(raw){
  return result;
 }
 function extractTract(p1,p2,items1,items2){
+ // Page 1 : positionner le titre et la citation d'après le contenu PDF réel.
+ // Le tract officiel Royaume place le titre vers y=140–178 et la citation vers y=210–240.
  const title=extractZone(items1,p1,120,207).replace(/\s+/g,' ').trim();
  const lead=extractZone(items1,p1,202,255);
  // Certaines couches texte PDF n'emploient ni guillemets français ni parenthèses.
@@ -214,19 +216,9 @@ try{
  const isAvenir=txt.includes('pourtoujours')&&txt.includes('3729')&&(txt.includes('3324')||txt.includes('1118'));
  // Tout tract à deux pages de la même structure utilise désormais l'extraction de son contenu,
  // sans ajout de son nom dans une liste. Les deux pilotes historiques sont préservés.
- const isKingdom=/^T[-_]kng[-_]F[.]pdf$/i.test(f.name);
- let extracted=(!isGod&&!isAvenir&&!isKingdom)?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null;
- // Le tract Royaume est vérifié sur son PDF source; la couche texte de ce PDF
- // espace les lettres et empêche la reconnaissance fiable des références.
- if(isKingdom){
-  const entry=(text,citation)=>({text,citation,refs:parsedReferences(citation)});
-  extracted={title:'Comment le royaume de Dieu résoudra-t-il nos problèmes ?',entries:[
-   entry('« Les méchants ne seront plus ; […] les humbles posséderont la terre »','Psaume 37:10, 11'),
-   entry('Le royaume de Dieu est un vrai gouvernement qui est au ciel.','Daniel 2:44 ; 7:14'),
-   entry('Le royaume de Dieu comblera tous nos besoins.','Isaïe 65:21-23')
-  ]};
- }
-const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!extracted&&!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
+ // Extraire le texte réel des deux pages, sans réponse codée selon le nom du fichier.
+ let extracted=(!isGod&&!isAvenir)?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null;
+ const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!extracted&&!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
  const c2=await renderPage(p2,3);
  
  const c1=(isGod||extracted)?await renderPage(p1,3):null;
