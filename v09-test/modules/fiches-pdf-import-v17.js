@@ -172,28 +172,63 @@ function passageExtracted(parent,entry){
 
 // Export a standalone, recoverable PNG before adding the fiche to IndexedDB.
 function imageReady(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('Illustration ou QR illisible'));img.src=src})}
-function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight){
- const words=String(text).trim().split(/\s+/);let line='';
- for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y);y+=lineHeight;line=word}else line=test}
- if(line){ctx.fillText(line,x,y);y+=lineHeight}return y;
+function canvasLines(ctx,text,maxWidth){
+ const words=String(text||'').trim().split(/\s+/).filter(Boolean),lines=[];
+ let line='';
+ for(const word of words){
+  const next=line?line+' '+word:word;
+  if(ctx.measureText(next).width<=maxWidth){line=next;continue;}
+  if(line){lines.push(line);line='';}
+  if(ctx.measureText(word).width<=maxWidth){line=word;continue;}
+  let part='';
+  for(const char of word){
+   if(part&&ctx.measureText(part+char).width>maxWidth){lines.push(part);part=char;}
+   else part+=char;
+  }
+  line=part;
+ }
+ if(line)lines.push(line);
+ return lines;
+}
+function drawLines(ctx,lines,x,y,lineHeight){
+ for(const line of lines){ctx.fillText(line,x,y);y+=lineHeight;}
+ return y;
 }
 async function renderFichePng(title,entries,photoSrc,qrSrc){
  const [photo,qr]=await Promise.all([imageReady(photoSrc),imageReady(qrSrc)]);
  const canvas=document.createElement('canvas');canvas.width=960;canvas.height=1320;
  const c=canvas.getContext('2d');c.fillStyle='#eaf7ff';c.fillRect(0,0,960,1320);
  c.fillStyle='#073a79';c.fillRect(0,0,960,100);c.fillStyle='white';c.font='34px Verdana';c.fillText('AIA — Fiche illustrée',40,62);
- c.fillStyle='#c7e6ff';c.fillRect(28,130,904,145);c.fillStyle='#071425';c.font='bold 34px Verdana';wrapCanvas(c,title,64,182,825,45);
+ c.fillStyle='#c7e6ff';c.fillRect(28,130,904,145);c.fillStyle='#071425';
+ let titleSize=34,titleLines;
+ do{c.font='bold '+titleSize+'px Verdana';titleLines=canvasLines(c,title,825);if(titleLines.length<=2)break;titleSize-=2;}while(titleSize>22);
+ drawLines(c,titleLines.slice(0,3),64,182,Math.round(titleSize*1.25));
  const photoX=30,photoY=315,photoW=410,photoH=735;
  c.save();c.beginPath();c.rect(photoX,photoY,photoW,photoH);c.clip();const scale=Math.max(photoW/photo.width,photoH/photo.height);c.drawImage(photo,photoX+(photoW-photo.width*scale)/2,photoY+(photoH-photo.height*scale)/2,photo.width*scale,photo.height*scale);c.restore();
- let y=315;
- for(const entry of entries){
-  c.font='27px Verdana';const lines=Math.max(2,Math.ceil(c.measureText(entry.text).width/440));const h=Math.max(130,Math.min(255,lines*39+76));
-  c.fillStyle='#f7fcff';c.fillRect(465,y,465,h);c.strokeStyle='#83bdd8';c.lineWidth=2;c.strokeRect(465,y,465,h);
-  c.fillStyle='#071425';let ty=wrapCanvas(c,entry.text,485,y+39,425,36);
-  c.fillStyle='#1467b2';c.font='bold 24px Verdana';wrapCanvas(c,entry.citation||'',485,Math.min(ty+8,y+h-25),420,30);
-  y+=h+13;
-  if(y>1060)break;
+ const boxX=465,boxW=465,innerW=425,available=770,gap=12;
+ let fontSize=27,refSize=24,blocks=[],total=Infinity;
+ for(;fontSize>=17;fontSize-=2){
+  refSize=Math.max(16,fontSize-3);
+  blocks=entries.map(entry=>{
+   c.font=fontSize+'px Verdana';const textLines=canvasLines(c,entry.text,innerW);
+   c.font='bold '+refSize+'px Verdana';const refLines=canvasLines(c,entry.citation||'',innerW);
+   const textHeight=Math.ceil(fontSize*1.35),refHeight=Math.ceil(refSize*1.3);
+   const h=Math.max(100,24+textLines.length*textHeight+10+refLines.length*refHeight+18);
+   return {textLines,refLines,textHeight,refHeight,h};
+  });
+  total=blocks.reduce((sum,block)=>sum+block.h,0)+gap*Math.max(0,blocks.length-1);
+  if(total<=available)break;
  }
+ if(total>available)throw Error('Fiche trop longue pour une image lisible : export annulé.');
+ let y=315;
+ blocks.forEach(block=>{
+  c.fillStyle='#f7fcff';c.fillRect(boxX,y,boxW,block.h);c.strokeStyle='#83bdd8';c.lineWidth=2;c.strokeRect(boxX,y,boxW,block.h);
+  c.fillStyle='#071425';c.font=fontSize+'px Verdana';
+  const afterText=drawLines(c,block.textLines,boxX+20,y+24+fontSize,block.textHeight);
+  c.fillStyle='#1467b2';c.font='bold '+refSize+'px Verdana';
+  drawLines(c,block.refLines,boxX+20,afterText+7,block.refHeight);
+  y+=block.h+gap;
+ });
  c.fillStyle='#d3eaff';c.fillRect(30,1110,900,165);c.drawImage(qr,50,1120,145,145);
  c.fillStyle='#071425';c.font='26px Verdana';c.fillText('Fiche AIA — copie de sauvegarde',220,1200);
  return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Export PNG impossible')),'image/png'));
