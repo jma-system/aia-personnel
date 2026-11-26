@@ -636,6 +636,22 @@ function renderTheme(theme){
  };
  area.append(headingRow,toolbar(add,view),view);
 }
+// Import validated PDF-derived image into the existing Repertoire storage.
+// This bridge does not change or delete any existing record.
+window.addEventListener('aia:save-pdf-fiche',async event=>{
+ const detail=event.detail||{};
+ try{
+  if(!db||!ready)throw Error('Répertoire non prêt');
+  if(!(detail.blob instanceof Blob)||!detail.blob.type.startsWith('image/'))throw Error('Image de fiche invalide');
+  const topic=String(detail.topic||'').trim();
+  if(!topics.includes(topic))throw Error('Thème non reconnu : choisis un thème existant');
+  const item={id:crypto.randomUUID(),blob:detail.blob,label:String(detail.label||topic).slice(0,100),topic,subtheme:'',placements:[],links:[]};
+  await save(item);
+  window.dispatchEvent(new CustomEvent('aia:pdf-fiche-saved',{detail:{requestId:detail.requestId,id:item.id}}));
+ }catch(error){
+  window.dispatchEvent(new CustomEvent('aia:pdf-fiche-save-failed',{detail:{requestId:detail.requestId,message:error.message||'Erreur de stockage'}}));
+ }
+});
 section.addEventListener('aia:index-render',e=>{
  activeTheme=null;
  const {category,letter}=e.detail||{};
