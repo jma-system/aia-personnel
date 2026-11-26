@@ -42,10 +42,78 @@ select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-
 body.embedded .top,body.embedded main>.desc,body.embedded #result>.panel>.muted,body.embedded #draftNotice{display:none!important}
 body.embedded main{padding:4px 0 24px}
 body.embedded .panel{margin:8px 0}
+
+/* CVM JWPUB — palette technologique, synchronisée avec le mode nuit AIA. */
+@media screen {
+ html:not([data-aia-theme="dark"]) body.embedded {background:#f1fbff;color:#133850;}
+ html:not([data-aia-theme="dark"]) body.embedded .panel,
+ html:not([data-aia-theme="dark"]) body.embedded .subject {
+   border-color:#9fdcd8;background:linear-gradient(145deg,#fff,#f4fffd);
+   box-shadow:0 3px 11px #164c5014;
+ }
+ html:not([data-aia-theme="dark"]) body.embedded button {
+   background:linear-gradient(145deg,#138b96,#0d6d83);
+   box-shadow:0 3px 8px #146a7d27;
+ }
+ html:not([data-aia-theme="dark"]) body.embedded .section-title {
+   background:#ddf8f2;border-left-color:#16a995;color:#0b6257;
+ }
+ html[data-aia-theme="dark"] {
+   color-scheme:dark;color:#e8f7ff;background:#0a1a2c;
+ }
+ html[data-aia-theme="dark"] body {background:#0b1d30;color:#e7f5ff;}
+ html[data-aia-theme="dark"] .panel,
+ html[data-aia-theme="dark"] .subject {
+   background:linear-gradient(160deg,#192e48,#11243b);
+   border-color:#37647b;
+   color:#e6f4ff;
+   box-shadow:0 5px 15px #00000029;
+ }
+ html[data-aia-theme="dark"] :is(h1,h2,h3,label,.subject-title span) {color:#ebf9ff;}
+ html[data-aia-theme="dark"] :is(.desc,.muted,.small,#draftNotice) {color:#b8d3df;}
+ html[data-aia-theme="dark"] a {color:#7edff5;}
+ html[data-aia-theme="dark"] button {
+   background:linear-gradient(140deg,#16888e,#086a7d);
+   color:#fff;border:1px solid #55d0cb;
+   box-shadow:0 3px 11px #053b4938;
+ }
+ html[data-aia-theme="dark"] button:disabled {opacity:.55;}
+ html[data-aia-theme="dark"] :is(select,input[type=file],#draftText) {
+   background:#0c1c2e;color:#edfaff;border:1px solid #517a8e;
+   border-radius:10px;
+ }
+ html[data-aia-theme="dark"] input[type=checkbox] {accent-color:#33d0bb;}
+ html[data-aia-theme="dark"] .details {border-top-color:#355469;}
+ html[data-aia-theme="dark"] .details summary {color:#8ce4eb;}
+ html[data-aia-theme="dark"] .details p {color:#d4e5ef;}
+ html[data-aia-theme="dark"] .section-title {
+   background:#16474e;color:#d9fff6;border-left-color:#4fe4d2;
+ }
+ html[data-aia-theme="dark"] #summaryBox {
+   background:#12374d;border-color:#417a95;color:#e9f9ff;
+ }
+ html[data-aia-theme="dark"] #draftPanel {border-color:#439c9b;}
+ html[data-aia-theme="dark"] .error {color:#ffabb2;}
+ html[data-aia-theme="dark"] .ok {color:#85f3bd;}
+ html[data-aia-theme="dark"] :is(button,select,input,summary):focus-visible {
+   outline:3px solid #7af3e9;outline-offset:2px;
+ }
+}
 </style>
 </head>
 <body>
 <script>if(new URLSearchParams(location.search).has('embedded'))document.body.classList.add('embedded');</script>
+<script>
+/* Le lecteur CVM partage automatiquement le thème de la page AIA parente. */
+if(window.parent!==window){
+ try{
+  const parentRoot=window.parent.document.documentElement;
+  const syncTheme=()=>{document.documentElement.dataset.aiaTheme=parentRoot.dataset.aiaTheme==='dark'?'dark':'light'};
+  syncTheme();
+  new MutationObserver(syncTheme).observe(parentRoot,{attributes:true,attributeFilter:['data-aia-theme']});
+ }catch(error){ /* L'écran autonome reste utilisable sans accès au parent. */ }
+}
+</script>
 <main>
 <div class="top"><h1>AIA — Test CVM JWPUB</h1><a href="./index.html">AIA Test</a></div>
 <p class="desc">Test privé sur ton téléphone. Le programme est lu localement depuis ton fichier JWPUB. Aucun contenu CVM n’est envoyé à GitHub ni enregistré dans AIA. Une connexion Internet est nécessaire pour charger les outils de lecture.</p>
