@@ -1,0 +1,12 @@
+/* AIA — Base de gabarit FAMILLE v1.
+   Fichier volontairement isolé : ne pas charger en production avant test visuel. */
+.aia-famille-template{--aia-fond:#eaf7ff;--aia-encadre:#c7e6ff;--aia-contour:#78bcd5;--aia-lien:#17639a;font-family:Verdana,Geneva,sans-serif;color:#071425;background:var(--aia-fond);box-sizing:border-box}
+.aia-famille-template *, .aia-famille-template *::before,.aia-famille-template *::after{box-sizing:border-box}
+.aia-famille-template .aia-famille-heading{background:var(--aia-encadre);font-weight:700}
+.aia-famille-template .aia-famille-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+.aia-famille-template .aia-famille-image{display:block;width:100%;height:auto;object-fit:contain}
+.aia-famille-template .aia-famille-text{min-width:0;overflow-wrap:break-word;word-break:normal;letter-spacing:normal;word-spacing:normal;white-space:normal}
+.aia-famille-template .aia-famille-verse{border:1px solid var(--aia-contour);padding:14px;margin-bottom:8px;line-height:1.12}
+.aia-famille-template .aia-famille-reference{display:block;margin-top:4px;color:var(--aia-lien);text-decoration:underline;font-weight:700}
+.aia-famille-template .aia-famille-actions{display:flex;gap:8px}
+.aia-famille-template .aia-famille-actions>*{min-width:0;flex:1}
