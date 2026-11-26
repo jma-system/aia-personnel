@@ -175,3 +175,36 @@
     #home button {transition:none!important;}
   }
 }
+
+/* AIA v51 — Répertoire / import PDF : contraste mode nuit.
+   L'importeur conserve son fond blanc ; ses textes doivent donc être foncés.
+   Les fiches et le visualiseur PDF ne sont pas affectés. */
+@media screen {
+  html[data-aia-theme="dark"] body #indexPanel #aia-fiches-pdf-import {
+    background:#ffffff!important;
+    color:#172d44!important;
+    border-color:#a6bfd4!important;
+    color-scheme:light;
+  }
+  html[data-aia-theme="dark"] body #indexPanel #aia-fiches-pdf-import h2 {
+    color:#17385c!important;
+    opacity:1!important;
+  }
+  html[data-aia-theme="dark"] body #indexPanel #aia-fiches-pdf-import :is(label,p) {
+    color:#1e3448!important;
+    opacity:1!important;
+  }
+  html[data-aia-theme="dark"] body #indexPanel #aia-fiches-pdf-import input[type="file"] {
+    background:#fff!important;
+    color:#172d44!important;
+    border-color:#91a9bc!important;
+    color-scheme:light;
+  }
+  html[data-aia-theme="dark"] body #indexPanel #aia-fiches-pdf-import input[type="file"]::file-selector-button {
+    background:#e9f1f8!important;
+    color:#17385c!important;
+    border:1px solid #8da7bd!important;
+    border-radius:6px;
+    padding:6px 9px;
+  }
+}
