@@ -28,7 +28,7 @@ async function renderPage(page,scale){const v=page.getViewport({scale});const ca
 function crop(canvas,x,y,w,h,outSize=360){const dst=document.createElement('canvas');dst.width=outSize;dst.height=Math.max(1,Math.round(outSize*h/w));dst.getContext('2d').drawImage(canvas,x,y,w,h,0,0,dst.width,dst.height);return dst.toDataURL('image/png')}
 function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')}
 function ref(title,book,chapter,verse){
-const books={19:'Psaumes',23:'Isa%C3%AFe',66:'R%C3%A9v%C3%A9lation'};
+const books={19:'Psaumes',23:'Isa%C3%AFe',66:'R%C3%A9v%C3%A9lation',24:'J%C3%A9r%C3%A9mie',55:'2-timoth%C3%A9e'};
 const link=element('a','',title);link.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+books[book]+'/'+chapter+'/#v'+String(book).padStart(2,'0')+String(chapter).padStart(3,'0')+String(verse).padStart(3,'0');link.target='_blank';link.rel='noopener noreferrer';return link;
 }
 function passage(parent,txt,refs){const card=element('div','aia-verse',txt);refs.forEach(r=>card.append(ref(...r)));parent.append(card)}
@@ -52,19 +52,26 @@ function chooseReplacement(image){
  picker.click();
  setTimeout(()=>picker.remove(),120000);
 }
-function build(photo,qr,pdfFile){
+function build(photo,qr,pdfFile,kind='avenir'){
+const god=kind==='dieu';
 sheet.replaceChildren();
-const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','','Tract – L’avenir');
+const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','',god?'Tract – Dieu':'Tract – L’avenir');
 const signet=element('span');signet.innerHTML='<svg width="24" height="28" viewBox="0 0 24 28" fill="none" aria-label="Signet bientôt disponible"><path d="M4 2.5H20V25L12 19.5L4 25V2.5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/></svg>';
 bar.append(back,title,signet);
 const body=element('section','aia-body');
-body.append(element('div','aia-heading','Peut-on vivre pour toujours ?'));
-const cols=element('div','aia-cols'),pic=element('div','aia-photo'),im=document.createElement('img');im.src=photo;im.alt='Illustration : un homme en montagne avec un ourson et sa mère';pic.append(im);
+body.append(element('div','aia-heading',god?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?'));
+const cols=element('div','aia-cols'),pic=element('div','aia-photo'),im=document.createElement('img');im.src=photo;im.alt=god?'Illustration originale du tract : un homme en chemise bleue':'Illustration : un homme en montagne avec un ourson et sa mère';pic.append(im);
 const verses=element('div','aia-verses');
+if(god){
+passage(verses,'« Jéhovah est réellement Dieu. Il est le Dieu vivant »',[['Jérémie 10:10',24,10,10]]);
+passage(verses,'Dieu a un nom.',[['Psaume 83:18',19,83,18]]);
+passage(verses,'Il communique avec les humains.',[['2 Timothée 3:16, 17',55,3,16]]);
+passage(verses,'Il veut nous aider.',[['Psaume 145:18, 19',19,145,18]]);
+}else{
 passage(verses,'« Les justes posséderont la terre et ils y vivront éternellement »',[['Psaume 37:29',19,37,29]]);
 passage(verses,'Tout le monde sera en parfaite santé.',[['Isaïe 33:24',23,33,24],['Isaïe 35:5, 6',23,35,5]]);
 passage(verses,'Les dégâts faits à l’environnement seront réparés.',[['Isaïe 35:1, 2',23,35,1],['Révélation 11:18',66,11,18]]);
-cols.append(pic,verses);body.append(cols);
+}cols.append(pic,verses);body.append(cols);
 const replace=element('button','aia-replace-image','Remplacer l’image');
 replace.type='button';replace.onclick=()=>chooseReplacement(im);
 body.append(replace);
@@ -86,13 +93,15 @@ try{
  const t1=(await p1.getTextContent()).items.map(x=>x.str).join(' ');
  const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
- const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!sourceEvidence||!(officialFilename||officialText))throw Error('Ce PDF ne correspond pas au tract pilote vérifié. Aucun texte n’est inventé.');
+ const isGod=txt.includes('quiestlevraidieu')&&txt.includes('jeremie1010')&&txt.includes('psaume8318')&&txt.includes('timothee31617')&&txt.includes('psaume1451819');
+const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Ce PDF n’est pas encore pris en charge. Aucun texte n’est inventé.');
  const c2=await renderPage(p2,3);
  
- const photo='./fiches/avenir-ours.svg?v=1';
+ const c1=isGod?await renderPage(p1,3):null;
+const photo=isGod?crop(c1,c1.width*.04,c1.height*.015,c1.width*.92,c1.height*.40,500):'./fiches/avenir-ours.svg?v=1';
  const qr=crop(c2,c2.width*(156/233.86),c2.height*(238/306.14),c2.width*(55/233.86),c2.height*(59/306.14),360);
- build(photo,qr,f);
- say('Fiche préparée depuis le PDF original : vérifie l’image, le QR et les cinq liens bibliques.');
+ build(photo,qr,f,isGod?'dieu':'avenir');
+ say('Fiche préparée depuis le PDF original : vérifie l’image, le QR et les références bibliques.');
 }catch(e){say('Conversion impossible : '+e.message,true)}
 finally{try{await pdf?.destroy()}catch(e){}btn.disabled=false}
 });
