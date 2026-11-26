@@ -228,13 +228,23 @@ const pdfBtn=element('button','','↓ PDF');pdfBtn.onclick=()=>{document.body.cl
 const shareBtn=element('button');shareBtn.setAttribute('aria-label','Partager');shareBtn.innerHTML='<svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4M8.7 13.5l6.6 4"/></svg><span>Partager</span>';shareBtn.onclick=()=>share(pdfFile);
 const saveBtn=element('button','','Enregistrer dans AIA');saveBtn.type='button';
 saveBtn.onclick=async()=>{
- if(!extracted){say('Enregistrement pilote réservé aux fiches extraites du PDF.',true);return}
- const theme=prompt('Classement THÈMES : L’avenir, La famille, Dieu, La prière, Jésus, Le Royaume de Dieu, Les souffrances, La mort, La religion ou Actualité',extracted.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':'');
+ const fallbackEntries=kind==='dieu'?[
+ {text:'« Jéhovah est réellement Dieu. Il est le Dieu vivant »',citation:'Jérémie 10:10',refs:[{label:'Jérémie 10:10',book:24,slug:'jeremie',chapter:10,verse:10}]},
+ {text:'Dieu a un nom.',citation:'Psaume 83:18',refs:[{label:'Psaume 83:18',book:19,slug:'psaumes',chapter:83,verse:18}]},
+ {text:'Il communique avec les humains.',citation:'2 Timothée 3:16, 17',refs:[{label:'2 Timothée 3:16, 17',book:55,slug:'2-timothee',chapter:3,verse:16}]},
+ {text:'Il veut nous aider.',citation:'Psaume 145:18, 19',refs:[{label:'Psaume 145:18, 19',book:19,slug:'psaumes',chapter:145,verse:18}]}
+]:[
+ {text:'« Les justes posséderont la terre et ils y vivront éternellement »',citation:'Psaume 37:29',refs:[{label:'Psaume 37:29',book:19,slug:'psaumes',chapter:37,verse:29}]},
+ {text:'Tout le monde sera en parfaite santé.',citation:'Isaïe 33:24 ; Isaïe 35:5, 6',refs:[{label:'Isaïe 33:24',book:23,slug:'isaie',chapter:33,verse:24},{label:'Isaïe 35:5, 6',book:23,slug:'isaie',chapter:35,verse:5}]},
+ {text:'Les dégâts faits à l’environnement seront réparés.',citation:'Isaïe 35:1, 2 ; Révélation 11:18',refs:[{label:'Isaïe 35:1, 2',book:23,slug:'isaie',chapter:35,verse:1},{label:'Révélation 11:18',book:66,slug:'revelation',chapter:11,verse:18}]}
+];
+ const fiche=extracted||{title:kind==='dieu'?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?',entries:fallbackEntries};
+ const theme=prompt('Classement THÈMES : L’avenir, La famille, Dieu, La prière, Jésus, Le Royaume de Dieu, Les souffrances, La mort, La religion ou Actualité',extracted?.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':kind==='avenir'?'L’avenir':kind==='dieu'?'Dieu':'');
  if(theme===null)return;
  saveBtn.disabled=true;
  try{
-  const blob=await renderFichePng(extracted.title,extracted.entries,im.src,qr);
-  downloadBackup(blob,extracted.title);
+  const blob=await renderFichePng(fiche.title,fiche.entries,im.src,qr);
+  downloadBackup(blob,fiche.title);
   const requestId=crypto.randomUUID();
   const result=await new Promise((resolve,reject)=>{
    const timeout=setTimeout(()=>{cleanup();reject(Error('Enregistrement non confirmé'))},12000);
@@ -242,8 +252,8 @@ saveBtn.onclick=async()=>{
    function ok(e){if(e.detail?.requestId!==requestId)return;cleanup();resolve(e.detail)}
    function fail(e){if(e.detail?.requestId!==requestId)return;cleanup();reject(Error(e.detail?.message||'Stockage indisponible'))}
    window.addEventListener('aia:pdf-fiche-saved',ok);window.addEventListener('aia:pdf-fiche-save-failed',fail);
-   const references=extracted.entries.flatMap(entry=>(entry.refs||[]).map(ref=>({reference:ref.label||entry.citation||'',book:ref.book,slug:ref.slug,chapter:ref.chapter,verse:ref.verse}))).filter(ref=>ref.book&&ref.chapter&&ref.verse);
-   window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:extracted.title,references}}));
+   const references=fiche.entries.flatMap(entry=>(entry.refs||[]).map(ref=>({reference:ref.label||entry.citation||'',book:ref.book,slug:ref.slug,chapter:ref.chapter,verse:ref.verse}))).filter(ref=>ref.book&&ref.chapter&&ref.verse);
+   window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:fiche.title,references}}));
   });
   say('Fiche enregistrée dans THÈMES / '+theme+'. Copie PNG téléchargée.');
   saveBtn.textContent='Enregistré dans AIA';
