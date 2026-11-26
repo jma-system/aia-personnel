@@ -116,8 +116,9 @@ function parsedReferences(raw){
 function extractTract(p1,p2,items1,items2){
  // Page 1 : positionner le titre et la citation d'après le contenu PDF réel.
  // Le tract officiel Royaume place le titre vers y=140–178 et la citation vers y=210–240.
- const title=extractZone(items1,p1,120,207).replace(/\s+/g,' ').trim();
- const lead=extractZone(items1,p1,202,255);
+ const title=extractZone(items1,p1,120,185).replace(/\s+/g,' ').trim();
+ // Inclure le début de la citation : sur T-sfr-F, le guillemet est avant y=202.
+ const lead=extractZone(items1,p1,180,255);
  // Certaines couches texte PDF n'emploient ni guillemets français ni parenthèses.
  // N'accepter un repli que si une citation et une référence sont réellement présentes.
  const quoteMatch=lead.match(/«[^»]+»|“[^”]+”|"[^"]+"/);
