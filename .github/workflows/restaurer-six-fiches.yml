@@ -1,0 +1,31 @@
+name: Restaurer les six fiches AIA
+on:
+  push:
+    paths:
+      - aia-six-fiches-sauvegarde.zip
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  restaurer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Extraire les six illustrations
+        run: |
+          set -euo pipefail
+          test -f aia-six-fiches-sauvegarde.zip
+          unzip -o aia-six-fiches-sauvegarde.zip -d .
+          for fiche in avenir-restaure famille-restauree dieu-restaure priere-restauree jesus-restaure royaume-restaure; do
+            test -s "v09-test/fiches/${fiche}.webp"
+          done
+      - name: Publier les fiches dans le code permanent
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v09-test/fiches/avenir-restaure.webp v09-test/fiches/famille-restauree.webp v09-test/fiches/dieu-restaure.webp v09-test/fiches/priere-restauree.webp v09-test/fiches/jesus-restaure.webp v09-test/fiches/royaume-restaure.webp
+          git rm aia-six-fiches-sauvegarde.zip
+          git diff --cached --quiet || git commit -m "AIA: restaurer six fiches illustrees permanentes"
+          git push
