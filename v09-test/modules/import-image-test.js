@@ -16,7 +16,19 @@ const dbName='aia-repertoire-v09-test';
 const storeName='fiches';
 let db=null,ready=false,request=null,focusBefore=null,replaceId=null,activeTheme=null;
 const picker=document.createElement('input');
-picker.type='file';picker.accept='image/png,image/jpeg,image/webp';picker.hidden=true;picker.multiple=true;
+picker.type='file';picker.accept='image/png,image/jpeg,image/webp';picker.multiple=true;
+// Android : le sélecteur doit être ouvert par le geste natif sur un label, pas par input.click().
+picker.id='aia-repertoire-native-picker';
+picker.style.cssText='position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden';
+function nativeImportLabel(topic){
+ const label=document.createElement('label');
+ label.className='aia-import-button';
+ label.htmlFor=picker.id;
+ label.textContent='Importer';
+ label.setAttribute('aria-label',topic);
+ label.style.cursor='pointer';
+ return label;
+}
 section.append(picker);
 const viewer=document.createElement('div');
 viewer.className='aia-photo-viewer';viewer.hidden=true;
@@ -526,8 +538,7 @@ function categoryView(category,letter){
  }
  wrap.append(bar);
  if(selected){
-  const add=makeButton('Importer','aia-import-button');
-  add.setAttribute('aria-label','Importer des images dans '+named(selected)+' sous '+letter);
+  const add=nativeImportLabel('Importer des images dans '+named(selected)+' sous '+letter);
   add.onclick=()=>{
    const topic=selected==='Famille'?'La famille'
     :topics.find(t=>normalized(t.replace(/^(?:La |Le |Les |L’|L')/i,''))===normalized(selected))||'';
@@ -535,7 +546,7 @@ function categoryView(category,letter){
    // Un seul fichier Jésus remplace le pilote pour TRACTS/J et THÈMES/Jésus.
    replaceId=(category==='TRACTS'&&letter==='J'&&selected==='Jésus')
     ?(records.find(item=>item.id==='aia-tract-jesus-jworg-t-jss')?.id||null):null;
-   picker.multiple=!replaceId;picker.click();
+   picker.multiple=!replaceId;
   };
   wrap.append(add);
  }else{
@@ -618,11 +629,10 @@ function renderTheme(theme){
  const items=allFiches().filter(item=>item.topic===theme&&item.id!=='aia-tract-jesus-jworg-t-jss');
  if(theme==='Jésus'&&!items.length)items.unshift(jesusApproved);
  const view=gallery(items,'','',theme);
- const add=makeButton('Importer','aia-import-button');
- add.setAttribute('aria-label','Importer des images dans le thème '+theme);
+ const add=nativeImportLabel('Importer des images dans le thème '+theme);
  add.onclick=()=>{
   request={category:'THÈMES',letter:'',topic:theme,subtheme:''};
-  replaceId=null;picker.multiple=true;picker.click();
+  replaceId=null;picker.multiple=true;
  };
  area.append(headingRow,toolbar(add,view),view);
 }
