@@ -216,7 +216,7 @@ function openImage(item){
  const isJesus=item.topic==='Jésus'||item.subtheme==='Jésus'||
   activeTheme==='Jésus'||/conseils de Jésus/i.test(item.label);
  jesusVerseLinks.forEach(link=>{link.hidden=!isJesus});
- const isKingdom=item.topic==='Le Royaume de Dieu'||item.subtheme==='Le Royaume de Dieu'||activeTheme==='Le Royaume de Dieu'||/royaume|royaume de dieu|t[-_]kng/i.test([item.label,item.name,item.filename,item.fileName].filter(Boolean).join(' '))||(Array.isArray(item.placements)&&item.placements.some(p=>p.letter==='R'||/royaume/i.test(p.subtheme||'')));
+ const isKingdom=item.topic==='Le Royaume de Dieu'||item.subtheme==='Le Royaume de Dieu'||activeTheme==='Le Royaume de Dieu'||/royaume|royaume de dieu|t[-_]kng/i.test([item.label,item.name,item.filename,item.fileName].filter(Boolean).join(' '))||(Array.isArray(item.placements)&&item.placements.some(p=>/royaume/i.test(p.subtheme||'')));
  kingdomVerseLinks.forEach(link=>{link.hidden=!isKingdom});
  imageFrame.classList.toggle('aia-jesus-enlarged',isJesus);
 
