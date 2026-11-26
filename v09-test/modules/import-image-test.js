@@ -728,6 +728,14 @@ window.addEventListener('pagehide',()=>{
      raw.topic='Jésus';
      try{await operation('readwrite',store=>store.put(raw))}catch(error){console.warn('AIA Jésus : classement différé',error)}
     }
+    // Migration ciblée : un ancien import PDF « Souffrances » a été
+    // rangé à tort dans L’avenir. Conserver l'image, les références et l'ID.
+    // Ne jamais modifier les autres fiches ni leurs emplacements TRACTS/FICHES.
+    if(raw.topic==='L’avenir'&&/^Une vie sans souffrances est-elle possible\s*\?$/i.test(String(raw.label||'').trim())){
+     raw.topic='Les souffrances';
+     try{await operation('readwrite',store=>store.put(raw))}
+     catch(error){console.warn('AIA Souffrances : migration différée',error);raw.topic='L’avenir'}
+    }
     records.push(makeRecord(raw));
    }
   }
