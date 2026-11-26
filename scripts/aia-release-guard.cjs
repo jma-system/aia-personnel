@@ -37,9 +37,11 @@ for (const match of html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi
 for (const name of ['fiches-pdf-import-v17.js', 'import-image-test.js']) {
   check(html.includes(name), 'Active importer referenced: ' + name);
 }
-for (const id of ['home', 'viewer', 'indexPanel']) {
+for (const id of ['home', 'viewer']) {
   check(new RegExp('\\bid\\s*=\\s*["\x27]' + id + '["\x27]').test(html), 'Required UI element: ' + id);
 }
+const indexJs = fs.readFileSync(path.join(moduleDir, 'index-interactif.js'), 'utf8');
+check(/section\\.id\\s*=\\s*['"]indexPanel['"]/.test(indexJs), 'Dynamically created indexPanel exists');
 console.log('NOTE: Static checks do not prove mobile layout, Bible links, QR codes, PDF fidelity, persistence or service-worker cache behavior.');
 if (failures) { console.error(failures + ' check(s) failed.'); process.exit(1); }
 console.log('AIA static release guard passed.');
