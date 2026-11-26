@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIA — Pilote PDF original (isolé)</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#172234;font:16px/1.5 system-ui,Arial,sans-serif}main{max-width:760px;margin:auto;padding:16px}h1{font-size:21px}.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}button,a.download{font:inherit;padding:10px 12px;border:1px solid #71869c;background:white;color:#142d44;border-radius:8px}input{max-width:100%}.status{min-height:30px}.page{position:relative;background:white;margin:16px auto;box-shadow:0 2px 12px #0002;max-width:100%}.page canvas{display:block;width:100%;height:auto}.layer{position:absolute;inset:0;pointer-events:none}.bible-link{position:absolute;display:block;pointer-events:auto;border:1px solid #136fba;background:rgba(17,114,186,.14);border-radius:3px;min-height:9px}.bible-link:focus-visible{outline:3px solid #f59e0b}.note{font-size:13px;color:#40556a}button:disabled{opacity:.5}
+</style></head>
+<body><main><h1>AIA — Pilote de fidélité PDF</h1>
+<p>Affichage du PDF original, sans reconstitution de la fiche. Test local : aucun document envoyé à un serveur par ce pilote. Les liens détectés sont superposés à l'écran et ne modifient pas le PDF sauvegardé.</p>
+<div class="bar"><label>Choisir une fiche PDF <input id="pdf" type="file" accept=".pdf,application/pdf"></label><button id="open" type="button">Afficher</button><button id="save" type="button" disabled>Récupérer le PDF original</button></div>
+<p id="status" class="status" role="status" aria-live="polite">Aucune fiche chargée.</p>
+<p class="note">Pilote limité : 6 noms de livres bibliques reconnus ; références PDF fragmentées ou scannées non détectées. Les zones de lien doivent être vérifiées sur téléphone. Aucun classement ni stockage automatique.</p>
+<div id="pages"></div></main>
+<script src="modules/pdf-original-references.js"></script>
+<script src="modules/pdf-original-pilot.js"></script>
+</body></html>
