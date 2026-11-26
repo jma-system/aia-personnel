@@ -93,7 +93,7 @@ function extractZone(items,page,from,to){
   for(const part of parts){
    const fragment=part.str;
    const gap=right===null?0:part.x-right;
-   const typical=previous?Math.max(3,previous.height*.28):3;
+   const typical=previous?Math.max(4.5,previous.height*.52):4.5;
    // PDF.js can return one item per glyph. Only insert a space when
    // the actual horizontal gap is large enough; never join existing spaces.
    if(result&&!/\s$/.test(result)&&!/^\s/.test(fragment)&&gap>typical)result+=' ';
