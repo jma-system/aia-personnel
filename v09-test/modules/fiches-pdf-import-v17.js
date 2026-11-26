@@ -116,9 +116,16 @@ function parsedReferences(raw){
 function extractTract(p1,p2,items1,items2){
  const title=extractZone(items1,p1,120,207).replace(/\s+/g,' ').trim();
  const lead=extractZone(items1,p1,202,255);
- const leadQuote=(lead.match(/«[\s\S]*?»/)||[])[0];
- const leadRef=(lead.match(/\(([^)]*\d+\s*:\s*\d+[^)]*)\)/)||[])[1];
- if(!title||title.length<12||title.length>160||!leadQuote||!leadRef)throw Error('Titre ou citation illisible : vérifie que le PDF est un tract illustré en deux pages.');
+ // Certaines couches texte PDF n'emploient ni guillemets français ni parenthèses.
+ // N'accepter un repli que si une citation et une référence sont réellement présentes.
+ const quoteMatch=lead.match(/«[^»]+»|“[^”]+”|"[^"]+"/);
+ const referenceMatch=lead.match(/\(([^)]*\d+\s*:\s*\d+[^)]*)\)/)
+  ||lead.match(/((?:2\s*Timoth[eé]e|Psaumes?|Isa[iï]e|J[eé]r[eé]mie|Daniel|Matthieu|Jean|Luc|R[eé]v[eé]lation|Proverbes)\s+\d{1,3}\s*:\s*\d{1,3}(?:\s*[-,]\s*\d{1,3})?)/i);
+ const leadRef=referenceMatch?.[1]||'';
+ const leadQuote=quoteMatch?.[0]||'';
+ if(!title||title.length<8||title.length>180)throw Error('Titre non reconnu sur la première page : vérifie le PDF original.');
+ if(!leadQuote)throw Error('Citation d’ouverture non reconnue : guillemets ou texte PDF absents.');
+ if(!leadRef)throw Error('Référence biblique d’ouverture non reconnue : vérifie le PDF original.');
  const opening={text:leadQuote.replace(/\[\s*5\s*\]/g,'[…]'),citation:leadRef,refs:parsedReferences(leadRef)};
  const second=extractZone(items2,p2,15,212);
  let bullets=second.split(/[˙•●]/u).slice(1).map(x=>x.trim()).filter(Boolean);
