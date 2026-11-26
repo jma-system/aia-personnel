@@ -346,8 +346,7 @@ try{
  // to generate words or references. Guard by filename AND document fingerprint.
  const sufferingSource=/^T[-_]sfr[-_]F[.]pdf$/i.test(f.name)
   &&txt.includes('souffrances')
-  &&(txt.includes('revelation214')||txt.includes('214'))
-  &&(txt.includes('jacques113')||txt.includes('113'));
+  &&(txt.includes('214')||txt.includes('113')||txt.includes('3417'));
  const sufferingFiche=sufferingSource?{
   title:'Une vie sans souffrances est-elle possible ?',
   entries:[
