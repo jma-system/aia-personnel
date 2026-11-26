@@ -132,12 +132,19 @@ for(const entry of kingdomReferences){
  a.textContent=entry.name;a.style.cssText='display:inline-block;padding:10px 12px;border:1px solid #78b6d5;border-radius:8px;color:#07549b;background:#fff;font:600 14px Verdana,sans-serif;text-decoration:underline';
  kingdomStudyLinks.append(a);
 }
-imageFrame.append(kingdomStudyLinks);
+// Les liens Royaume disposent déjà de zones tactiles sur la fiche.
+// Ne pas afficher un second panneau de versets à côté de l'image.
+kingdomStudyLinks.hidden=true;
 // Generic, data-driven links for every PDF-derived fiche; no image-coordinate dependency.
 const savedStudyLinks=document.createElement('nav');
 savedStudyLinks.setAttribute('aria-label','Références — Bible d’étude JW.org');
 savedStudyLinks.style.cssText='display:none;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px 8px;background:#eaf7ff;border-radius:12px';
-imageFrame.append(savedStudyLinks);
+// Références génériques accessibles sur demande, sous la fiche et jamais à sa droite.
+const studyDetails=document.createElement('details');
+studyDetails.className='aia-saved-references';
+const studySummary=document.createElement('summary');
+studySummary.textContent='Références bibliques';
+studyDetails.append(studySummary,savedStudyLinks);
 function renderStudyLinks(item){
  savedStudyLinks.replaceChildren();
  const seen=new Set();
@@ -155,6 +162,8 @@ function renderStudyLinks(item){
   savedStudyLinks.append(a);
  }
  savedStudyLinks.style.display=seen.size?'flex':'none';
+ studyDetails.hidden=!seen.size;
+ studyDetails.open=false;
 }
 const linkButton=document.createElement('button');
 linkButton.type='button';linkButton.className='aia-link-editor-button';
@@ -164,7 +173,10 @@ linkButton.setAttribute('aria-label','Ajouter un lien biblique sur cette image')
 const statusLink=document.createElement('div');statusLink.className='aia-link-editor-status';statusLink.hidden=true;
 const userLinks=document.createElement('div');userLinks.className='aia-custom-links';
 imageFrame.append(userLinks);
-viewer.append(close,imageFrame,linkButton,statusLink);document.body.append(viewer);
+viewer.append(close,imageFrame,studyDetails,linkButton,statusLink);
+const viewerFix=document.createElement('style');
+viewerFix.textContent='.aia-photo-viewer{overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important}.aia-photo-frame{display:block!important;box-sizing:border-box!important;max-width:min(100%,960px)!important;width:100%!important;margin-left:auto!important;margin-right:auto!important;min-width:0!important}.aia-photo-frame>img{display:block!important;width:100%!important;max-width:100%!important;height:auto!important;object-fit:contain!important}.aia-saved-references{box-sizing:border-box;max-width:min(100%,960px);margin:10px auto 24px;padding:8px 12px;border-radius:10px;background:#eaf7ff;color:#073a79;font:14px Verdana,sans-serif}.aia-saved-references[hidden]{display:none!important}.aia-saved-references summary{cursor:pointer;min-height:32px;display:list-item;padding:6px 0}.aia-saved-references nav{max-width:100%;overflow-wrap:anywhere}';
+document.head.append(viewerFix);document.body.append(viewer);
 let currentPhoto=null,placingLink=false;
 function parseVerseReference(input){
  const match=input.trim().match(/^(.+?)\\s+(\\d{1,3})\\s*:\\s*(\\d{1,3})(?:\\s*[-–,].*)?$/u);
@@ -265,8 +277,8 @@ function openImage(item){
  jesusVerseLinks.forEach(link=>{link.hidden=!isJesus});
  const isKingdom=item.topic==='Le Royaume de Dieu'||item.subtheme==='Le Royaume de Dieu'||activeTheme==='Le Royaume de Dieu'||/royaume|royaume de dieu|t[-_]kng/i.test([item.label,item.name,item.filename,item.fileName].filter(Boolean).join(' '))||(Array.isArray(item.placements)&&item.placements.some(p=>/royaume/i.test(p.subtheme||'')));
  kingdomVerseLinks.forEach(link=>{link.hidden=!isKingdom});
- kingdomStudyLinks.hidden=!isKingdom;
- kingdomStudyLinks.style.display=isKingdom?'flex':'none';
+ kingdomStudyLinks.hidden=true;
+ kingdomStudyLinks.style.display='none';
  imageFrame.classList.toggle('aia-jesus-enlarged',isJesus);
 
  viewer.hidden=false;document.body.style.overflow='hidden';close.focus();
@@ -719,9 +731,13 @@ section.addEventListener('aia:theme-select',e=>{
  activeTheme=theme;
  renderTheme(theme);
 });
-window.addEventListener('pagehide',()=>{
- closeImage();records.forEach(discard);db?.close();
-},{once:true});
+// Ne pas révoquer les blob: URLs ni fermer IndexedDB sur pagehide : Android
+// peut conserver la page en cache de navigation (BFCache). Les URLs révoquées
+// resteraient alors dans les vignettes et paraîtraient « disparues » au retour.
+// Le navigateur libère ces ressources à la destruction effective du document.
+window.addEventListener('pageshow',event=>{
+ if(event.persisted){closeImage();refresh();}
+});
 (async()=>{
  try{
   db=await openDatabase();
