@@ -210,3 +210,24 @@
  }
  @media(max-width:350px){#aia-hub .hub-real-icon{height:56px;font-size:38px}}
 }
+
+/* Accueil AIA 3D v3 : relief, éclat et lisibilité des neuf boutons. */
+@media screen {
+ #aia-hub .hub-grid {gap:12px!important}
+ #aia-hub .hub-grid .hub-tile[data-universe] {
+   position:relative; isolation:isolate; overflow:hidden;
+   min-height:154px; padding:13px 4px 11px;
+   border-radius:23px!important; border:2px solid var(--tile-edge)!important;
+   background:linear-gradient(155deg,var(--tile-top) 0%,var(--tile-bottom) 86%)!important;
+   color:#fff!important; text-shadow:0 2px 3px #001c4055!important;
+   box-shadow:inset 0 3px 2px #ffffff90,inset 0 -5px 8px #00162c66,0 8px 13px #122c4b35!important;
+   transition:transform .12s ease,filter .12s ease;
+ }
+ #aia-hub .hub-grid .hub-tile[data-universe]::before {
+   content:"";position:absolute;inset:3px 5px auto;height:39%;border-radius:19px 19px 45% 45%;
+   background:linear-gradient(180deg,#ffffff65,#ffffff00);pointer-events:none;z-index:-1;
+ }
+ #aia-hub .hub-grid .hub-tile[data-universe]:active {transform:translateY(2px);filter:brightness(.92)}
+ #aia-hub .hub-real-icon {font-size:clamp(43px,11vw,65px);height:83px;filter:drop-shadow(0 6px 3px #00122e65)}
+ @media(max-width:350px){#aia-hub .hub-grid .hub-tile[data-universe]{min-height:120px;padding:8px 3px}#aia-hub .hub-real-icon{height:60px;font-size:39px}}
+}
