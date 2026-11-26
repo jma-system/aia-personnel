@@ -7,12 +7,12 @@
   #home:has(#cvm.selected) {--study-accent:#16bfae;--study-glow:#24ddbf40;}
   #home:has(#tg.selected) {--study-accent:#4ca7ff;--study-glow:#4ca7ff42;}
 
-  html:not([data-aia-theme="dark"]) body #home {
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="reunions"] main > #home {
     background:linear-gradient(165deg,#f6fbff 0%,#eff6ff 100%)!important;
     border-color:#c3d9ee!important;
     color:#142f4d;
   }
-  html:not([data-aia-theme="dark"]) body #home:has(#cvm.selected) {
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="reunions"] main > #home:has(#cvm.selected) {
     background:linear-gradient(165deg,#f3fffd,#effaf9)!important;
   }
   html:not([data-aia-theme="dark"]) body #home .aia-workflow,
@@ -59,7 +59,7 @@
     box-shadow:inset 0 1px 0 #ffffff17!important;
   }
   html[data-aia-theme="dark"] body > header #date {color-scheme:dark;}
-  html[data-aia-theme="dark"] body main > #home {
+  html[data-aia-theme="dark"] body[data-aia-universe="reunions"] main > #home {
     background:linear-gradient(165deg,#152841,#0d1b2f)!important;
     color:#f1f7ff!important;
     border:1px solid #284965!important;
