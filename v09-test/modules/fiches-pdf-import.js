@@ -12,7 +12,7 @@ css.textContent='#aia-fiches-pdf-import{padding:14px;margin:0 0 14px;background:
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
-box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche FAMILLE</button><p id="aia-pdf-status" role="status">Prêt pour l’importation.</p>';
+box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche</button><p id="aia-pdf-status" role="status">Prêt pour l’importation.</p>';
 tabs.before(box);
 const input=box.querySelector('#aia-pdf-file'),btn=box.querySelector('#aia-pdf-go'),status=box.querySelector('#aia-pdf-status');
 function say(msg,err=false){status.textContent=msg;status.style.color=err?'#aa2525':'#166b42'}
