@@ -1,0 +1,182 @@
+/* AIA — Palette des neuf univers, issue des bleus / verts / violets
+   de la maquette à trois écrans. Écran uniquement.
+   L'objectif est de donner un repère couleur par bouton et dans sa rubrique.
+   Ne touche ni aux images importées, ni aux documents imprimés. */
+@media screen {
+  /* Chaque bouton a sa nuance propre. Couleurs pastel et encre marine. */
+  #aia-hub .hub-tile[data-universe="repertoire"] {
+    --tile-top:#d8eaff;--tile-bottom:#a9cefb;--tile-edge:#75a8df;--tile-ink:#133f79;
+    --tile-dark-top:#254a7a;--tile-dark-bottom:#1d3454;
+  }
+  #aia-hub .hub-tile[data-universe="reunions"] {
+    --tile-top:#e1f5ff;--tile-bottom:#b8e3f8;--tile-edge:#7ebbd8;--tile-ink:#15506e;
+    --tile-dark-top:#24596c;--tile-dark-bottom:#1c3e52;
+  }
+  #aia-hub .hub-tile[data-universe="index"] {
+    --tile-top:#f1e6ff;--tile-bottom:#d7bcf5;--tile-edge:#b18bd5;--tile-ink:#57377f;
+    --tile-dark-top:#4d3c74;--tile-dark-bottom:#332a51;
+  }
+  #aia-hub .hub-tile[data-universe="fiches"] {
+    --tile-top:#ddf7f5;--tile-bottom:#afe4df;--tile-edge:#77b9b2;--tile-ink:#165e61;
+    --tile-dark-top:#225d61;--tile-dark-bottom:#1d3e46;
+  }
+  #aia-hub .hub-tile[data-universe="rubriques"] {
+    --tile-top:#f7e9ff;--tile-bottom:#e5c9f1;--tile-edge:#bf96d2;--tile-ink:#663b74;
+    --tile-dark-top:#61466b;--tile-dark-bottom:#3d2d4b;
+  }
+  #aia-hub .hub-tile[data-universe="videos"] {
+    --tile-top:#e8ecff;--tile-bottom:#c5cff6;--tile-edge:#95a7da;--tile-ink:#384f8a;
+    --tile-dark-top:#384f7b;--tile-dark-bottom:#293758;
+  }
+  #aia-hub .hub-tile[data-universe="jworg"] {
+    --tile-top:#e4f7e6;--tile-bottom:#c0e8c3;--tile-edge:#8dbf93;--tile-ink:#255c3a;
+    --tile-dark-top:#355f45;--tile-dark-bottom:#263f35;
+  }
+  #aia-hub .hub-tile[data-universe="wol"] {
+    --tile-top:#e6faec;--tile-bottom:#bee9d0;--tile-edge:#87c4a3;--tile-ink:#23674c;
+    --tile-dark-top:#2b6551;--tile-dark-bottom:#204539;
+  }
+  #aia-hub .hub-tile[data-universe="reglages"] {
+    --tile-top:#faeaf5;--tile-bottom:#edcfe4;--tile-edge:#c89ebd;--tile-ink:#754567;
+    --tile-dark-top:#67465f;--tile-dark-bottom:#453247;
+  }
+
+  /* Surcharge des anciennes cartes bleu uniforme, y compris leur nth-child. */
+  html:not([data-aia-theme="dark"]) body #aia-hub .hub-grid .hub-tile[data-universe] {
+    background:linear-gradient(155deg,var(--tile-top),var(--tile-bottom))!important;
+    border:1.5px solid var(--tile-edge)!important;
+    color:var(--tile-ink)!important;
+    box-shadow:0 3px 9px #1a47721b!important;
+  }
+  html:not([data-aia-theme="dark"]) body #aia-hub .hub-grid .hub-tile[data-universe]:active {
+    filter:brightness(.96);
+  }
+  html[data-aia-theme="dark"] body #aia-hub .hub-grid .hub-tile[data-universe] {
+    background:linear-gradient(160deg,var(--tile-dark-top),var(--tile-dark-bottom))!important;
+    border:1.5px solid var(--tile-edge)!important;
+    color:#fff!important;
+    box-shadow:0 3px 10px #0004!important;
+  }
+
+  /* Correspondance des neuf espaces avec leur bouton racine. */
+  body[data-aia-universe="repertoire"] {
+    --u-tint:#e9f4ff;--u-pale:#d7eaff;--u-edge:#a5c8ed;--u-main:#246dba;--u-ink:#144b84;
+  }
+  body[data-aia-universe="reunions"] {
+    --u-tint:#effbff;--u-pale:#d9effa;--u-edge:#aad5e6;--u-main:#2180b2;--u-ink:#155570;
+  }
+  body[data-aia-universe="index"] {
+    --u-tint:#f8f2ff;--u-pale:#eadcf9;--u-edge:#cdb1e9;--u-main:#8051b1;--u-ink:#624185;
+  }
+  body[data-aia-universe="fiches"] {
+    --u-tint:#effaf9;--u-pale:#d6efeb;--u-edge:#a4d5cf;--u-main:#28877f;--u-ink:#17645d;
+  }
+  body[data-aia-universe="rubriques"] {
+    --u-tint:#fcf4ff;--u-pale:#f1e0f8;--u-edge:#d9b8e4;--u-main:#975cb1;--u-ink:#70407d;
+  }
+  body[data-aia-universe="videos"] {
+    --u-tint:#f4f6ff;--u-pale:#e0e6ff;--u-edge:#b4c2ed;--u-main:#5872bb;--u-ink:#3b5290;
+  }
+  body[data-aia-universe="jworg"] {
+    --u-tint:#f1fbf2;--u-pale:#dbf0de;--u-edge:#a9d5ac;--u-main:#468951;--u-ink:#255f34;
+  }
+  body[data-aia-universe="wol"] {
+    --u-tint:#f1fbf6;--u-pale:#ddf3e6;--u-edge:#a5d9bb;--u-main:#348d65;--u-ink:#276e4e;
+  }
+  body[data-aia-universe="reglages"] {
+    --u-tint:#fff5fa;--u-pale:#f4e1ed;--u-edge:#e0c0d5;--u-main:#a36691;--u-ink:#794969;
+  }
+  /* Dans l'univers : fond et bordure hérités du bouton, sans recolorer les photos. */
+  html:not([data-aia-theme="dark"]) body[data-aia-universe] main > :is(#home,#indexPanel,#library,#viewer,#editor,#exportPanel,#desk):not(.hidden) {
+    background:var(--u-tint)!important;
+    border-color:var(--u-edge)!important;
+    border-top:4px solid var(--u-main)!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe] :is(#home .aia-workflow,#home .aia-search-panel,#indexPanel .aia-index-tile,#library .card,#desk .card) {
+    border-color:var(--u-edge)!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="repertoire"] #indexPanel .aia-index-tile {
+    background:var(--u-pale)!important;
+  }
+  body[data-aia-universe="repertoire"] #indexPanel .aia-index-tabs button.selected,
+  body[data-aia-universe="repertoire"] #indexPanel .aia-index-letters button.selected {
+    background:var(--u-main)!important;
+    border-color:var(--u-main)!important;
+    color:#fff!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="repertoire"] #indexPanel .aia-index-letters button:not(.selected) {
+    background:var(--u-pale)!important;
+    border-color:var(--u-edge)!important;
+    color:var(--u-ink)!important;
+  }
+  body[data-aia-universe="repertoire"] #indexPanel .aia-import-button,
+  body[data-aia-universe="repertoire"] #indexPanel #aia-fiches-pdf-import button {
+    background:var(--u-main)!important;
+    color:#fff!important;
+    border-color:var(--u-main)!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="reunions"] #home .selected {
+    background:var(--u-pale)!important;
+    border-color:var(--u-main)!important;
+    color:var(--u-ink)!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="reunions"] #home .primary {
+    background:var(--u-main)!important;
+    color:#fff!important;
+    border-color:var(--u-main)!important;
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe="reunions"] :is(#home .aia-workflow,#home .aia-search-panel) {
+    background:#fff!important;
+    border-color:var(--u-edge)!important;
+  }
+  body[data-aia-universe="fiches"] :is(#library,#viewer,#editor,#exportPanel) h2,
+  body[data-aia-universe="videos"] #desk h2 {
+    color:var(--u-ink);
+  }
+  html:not([data-aia-theme="dark"]) body[data-aia-universe] :is(#library,#viewer,#editor,#exportPanel,#desk) .primary {
+    background:var(--u-main)!important;
+    color:#fff!important;
+    border-color:var(--u-main)!important;
+  }
+  body.aia-hub-active[data-aia-universe] #aia-hub .hub-inner {
+    border-left:5px solid var(--u-main);
+    background:var(--u-tint);
+    padding:18px 15px;
+    border-radius:12px;
+    color:var(--u-ink);
+  }
+  body.aia-hub-active[data-aia-universe] #aia-hub .hub-inner h2 {
+    color:var(--u-ink)!important;
+  }
+  body.aia-hub-active[data-aia-universe] #aia-hub .hub-inner button {
+    border-color:var(--u-edge);
+    color:var(--u-ink);
+    background:var(--u-pale);
+  }
+
+  /* Mode sombre : garder les panneaux sombres, avec la couleur propre à la rubrique. */
+  html[data-aia-theme="dark"] body[data-aia-universe] main > :is(#home,#indexPanel,#library,#viewer,#editor,#exportPanel,#desk):not(.hidden) {
+    background:#1b2635!important;
+    border:1px solid var(--u-edge)!important;
+    border-top:4px solid var(--u-main)!important;
+    color:#edf5ff!important;
+  }
+  html[data-aia-theme="dark"] body[data-aia-universe] #indexPanel .aia-index-tabs button.selected,
+  html[data-aia-theme="dark"] body[data-aia-universe] #indexPanel .aia-index-letters button.selected {
+    background:var(--u-main)!important;
+    border-color:var(--u-main)!important;
+    color:#fff!important;
+  }
+  html[data-aia-theme="dark"] body[data-aia-universe] :is(#home,#indexPanel,#library,#viewer,#editor,#exportPanel,#desk) h2 {
+    color:#e5f2ff;
+  }
+  html[data-aia-theme="dark"] body.aia-hub-active[data-aia-universe] #aia-hub .hub-inner {
+    background:#202b39;
+    border-left:5px solid var(--u-main);
+    border-radius:12px;
+    padding:18px 15px;
+  }
+  html[data-aia-theme="dark"] body.aia-hub-active[data-aia-universe] #aia-hub .hub-inner h2 {
+    color:#f4f8ff!important;
+  }
+}
