@@ -44,3 +44,12 @@ Rendre l'importation PDF et image reproductible, testable et sûre dans `v09-tes
 - Aucun verset ou QR supposé valide sans vérification.
 - Une fiche validée peut être retrouvée après fermeture/actualisation; une sauvegarde externe permet de la restaurer après suppression des données du site.
 - Chaque statut doit être rapporté comme DOCUMENTÉ / À TESTER / PROUVÉ EN TEST / VALIDÉ SUR TÉLÉPHONE.
+
+## Automatisation GitHub installée (26/11/2026)
+- Workflow : `.github/workflows/aia-pdf-checks.yml`.
+- Tests statiques : `scripts/aia-pdf-checks.cjs` (Node.js 22, sans dépendance).
+- Déclenchement : push / pull request sur les fichiers concernés et lancement manuel depuis Actions.
+- Vérifie la syntaxe JavaScript, la présence des modules et des points d'entrée critiques.
+- Ce workflow **ne corrige pas automatiquement** le code, n'importe pas de PDF, ne sauvegarde pas les images et ne simule pas un téléphone Android.
+- Un succès CI signifie seulement **contrôles statiques réussis**. Les bugs fonctionnels, PDF réels, QR, versets, sauvegarde externe et ergonomie restent **À TESTER** jusqu'à preuves.
+- Ne pas déclencher de déploiement destructif, ni de migration IndexedDB automatique.
