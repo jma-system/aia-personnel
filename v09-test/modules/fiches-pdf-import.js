@@ -52,17 +52,97 @@ function chooseReplacement(image){
  picker.click();
  setTimeout(()=>picker.remove(),120000);
 }
-function build(photo,qr,pdfFile,kind='avenir'){
+
+/* Extraction contrôlée de tracts PDF en deux pages, sans texte pré-rédigé. */
+function extractZone(items,page,from,to){
+ const h=page.view[3];
+ return items.filter(it=>it.str&&it.transform&&h-it.transform[5]>=from&&h-it.transform[5]<=to)
+  .sort((a,b)=>(b.transform[5]-a.transform[5])||(a.transform[4]-b.transform[4]))
+  .map(it=>it.str).join(' ').replace(/\s+/g,' ').trim();
+}
+function parsedReferences(raw){
+ const bookMap={
+  'p':{id:19,slug:'psaumes'},'psaume':{id:19,slug:'psaumes'},'psaumes':{id:19,slug:'psaumes'},
+  'daniel':{id:27,slug:'daniel'},'da':{id:27,slug:'daniel'},
+  'isaie':{id:23,slug:'isaie'},'is':{id:23,slug:'isaie'},
+  'jeremie':{id:24,slug:'jeremie'},'jr':{id:24,slug:'jeremie'},
+  'matthieu':{id:40,slug:'matthieu'},'mt':{id:40,slug:'matthieu'},
+  'luc':{id:42,slug:'luc'},'lc':{id:42,slug:'luc'},
+  'jean':{id:43,slug:'jean'},'jn':{id:43,slug:'jean'},
+  'revelation':{id:66,slug:'revelation'},'rv':{id:66,slug:'revelation'},
+  'proverbes':{id:20,slug:'proverbes'},'pr':{id:20,slug:'proverbes'},
+  '2 timothee':{id:55,slug:'2-timothee'},'2 tm':{id:55,slug:'2-timothee'}
+ };
+ const source=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[‐‑–—]/g,'-');
+ let last=null;
+ const parts=source.split(/\s*;\s*/);
+ const result=[];
+ for(let part of parts){
+  const found=part.match(/(2\s*timothee|2\s*tm|psaumes?|daniel|da|isaie|is|jeremie|jr|matthieu|mt|luc|lc|jean|jn|revelation|rv|proverbes|pr|p)\s+(\d{1,3})\s*:\s*(\d{1,3})/i);
+  let chapter,verse;
+  if(found){
+   const key=found[1].toLowerCase().replace(/\s+/g,' ');
+   last=bookMap[key];chapter=Number(found[2]);verse=Number(found[3]);
+  }else{
+   const noBook=part.match(/(\d{1,3})\s*:\s*(\d{1,3})/);
+   if(!last||!noBook)continue;
+   chapter=Number(noBook[1]);verse=Number(noBook[2]);
+  }
+  if(!last||chapter<1||verse<1||chapter>150||verse>176)continue;
+  const label=part.trim().replace(/^\(+|\)+$/g,'').trim();
+  result.push({label,book:last.id,slug:last.slug,chapter,verse});
+ }
+ return result;
+}
+function extractTract(p1,p2,items1,items2){
+ const title=extractZone(items1,p1,120,207).replace(/\s+/g,' ').trim();
+ const lead=extractZone(items1,p1,202,255);
+ const leadQuote=(lead.match(/«[\s\S]*?»/)||[])[0];
+ const leadRef=(lead.match(/\(([^)]*\d+\s*:\s*\d+[^)]*)\)/)||[])[1];
+ if(!title||title.length<12||title.length>160||!leadQuote||!leadRef)throw Error('Titre ou citation illisible : vérifie que le PDF est un tract illustré en deux pages.');
+ const opening={text:leadQuote.replace(/\[\s*5\s*\]/g,'[…]'),citation:leadRef,refs:parsedReferences(leadRef)};
+ const second=extractZone(items2,p2,15,212);
+ let bullets=second.split(/[˙•●]/u).slice(1).map(x=>x.trim()).filter(Boolean);
+ if(!bullets.length){
+  // Certaines polices PDF emploient un point typographique représenté différemment.
+  bullets=second.split(/(?:\s{2,}|^)[•·]\s*/).slice(1).map(x=>x.trim()).filter(Boolean);
+ }
+ if(!bullets.length)throw Error('Liste de la seconde page non reconnue : aucune fiche automatique créée.');
+ const entries=[opening];
+ for(const bullet of bullets.slice(0,5)){
+  const matches=[...bullet.matchAll(/\(([^)]*\d+\s*:\s*\d+[^)]*)\)/g)];
+  if(!matches.length)continue;
+  const citation=matches.map(m=>m[1]).join(' ; ');
+  const firstAt=matches[0].index;
+  const description=bullet.slice(0,firstAt).replace(/[. ;:,]+$/,'').trim();
+  if(!description)continue;
+  entries.push({text:description+'.',citation,refs:parsedReferences(citation)});
+ }
+ if(entries.length<3||entries.some(e=>!e.refs.length))throw Error('Références bibliques non reconnues : vérification nécessaire avant la conversion.');
+ return {title,entries};
+}
+function passageExtracted(parent,entry){
+ const card=element('div','aia-verse',entry.text);
+ for(const r of entry.refs){
+  const a=element('a','',r.label);
+  a.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+r.slug+'/'+r.chapter+'/#v'+String(r.book).padStart(2,'0')+String(r.chapter).padStart(3,'0')+String(r.verse).padStart(3,'0');
+  a.target='_blank';a.rel='noopener noreferrer';card.append(a);
+ }
+ parent.append(card);
+}
+
+function build(photo,qr,pdfFile,kind='avenir',extracted=null){
 const god=kind==='dieu';
 sheet.replaceChildren();
-const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','',god?'Tract – Dieu':'Tract – L’avenir');
+const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','',extracted?'Tract – '+extracted.title:(god?'Tract – Dieu':'Tract – L’avenir'));
 const signet=element('span');signet.innerHTML='<svg width="24" height="28" viewBox="0 0 24 28" fill="none" aria-label="Signet bientôt disponible"><path d="M4 2.5H20V25L12 19.5L4 25V2.5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/></svg>';
 bar.append(back,title,signet);
 const body=element('section','aia-body');
-body.append(element('div','aia-heading',god?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?'));
+body.append(element('div','aia-heading',extracted?extracted.title:(god?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?')));
 const cols=element('div','aia-cols'),pic=element('div','aia-photo'),im=document.createElement('img');im.src=photo;im.alt=god?'Illustration originale du tract : un homme en chemise bleue':'Illustration : un homme en montagne avec un ourson et sa mère';pic.append(im);
 const verses=element('div','aia-verses');
-if(god){
+if(extracted){for(const entry of extracted.entries)passageExtracted(verses,entry);
+}else if(god){
 passage(verses,'« Jéhovah est réellement Dieu. Il est le Dieu vivant »',[['Jérémie 10:10',24,10,10]]);
 passage(verses,'Dieu a un nom.',[['Psaume 83:18',19,83,18]]);
 passage(verses,'Il communique avec les humains.',[['2 Timothée 3:16, 17',55,3,16]]);
@@ -94,14 +174,16 @@ try{
  const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
  const isGod=txt.includes('quiestlevraidieu')&&txt.includes('jeremie1010')&&txt.includes('psaume8318')&&txt.includes('timothee31617')&&txt.includes('psaume1451819');
-const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
+ const isKing=/^T[-_]kng[-_]F[.]pdf$/i.test(f.name);
+ const extracted=isKing?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null;
+const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!extracted&&!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
  const c2=await renderPage(p2,3);
  
- const c1=isGod?await renderPage(p1,3):null;
-const photo=isGod?crop(c1,c1.width*.04,c1.height*.015,c1.width*.92,c1.height*.40,500):'./fiches/avenir-ours.svg?v=1';
+ const c1=(isGod||extracted)?await renderPage(p1,3):null;
+const photo=extracted?crop(c1,c1.width*.04,0,c1.width*.92,c1.height*.44,500):isGod?crop(c1,c1.width*.04,c1.height*.015,c1.width*.92,c1.height*.40,500):'./fiches/avenir-ours.svg?v=1';
  const qr=crop(c2,c2.width*(156/233.86),c2.height*(238/306.14),c2.width*(55/233.86),c2.height*(59/306.14),360);
- build(photo,qr,f,isGod?'dieu':'avenir');
- say('Fiche préparée depuis le PDF original : vérifie l’image, le QR et les références bibliques.');
+ build(photo,qr,f,isGod?'dieu':'avenir',extracted);
+ say('Fiche provisoire depuis le PDF original : vérifie les textes, les liens, l’image et le QR. Aucun enregistrement automatique.');
 }catch(e){say('Conversion impossible : '+e.message,true)}
 finally{try{await pdf?.destroy()}catch(e){}btn.disabled=false}
 });
