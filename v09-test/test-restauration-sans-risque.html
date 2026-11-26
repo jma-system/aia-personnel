@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIA — Vérification de sauvegarde</title>
+<style>body{font:16px/1.5 system-ui,Arial,sans-serif;background:#f3f5f7;color:#172234;margin:0;padding:16px}main{max-width:680px;margin:auto;background:white;border-radius:12px;padding:20px}h1{font-size:22px}input{max-width:100%}output{display:block;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:16px;border:1px solid #bbc6d1;border-radius:8px;padding:12px}small{color:#485c72}</style></head>
+<body><main><h1>AIA — Vérification de sauvegarde</h1>
+<p>Analyse uniquement le fichier JSON choisi sur ton téléphone. Aucune modification du Répertoire, aucune restauration, aucun envoi à un serveur.</p>
+<label>Choisir la sauvegarde AIA <input type="file" id="backup" accept=".json,application/json"></label>
+<output id="result" aria-live="polite">Aucun fichier sélectionné.</output>
+<small>Contrôle de structure uniquement : la validité visuelle des images et la restauration ne sont pas encore prouvées.</small>
+</main><script src="modules/repertoire-backup-audit.js"></script>
+<script>
+document.getElementById('backup').addEventListener('change',async event=>{
+ const out=document.getElementById('result'),file=event.target.files?.[0];
+ if(!file)return;
+ if(file.size>110*1024*1024){out.textContent='Fichier trop volumineux.';return}
+ try{
+  const doc=JSON.parse(await file.text());
+  const r=window.AIABackupAudit.validate(doc);
+  out.textContent=r.ok?'STRUCTURE CONFORME — '+r.count+' fiche(s), '+r.subthemes+' sous-thème(s).\nTitres : '+r.titles.join(' ; ')+'\nAucune donnée modifiée.':'SAUVEGARDE À VÉRIFIER : '+r.problems.join(' ; ');
+ }catch(e){out.textContent='Fichier illisible : '+e.message}
+});
+</script></body></html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AIA — Pilote import groupé</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1f5f9;color:#15263d;font:16px/1.45 system-ui,Arial,sans-serif}
+main{max-width:760px;margin:auto;padding:16px}h1{font-size:23px;margin:12px 0}
+.card{background:#fff;border:1px solid #c9d5e0;border-radius:12px;padding:15px;margin:14px 0}
+input{max-width:100%;display:block;margin:10px 0}button{font:inherit;border:1px solid #8da6c0;background:#164a81;color:#fff;border-radius:9px;padding:12px 15px;min-height:44px}
+button:disabled{opacity:.5}.note{font-size:13px;color:#526477}.error{color:#aa2828}
+.result{border-top:1px solid #d6e0e9;padding:14px 0}.result:first-child{border-top:0}
+.result h2{font-size:16px;margin:0 0 4px;overflow-wrap:anywhere}.result canvas{display:block;max-width:100%;height:auto;margin:8px 0;border:1px solid #ccd6e0}
+</style></head>
+<body><main><h1>AIA — Import groupé, essai isolé</h1>
+<p>Choisis jusqu'à 10 PDF à la fois. Chaque document est examiné séparément et la première page est affichée sans reconstruire le contenu.</p>
+<div class="card">
+<label for="files">Sélectionner plusieurs PDF</label>
+<input id="files" type="file" accept=".pdf,application/pdf" multiple>
+<button id="analyze" type="button">Vérifier le lot</button>
+<p id="status" role="status" aria-live="polite">Aucun document analysé.</p>
+<p class="note">Aucune fiche enregistrée, aucun classement automatique, aucune modification du Répertoire. Le chargement de PDF.js nécessite une connexion Internet.</p>
+</div>
+<section class="card" id="results" aria-label="Résultats individuels"></section>
+</main><script src="modules/pdf-batch-pilot.js"></script></body></html>

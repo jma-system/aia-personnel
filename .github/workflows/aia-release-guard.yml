@@ -1,0 +1,42 @@
+name: AIA release guard
+on:
+  pull_request:
+    paths:
+      - 'v09-test/**'
+      - 'scripts/aia-release-guard.cjs'
+      - 'scripts/aia-bible-references-checks.cjs'
+      - 'scripts/aia-pdf-original-pilot-checks.cjs'
+      - 'scripts/aia-repertoire-backup-checks.cjs'
+      - 'scripts/aia-backup-audit-checks.cjs'
+      - 'scripts/aia-pdf-batch-checks.cjs'
+      - '.github/workflows/aia-release-guard.yml'
+  push:
+    branches:
+      - 'audit/tests-avant-publication'
+    paths:
+      - 'v09-test/**'
+      - 'scripts/aia-release-guard.cjs'
+      - 'scripts/aia-bible-references-checks.cjs'
+      - 'scripts/aia-pdf-original-pilot-checks.cjs'
+      - 'scripts/aia-repertoire-backup-checks.cjs'
+      - 'scripts/aia-backup-audit-checks.cjs'
+      - 'scripts/aia-pdf-batch-checks.cjs'
+      - '.github/workflows/aia-release-guard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/aia-release-guard.cjs
+      - run: node scripts/aia-bible-references-checks.cjs
+      - run: node scripts/aia-pdf-original-pilot-checks.cjs
+      - run: node scripts/aia-repertoire-backup-checks.cjs
+      - run: node scripts/aia-backup-audit-checks.cjs
+      - run: node scripts/aia-pdf-batch-checks.cjs
