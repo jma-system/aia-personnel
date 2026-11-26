@@ -16,6 +16,8 @@ css.textContent += '#aia-pdf-sheet.aia-dieu .aia-verses{align-self:stretch;justi
 /* Gabarit commun FAMILLE pour toutes les fiches PDF (affichage mobile).
    Garder les tailles adaptatives pour eviter le debordement sur Android. */
 css.textContent += '#aia-pdf-sheet .aia-cols{grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);gap:clamp(7px,2vw,14px)}#aia-pdf-sheet .aia-photo{aspect-ratio:291/519}#aia-pdf-sheet .aia-heading{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.12}#aia-pdf-sheet .aia-verse{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.18;overflow-wrap:normal;word-break:normal;padding:clamp(7px,2vw,14px)}#aia-pdf-sheet .aia-verse a{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.18;margin-top:4px}#aia-pdf-sheet .aia-actions{grid-template-columns:repeat(3,minmax(0,1fr))}';
+/* Disposition FAMILLE : image et trois encadrés répartis sur la même hauteur. */
+css.textContent += '#aia-pdf-sheet .aia-cols{align-items:stretch}#aia-pdf-sheet .aia-verses{height:100%;align-self:stretch;justify-content:space-between;gap:6px}#aia-pdf-sheet .aia-verse{flex:0 1 auto;letter-spacing:normal;word-spacing:normal}';
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
@@ -181,10 +183,12 @@ function extractTract(p1,p2,items1,items2){
  return {title,entries};
 }
 function passageExtracted(parent,entry){
+ // Verified references on PDF are authoritative: never show false warnings when links exist.
+ if(Array.isArray(entry.refs)&&entry.refs.length)entry.unverified=false;
  const card=element('div','aia-verse',entry.text);
  for(const r of entry.refs){
   const a=element('a','',r.label);
-  a.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+r.slug+'/'+r.chapter+'/#v'+String(r.book).padStart(2,'0')+String(r.chapter).padStart(3,'0')+String(r.verse).padStart(3,'0');
+  a.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/bible-d-etude/livres/'+r.slug+'/'+r.chapter+'/#v'+String(r.book).padStart(2,'0')+String(r.chapter).padStart(3,'0')+String(r.verse).padStart(3,'0');
   a.target='_blank';a.rel='noopener noreferrer';card.append(a);
  }
  if(entry.unverified){
@@ -230,7 +234,7 @@ async function renderFichePng(title,entries,photoSrc,qrSrc){
  drawLines(c,titleLines.slice(0,3),64,182,Math.round(titleSize*1.25));
  const photoX=30,photoY=315,photoW=410,photoH=735;
  c.save();c.beginPath();c.rect(photoX,photoY,photoW,photoH);c.clip();const scale=Math.max(photoW/photo.width,photoH/photo.height);c.drawImage(photo,photoX+(photoW-photo.width*scale)/2,photoY+(photoH-photo.height*scale)/2,photo.width*scale,photo.height*scale);c.restore();
- const boxX=465,boxW=465,innerW=425,available=770,gap=12;
+ const boxX=465,boxW=465,innerW=425,available=735,gap=12;
  let fontSize=27,refSize=24,blocks=[],total=Infinity;
  for(;fontSize>=17;fontSize-=2){
   refSize=Math.max(16,fontSize-3);
@@ -245,6 +249,7 @@ async function renderFichePng(title,entries,photoSrc,qrSrc){
   if(total<=available)break;
  }
  if(total>available)throw Error('Fiche trop longue pour une image lisible : export annulé.');
+ const distributedGap=blocks.length>1?Math.max(gap,(photoH-blocks.reduce((sum,block)=>sum+block.h,0))/(blocks.length-1)):0;
  let y=315;
  blocks.forEach(block=>{
   c.fillStyle='#f7fcff';c.fillRect(boxX,y,boxW,block.h);c.strokeStyle='#83bdd8';c.lineWidth=2;c.strokeRect(boxX,y,boxW,block.h);
@@ -252,7 +257,7 @@ async function renderFichePng(title,entries,photoSrc,qrSrc){
   const afterText=drawLines(c,block.textLines,boxX+20,y+24+fontSize,block.textHeight);
   c.fillStyle='#1467b2';c.font='bold '+refSize+'px Verdana';
   drawLines(c,block.refLines,boxX+20,afterText+7,block.refHeight);
-  y+=block.h+gap;
+  y+=block.h+distributedGap;
  });
  c.fillStyle='#d3eaff';c.fillRect(30,1110,900,165);c.drawImage(qr,50,1120,145,145);
  c.fillStyle='#071425';c.font='26px Verdana';c.fillText('Fiche AIA — copie de sauvegarde',220,1200);
@@ -281,9 +286,7 @@ passage(verses,'« Les justes posséderont la terre et ils y vivront éternellem
 passage(verses,'Tout le monde sera en parfaite santé.',[['Isaïe 33:24',23,33,24],['Isaïe 35:5, 6',23,35,5]]);
 passage(verses,'Les dégâts faits à l’environnement seront réparés.',[['Isaïe 35:1, 2',23,35,1],['Révélation 11:18',66,11,18]]);
 }cols.append(pic,verses);body.append(cols);
-const replace=element('button','aia-replace-image','Remplacer l’image');
-replace.type='button';replace.onclick=()=>chooseReplacement(im);
-body.append(replace);
+/* Le bouton d’édition d’image n’appartient pas à la fiche FAMILLE finale. */
 const acts=element('div','aia-actions'),qrBtn=element('button'),qrImg=document.createElement('img');qrImg.src=qr;qrImg.alt='QR code';qrBtn.title='Agrandir le QR original';qrBtn.append(qrImg);qrBtn.onclick=()=>qrLarge(qr);
 const pdfBtn=element('button','','↓ PDF');pdfBtn.onclick=()=>{document.body.classList.add('aia-pdf-print');window.addEventListener('afterprint',()=>document.body.classList.remove('aia-pdf-print'),{once:true});window.print()};
 const shareBtn=element('button');shareBtn.setAttribute('aria-label','Partager');shareBtn.innerHTML='<svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4M8.7 13.5l6.6 4"/></svg><span>Partager</span>';shareBtn.onclick=()=>share(pdfFile);
