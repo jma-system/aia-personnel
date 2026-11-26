@@ -12,7 +12,7 @@ css.textContent='#aia-fiches-pdf-import{padding:14px;margin:0 0 14px;background:
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
-box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche</button><p id="aia-pdf-status" role="status">Prêt pour l’importation.</p>';
+box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche</button><p id="aia-pdf-status" role="status">Lecteur PDF 13 — prêt.</p>';
 tabs.before(box);
 const input=box.querySelector('#aia-pdf-file'),btn=box.querySelector('#aia-pdf-go'),status=box.querySelector('#aia-pdf-status');
 function say(msg,err=false){status.textContent=msg;status.style.color=err?'#aa2525':'#166b42'}
@@ -134,7 +134,7 @@ function passageExtracted(parent,entry){
 function build(photo,qr,pdfFile,kind='avenir',extracted=null){
 const god=kind==='dieu';
 sheet.replaceChildren();
-const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','',extracted?'Tract – '+extracted.title:(god?'Tract – Dieu':'Tract – L’avenir'));
+const bar=element('header','aia-top');const back=element('button','aia-back','‹');back.onclick=close;back.setAttribute('aria-label','Retour au Répertoire');const title=element('span','',extracted?'Tract – '+extracted.title:(god?'Tract – Dieu':'Tract – L’avenir'));title.style.cssText='min-width:0;max-width:70%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:center';
 const signet=element('span');signet.innerHTML='<svg width="24" height="28" viewBox="0 0 24 28" fill="none" aria-label="Signet bientôt disponible"><path d="M4 2.5H20V25L12 19.5L4 25V2.5Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/></svg>';
 bar.append(back,title,signet);
 const body=element('section','aia-body');
