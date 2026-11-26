@@ -8,6 +8,7 @@ on:
       - 'scripts/aia-pdf-original-pilot-checks.cjs'
       - 'scripts/aia-repertoire-backup-checks.cjs'
       - 'scripts/aia-backup-audit-checks.cjs'
+      - 'scripts/aia-pdf-batch-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   push:
     branches:
@@ -19,6 +20,7 @@ on:
       - 'scripts/aia-pdf-original-pilot-checks.cjs'
       - 'scripts/aia-repertoire-backup-checks.cjs'
       - 'scripts/aia-backup-audit-checks.cjs'
+      - 'scripts/aia-pdf-batch-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   workflow_dispatch:
 permissions:
@@ -37,3 +39,4 @@ jobs:
       - run: node scripts/aia-pdf-original-pilot-checks.cjs
       - run: node scripts/aia-repertoire-backup-checks.cjs
       - run: node scripts/aia-backup-audit-checks.cjs
+      - run: node scripts/aia-pdf-batch-checks.cjs
