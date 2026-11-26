@@ -1,0 +1,28 @@
+name: AIA PDF and repertoire checks
+on:
+  push:
+    paths:
+      - 'v09-test/**'
+      - 'skills/aia-fiches-pdf/**'
+      - 'scripts/aia-pdf-checks.cjs'
+      - '.github/workflows/aia-pdf-checks.yml'
+  pull_request:
+    paths:
+      - 'v09-test/**'
+      - 'skills/aia-fiches-pdf/**'
+      - 'scripts/aia-pdf-checks.cjs'
+      - '.github/workflows/aia-pdf-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: AIA PDF and repertoire static regression checks
+        run: node scripts/aia-pdf-checks.cjs
