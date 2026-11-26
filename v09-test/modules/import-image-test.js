@@ -88,22 +88,26 @@ const jesusVerseLinks=[
 });
 imageFrame.append(...jesusVerseLinks);
 
-/* Royaume : zones bibliques cliquables sur la fiche image importée. */
+/* Fiche Royaume réutilisable : mêmes liens quel que soit le classement.
+   Les positions sont relatives à l'image complète (gabarit illustré). */
 const kingdomReferences=[
- {name:'Psaume 37:10, 11',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/37/#v19037010',coords:[52,41,43,5]},
- {name:'Daniel 2:44 ; 7:14',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Daniel/2/#v27002044',coords:[52,60,43,5]},
- {name:'Isaïe 65:21-23',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Isa%C3%AFe/65/#v23065021',coords:[52,78,43,5]}
+ {name:'Psaume 37:10, 11',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/37/#v19037010',coords:[52,37.3,36,3.8]},
+ {name:'Daniel 2:44',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Daniel/2/#v27002044',coords:[52,52.3,30,3.2]},
+ {name:'Daniel 7:14',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Daniel/7/#v27007014',coords:[52,55.2,25,3.2]},
+ {name:'Isaïe 65:21-23',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Isa%C3%AFe/65/#v23065021',coords:[52,69.2,36,3.8]}
 ];
 const kingdomVerseLinks=kingdomReferences.map(entry=>{
- const a=document.createElement('a');a.className='aia-verse-hotspot aia-kingdom-verse';
+ const a=document.createElement('a');
+ a.className='aia-verse-hotspot aia-kingdom-verse';
  a.href=entry.url;a.target='_blank';a.rel='noopener noreferrer';
  a.title=entry.name;a.setAttribute('aria-label','Lire '+entry.name+' sur JW.org');
  const [x,y,w,h]=entry.coords;
- for(const [k,v] of Object.entries({left:x+'%',top:y+'%',width:w+'%',height:h+'%',bottom:'auto',transform:'none',background:'transparent',outline:'none',border:'0',boxShadow:'none',padding:'0',minHeight:'0'}))a.style.setProperty(k,v,'important');
+ for(const [k,v] of Object.entries({left:x+'%',top:y+'%',width:w+'%',height:h+'%',bottom:'auto',transform:'none',background:'transparent',outline:'none',border:'0',boxShadow:'none',padding:'0',minHeight:'0',position:'absolute',zIndex:'6',pointerEvents:'auto'})){
+  a.style.setProperty(k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase()),v,'important');
+ }
  a.hidden=true;return a;
 });
 imageFrame.append(...kingdomVerseLinks);
-
 
 
 const linkButton=document.createElement('button');
@@ -212,7 +216,7 @@ function openImage(item){
  const isJesus=item.topic==='Jésus'||item.subtheme==='Jésus'||
   activeTheme==='Jésus'||/conseils de Jésus/i.test(item.label);
  jesusVerseLinks.forEach(link=>{link.hidden=!isJesus});
- const isKingdom=item.topic==='Le Royaume de Dieu'||item.subtheme==='Le Royaume de Dieu'||activeTheme==='Le Royaume de Dieu'||/royaume de dieu/i.test(item.label);
+ const isKingdom=item.topic==='Le Royaume de Dieu'||item.subtheme==='Le Royaume de Dieu'||activeTheme==='Le Royaume de Dieu'||/royaume|royaume de dieu|t[-_]kng/i.test([item.label,item.name,item.filename,item.fileName].filter(Boolean).join(' '))||(Array.isArray(item.placements)&&item.placements.some(p=>p.letter==='R'||/royaume/i.test(p.subtheme||'')));
  kingdomVerseLinks.forEach(link=>{link.hidden=!isKingdom});
  imageFrame.classList.toggle('aia-jesus-enlarged',isJesus);
 
