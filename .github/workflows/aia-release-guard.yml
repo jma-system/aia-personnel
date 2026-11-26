@@ -4,6 +4,7 @@ on:
     paths:
       - 'v09-test/**'
       - 'scripts/aia-release-guard.cjs'
+      - 'scripts/aia-bible-references-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   push:
     branches:
@@ -11,6 +12,7 @@ on:
     paths:
       - 'v09-test/**'
       - 'scripts/aia-release-guard.cjs'
+      - 'scripts/aia-bible-references-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   workflow_dispatch:
 permissions:
@@ -25,3 +27,4 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/aia-release-guard.cjs
+      - run: node scripts/aia-bible-references-checks.cjs
