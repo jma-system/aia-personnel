@@ -242,7 +242,8 @@ saveBtn.onclick=async()=>{
    function ok(e){if(e.detail?.requestId!==requestId)return;cleanup();resolve(e.detail)}
    function fail(e){if(e.detail?.requestId!==requestId)return;cleanup();reject(Error(e.detail?.message||'Stockage indisponible'))}
    window.addEventListener('aia:pdf-fiche-saved',ok);window.addEventListener('aia:pdf-fiche-save-failed',fail);
-   window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:extracted.title}}));
+   const references=extracted.entries.flatMap(entry=>(entry.refs||[]).map(ref=>({reference:ref.label||entry.citation||'',book:ref.book,slug:ref.slug,chapter:ref.chapter,verse:ref.verse}))).filter(ref=>ref.book&&ref.chapter&&ref.verse);
+   window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:extracted.title,references}}));
   });
   say('Fiche enregistrée dans THÈMES / '+theme+'. Copie PNG téléchargée.');
   saveBtn.textContent='Enregistré dans AIA';
