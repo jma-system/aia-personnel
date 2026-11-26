@@ -75,9 +75,31 @@ function chooseReplacement(image){
 /* Extraction contrôlée de tracts PDF en deux pages, sans texte pré-rédigé. */
 function extractZone(items,page,from,to){
  const h=page.view[3];
- return items.filter(it=>it.str&&it.transform&&h-it.transform[5]>=from&&h-it.transform[5]<=to)
-  .sort((a,b)=>(b.transform[5]-a.transform[5])||(a.transform[4]-b.transform[4]))
-  .map(it=>it.str).join(' ').replace(/\s+/g,' ').trim();
+ const glyphs=items.filter(it=>it.str&&it.transform&&h-it.transform[5]>=from&&h-it.transform[5]<=to)
+  .map(it=>({str:it.str,x:it.transform[4],y:it.transform[5],width:Math.abs(it.width||0),height:Math.abs(it.height||it.transform[3]||12),hasEOL:!!it.hasEOL}))
+  .sort((a,b)=>b.y-a.y||a.x-b.x);
+ const lines=[];
+ for(const item of glyphs){
+  let line=lines.find(line=>Math.abs(line.y-item.y)<=Math.max(2,Math.min(5,item.height*.28)));
+  if(!line){line={y:item.y,items:[]};lines.push(line);}
+  line.items.push(item);
+ }
+ return lines.sort((a,b)=>b.y-a.y).map(line=>{
+  const parts=line.items.sort((a,b)=>a.x-b.x);
+  let result='',right=null,previous=null;
+  for(const part of parts){
+   const fragment=part.str;
+   const gap=right===null?0:part.x-right;
+   const typical=previous?Math.max(3,previous.height*.28):3;
+   // PDF.js can return one item per glyph. Only insert a space when
+   // the actual horizontal gap is large enough; never join existing spaces.
+   if(result&&!/\s$/.test(result)&&!/^\s/.test(fragment)&&gap>typical)result+=' ';
+   result+=fragment;
+   right=Math.max(right??-Infinity,part.x+part.width);
+   previous=part;
+  }
+  return result.trim();
+ }).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
 }
 function parsedReferences(raw){
  const bookMap={
