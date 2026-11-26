@@ -299,7 +299,12 @@ const saveAutomatically=async()=>{
  {text:'Les dégâts faits à l’environnement seront réparés.',citation:'Isaïe 35:1, 2 ; Révélation 11:18',refs:[{label:'Isaïe 35:1, 2',book:23,slug:'isaie',chapter:35,verse:1},{label:'Révélation 11:18',book:66,slug:'revelation',chapter:11,verse:18}]}
 ];
  const fiche=extracted||{title:kind==='dieu'?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?',entries:fallbackEntries};
- const theme=extracted?.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':kind==='avenir'?'L’avenir':kind==='dieu'?'Dieu':null;
+ const normalizedTitle=String(extracted?.title||'').toLocaleLowerCase('fr-FR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+ const theme=normalizedTitle.includes('souffrance')?'Les souffrances'
+  :normalizedTitle.includes('royaume')?'Le Royaume de Dieu'
+  :normalizedTitle.includes('pourtoujours')?'L’avenir'
+  :normalizedTitle.includes('vrai dieu')?'Dieu'
+  :extracted?null:kind==='avenir'?'L’avenir':kind==='dieu'?'Dieu':null;
  if(!theme){say('Choisis le thème avant de sauvegarder cette fiche.',true);return;}
 
  try{
