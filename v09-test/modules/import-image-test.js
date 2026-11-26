@@ -133,6 +133,29 @@ for(const entry of kingdomReferences){
  kingdomStudyLinks.append(a);
 }
 imageFrame.append(kingdomStudyLinks);
+// Generic, data-driven links for every PDF-derived fiche; no image-coordinate dependency.
+const savedStudyLinks=document.createElement('nav');
+savedStudyLinks.setAttribute('aria-label','Références — Bible d’étude JW.org');
+savedStudyLinks.style.cssText='display:none;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px 8px;background:#eaf7ff;border-radius:12px';
+imageFrame.append(savedStudyLinks);
+function renderStudyLinks(item){
+ savedStudyLinks.replaceChildren();
+ const seen=new Set();
+ for(const ref of (Array.isArray(item.references)?item.references:[])){
+  const book=Number(ref.book),ch=Number(ref.chapter),verse=Number(ref.verse);
+  if(!Number.isInteger(book)||book<1||book>66||!Number.isInteger(ch)||ch<1||ch>150||!Number.isInteger(verse)||verse<1||verse>176)continue;
+  const slug=String(ref.slug||'');if(!/^[a-z0-9-]+$/.test(slug))continue;
+  const id=String(book).padStart(2,'0')+String(ch).padStart(3,'0')+String(verse).padStart(3,'0');
+  if(seen.has(id))continue;seen.add(id);
+  const a=document.createElement('a');
+  a.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/bible-d-etude/livres/'+slug+'/'+ch+'/#v'+id;
+  a.target='_blank';a.rel='noopener noreferrer';
+  a.textContent=String(ref.reference||slug+' '+ch+':'+verse).slice(0,100);
+  a.style.cssText='display:inline-block;padding:10px 12px;border:1px solid #78b6d5;border-radius:8px;color:#07549b;background:#fff;font:600 14px Verdana,sans-serif;text-decoration:underline';
+  savedStudyLinks.append(a);
+ }
+ savedStudyLinks.style.display=seen.size?'flex':'none';
+}
 const linkButton=document.createElement('button');
 linkButton.type='button';linkButton.className='aia-link-editor-button';
 linkButton.textContent='Ajouter un verset';
@@ -223,6 +246,7 @@ function openImage(item){
  imageFrame.classList.remove('aia-placing-link');
  familyVerseLinks.forEach(link=>link.style.pointerEvents='auto');
  showSavedLinks(item);
+ renderStudyLinks(item);
  // Ne montrer les liens que sur la fiche illustrée « La famille peut-elle être heureuse ? ».
  // Cette reconnaissance provisoire concerne uniquement le test personnel Famille.
  const isFamily=(item.topic==='La famille'||item.subtheme==='Famille'||/famille/i.test(item.label));
@@ -292,7 +316,7 @@ function operation(mode,perform,store=storeName){
 function makeRecord(raw){return {...raw,url:URL.createObjectURL(raw.blob)}}
 function discard(item){if(item?.url)URL.revokeObjectURL(item.url)}
 async function save(item){
- const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,subtheme:item.subtheme||'',placements:item.placements,links:Array.isArray(item.links)?item.links:[]};
+ const raw={id:item.id,blob:item.blob,label:item.label,topic:item.topic,subtheme:item.subtheme||'',placements:item.placements,links:Array.isArray(item.links)?item.links:[],references:Array.isArray(item.references)?item.references:[]};
  await operation('readwrite',store=>store.put(raw));
  const index=records.findIndex(r=>r.id===item.id);
  if(index>=0){discard(records[index]);records[index]=makeRecord(raw)}
@@ -658,7 +682,7 @@ window.addEventListener('aia:save-pdf-fiche',async event=>{
   if(!(detail.blob instanceof Blob)||!detail.blob.type.startsWith('image/'))throw Error('Image de fiche invalide');
   const topic=String(detail.topic||'').trim();
   if(!topics.includes(topic))throw Error('Thème non reconnu : choisis un thème existant');
-  const item={id:crypto.randomUUID(),blob:detail.blob,label:String(detail.label||topic).slice(0,100),topic,subtheme:'',placements:[],links:[]};
+  const item={id:crypto.randomUUID(),blob:detail.blob,label:String(detail.label||topic).slice(0,100),topic,subtheme:'',placements:[],links:[],references:Array.isArray(detail.references)?detail.references:[]};
   await save(item);
   window.dispatchEvent(new CustomEvent('aia:pdf-fiche-saved',{detail:{requestId:detail.requestId,id:item.id}}));
  }catch(error){
