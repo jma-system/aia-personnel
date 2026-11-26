@@ -314,6 +314,23 @@ function thumb(item){
 // Fiche illustrée Jésus validée : un seul fichier partagé par TRACTS et THÈMES.
 // Le fichier n'est pas enregistré dans IndexedDB.
 const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp?v=2',readOnly:true};
+
+/* Fiches permanentes, servies par GitHub Pages : pas de dépendance à IndexedDB.
+   Les fichiers sont installés automatiquement après dépôt de l'archive de restauration. */
+const permanentFiches=[
+ ['avenir','L’avenir','Peut-on vivre pour toujours ?','avenir-restaure.webp','A'],
+ ['famille','La famille','La famille peut-elle être heureuse ?','famille-restauree.webp','F'],
+ ['dieu','Dieu','Qui est le vrai Dieu ?','dieu-restaure.webp','D'],
+ ['priere','La prière','Est-ce que quelqu’un écoute nos prières ?','priere-restauree.webp','P'],
+ ['jesus','Jésus','Les conseils de Jésus sont-ils efficaces aujourd’hui ?','jesus-restaure.webp','J'],
+ ['royaume','Le Royaume de Dieu','Comment le royaume de Dieu résoudra-t-il nos problèmes ?','royaume-restaure.webp','R']
+].map(([id,topic,label,file,letter])=>({
+ id:'aia-permanent-'+id,topic,label,subtheme:topic.replace(/^(La |Le |Les |L’)/,''),
+ placements:[{category:'TRACTS',letter}],
+ url:'./fiches/'+file,readOnly:true
+}));
+function allFiches(){return [...permanentFiches,...records.filter(r=>!permanentFiches.some(p=>p.topic===r.topic))]}
+
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
  const bar=document.createElement('div');bar.className='aia-gallery-selection-bar';
@@ -430,10 +447,9 @@ function isUnder(item,category,letter){
 function categoryView(category,letter){
  if(!categories.includes(category)||!letter)return;
  if(!ready){note('Ouverture du stockage…');return}
- if(!db){note('Stockage indisponible sur ce navigateur.');return}
  const key=category+'|'+letter;
- const items=records.filter(item=>isUnder(item,category,letter)&&item.id!=='aia-tract-jesus-jworg-t-jss');
- if(category==='TRACTS'&&letter==='J')items.unshift(jesusApproved);
+ const items=allFiches().filter(item=>isUnder(item,category,letter)&&item.id!=='aia-tract-jesus-jworg-t-jss');
+ if(category==='TRACTS'&&letter==='J'&&!items.some(item=>item.topic==='Jésus'))items.unshift(jesusApproved);
  // Initialiser F avec les sous-thèmes déjà validés. Sur les autres lettres,
  // les noms sont créés par l'utilisateur ou issus des fiches existantes.
  // Les noms d'origine restent les identifiants : renommer n'altère aucune photo.
@@ -612,8 +628,8 @@ function renderTheme(theme){
   }catch(error){alert('Renommage impossible : '+(error?.message||'erreur'))}
  };
  headingRow.append(heading,rename);
- const items=records.filter(item=>item.topic===theme&&item.id!=='aia-tract-jesus-jworg-t-jss');
- if(theme==='Jésus')items.unshift(jesusApproved);
+ const items=allFiches().filter(item=>item.topic===theme&&item.id!=='aia-tract-jesus-jworg-t-jss');
+ if(theme==='Jésus'&&!items.length)items.unshift(jesusApproved);
  const view=gallery(items,'','',theme);
  const add=makeButton('Importer','aia-import-button');
  add.setAttribute('aria-label','Importer des images dans le thème '+theme);
@@ -630,7 +646,7 @@ section.addEventListener('aia:index-render',e=>{
   if(!ready)return;
   for(const tile of area.querySelectorAll('.aia-index-tile')){
    const name=tile.querySelector('strong')?.textContent;
-   const item=name==='Jésus'?jesusApproved:records.find(r=>r.topic===name);
+   const item=allFiches().find(r=>r.topic===name)|| (name==='Jésus'?jesusApproved:null);
    const pic=tile.querySelector('.aia-index-placeholder');
    if(item&&pic){const img=document.createElement('img');img.src=item.url;img.alt='';img.className='aia-family-thumb';pic.replaceWith(img)}
    const title=tile.querySelector('strong');
