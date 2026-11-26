@@ -94,7 +94,7 @@ try{
  const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
  const isGod=txt.includes('quiestlevraidieu')&&txt.includes('jeremie1010')&&txt.includes('psaume8318')&&txt.includes('timothee31617')&&txt.includes('psaume1451819');
-const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Ce PDF n’est pas encore pris en charge. Aucun texte n’est inventé.');
+const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
  const c2=await renderPage(p2,3);
  
  const c1=isGod?await renderPage(p1,3):null;
