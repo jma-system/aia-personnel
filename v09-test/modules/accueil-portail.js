@@ -24,6 +24,39 @@ function leaveHub(target,universe){document.body.dataset.aiaUniverse=universe;do
 function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;grid.hidden=true;inner.hidden=false;inner.replaceChildren();const back=document.createElement('button');back.textContent='← Accueil';back.onclick=openHub;const title=document.createElement('h2');title.textContent=name;inner.append(back,title);if(name==='RÉGLAGES'){const btn=document.createElement('button');btn.textContent='Changer le mode clair / nuit';btn.onclick=()=>document.getElementById('aia-theme-toggle')?.click();inner.append(btn)}else{const p=document.createElement('p');p.textContent='Espace indépendant à construire, sans modifier les pages existantes.';inner.append(p)}window.scrollTo(0,0);}
 const items=[['RÉPERTOIRE','users','indexPanel','repertoire'],['RÉUNIONS','calendar','home','reunions'],['INDEX','layers','index','index'],['FICHES','file','library','fiches'],['RUBRIQUES','grid','rubriques','rubriques'],['VIDÉOS','video','desk','videos'],['JW.ORG','globe','https://www.jw.org/fr/','jworg'],['WOL','book','https://wol.jw.org/fr/wol/h/r30/lp-f','wol'],['RÉGLAGES','gear','reglages','reglages']];
 for(const [name,shape,target,universe] of items){const link=target.startsWith('https://');const b=document.createElement(link?'a':'button');b.className='hub-tile';b.dataset.universe=universe;if(link){b.href=target;b.target='_blank';b.rel='noopener noreferrer'}else{b.type='button';b.onclick=()=>['index','rubriques','reglages'].includes(target)?placeholder(name,universe):leaveHub(target,universe)}b.append(icon(shape),document.createTextNode(name));grid.append(b)}
+
+// Pilote : remplacement visuel du pictogramme RÉPERTOIRE depuis la galerie.
+// L'image reste en mémoire pendant la session ; aucun stockage local ni envoi externe.
+const repertoireTile=grid.querySelector('[data-universe="repertoire"]');
+if(repertoireTile){
+ const edit=document.createElement('button');
+ edit.type='button';edit.className='aia-hub-image-edit';edit.textContent='✎';
+ edit.setAttribute('aria-label',"Changer l'image du bouton Répertoire");
+ edit.title="Changer l'image";
+ const picker=document.createElement('input');
+ picker.type='file';picker.accept='image/*';picker.hidden=true;
+ picker.setAttribute('aria-label',"Choisir une image pour Répertoire");
+ let currentImageUrl=null;
+ edit.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();picker.click()});
+ picker.addEventListener('change',()=>{
+  const file=picker.files&&picker.files[0];if(!file)return;
+  if(!file.type.startsWith('image/')){alert('Choisis une image.');return;}
+  if(file.size>12*1024*1024){alert('Image trop volumineuse (12 Mo maximum).');return;}
+  const url=URL.createObjectURL(file);
+  const picture=document.createElement('img');picture.className='hub-custom-image';picture.alt='';
+  picture.onload=()=>{if(currentImageUrl)URL.revokeObjectURL(currentImageUrl);currentImageUrl=url;};
+  picture.onerror=()=>{URL.revokeObjectURL(url);alert("Impossible de lire cette image.");};
+  picture.src=url;
+  repertoireTile.querySelector('.hub-real-icon')?.replaceWith(picture);
+  repertoireTile.querySelector('.hub-custom-image:not(:last-of-type)')?.remove();
+  picker.value='';
+ });
+ repertoireTile.append(edit,picker);
+ const editCss=document.createElement('style');
+ editCss.textContent='#aia-hub .hub-tile[data-universe="repertoire"]{position:relative;overflow:visible!important}#aia-hub .aia-hub-image-edit{position:absolute;z-index:3;right:4px;top:4px;min-width:30px;min-height:30px;padding:0;border:1px solid #fff9;border-radius:50%;background:#fff;color:#174e83;font-size:21px;line-height:1;box-shadow:0 2px 6px #0003}#aia-hub .hub-custom-image{width:72px;height:72px;max-width:90%;object-fit:contain;display:block;flex:none;border-radius:12px;filter:drop-shadow(0 3px 4px #001c3d44)}';
+ document.head.append(editCss);
+}
+
 page.append(grid,inner);main.prepend(page);
 const topHome=document.getElementById('aia-home-top');topHome?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openHub()},true);
 window.showHome=openHub;
