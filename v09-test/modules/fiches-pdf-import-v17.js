@@ -18,6 +18,21 @@ const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
 box.innerHTML='<h2>Importer un PDF dans le Répertoire</h2><label for="aia-pdf-file">Choisir le PDF original</label><input id="aia-pdf-file" type="file" accept=".pdf,application/pdf"><button type="button" id="aia-pdf-go">Transformer en fiche</button><p id="aia-pdf-status" role="status">Lecteur PDF 17 — prêt.</p>';
 tabs.before(box);
+/* Correction de contraste indépendante des feuilles CSS et du cache de palette.
+   Le panneau est blanc en modes clair et nuit : conserver une encre foncée.
+   Styles inline !important pour éviter l'écrasement par les thèmes globaux. */
+const importHeading=box.querySelector('h2');
+importHeading.style.setProperty('color','#17385c','important');
+importHeading.style.setProperty('-webkit-text-fill-color','#17385c','important');
+importHeading.style.setProperty('opacity','1','important');
+box.style.setProperty('background-color','#ffffff','important');
+box.style.setProperty('color','#172d44','important');
+box.style.setProperty('color-scheme','light','important');
+const fileInput=box.querySelector('#aia-pdf-file');
+fileInput.style.setProperty('background-color','#ffffff','important');
+fileInput.style.setProperty('color','#172d44','important');
+fileInput.style.setProperty('-webkit-text-fill-color','#172d44','important');
+fileInput.style.setProperty('color-scheme','light','important');
 const input=box.querySelector('#aia-pdf-file'),btn=box.querySelector('#aia-pdf-go'),status=box.querySelector('#aia-pdf-status');
 function say(msg,err=false){status.textContent=msg;status.style.color=err?'#aa2525':'#166b42'}
 const viewer=document.createElement('div');viewer.id='aia-pdf-modal';viewer.hidden=true;viewer.setAttribute('role','dialog');viewer.setAttribute('aria-modal','true');
