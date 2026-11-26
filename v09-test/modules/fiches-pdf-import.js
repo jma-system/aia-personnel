@@ -174,8 +174,10 @@ try{
  const t2=(await p2.getTextContent()).items.map(x=>x.str).join(' ');
  const txt=normalize(t1+t2);
  const isGod=txt.includes('quiestlevraidieu')&&txt.includes('jeremie1010')&&txt.includes('psaume8318')&&txt.includes('timothee31617')&&txt.includes('psaume1451819');
- const isKing=/^T[-_]kng[-_]F[.]pdf$/i.test(f.name);
- const extracted=isKing?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null;
+ const isAvenir=txt.includes('pourtoujours')&&txt.includes('3729')&&(txt.includes('3324')||txt.includes('1118'));
+ // Tout tract à deux pages de la même structure utilise désormais l'extraction de son contenu,
+ // sans ajout de son nom dans une liste. Les deux pilotes historiques sont préservés.
+ const extracted=(!isGod&&!isAvenir)?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null;
 const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!extracted&&!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
  const c2=await renderPage(p2,3);
  
