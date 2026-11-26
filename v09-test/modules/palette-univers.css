@@ -231,3 +231,58 @@
  #aia-hub .hub-real-icon {font-size:clamp(43px,11vw,65px);height:83px;filter:drop-shadow(0 6px 3px #00122e65)}
  @media(max-width:350px){#aia-hub .hub-grid .hub-tile[data-universe]{min-height:120px;padding:8px 3px}#aia-hub .hub-real-icon{height:60px;font-size:39px}}
 }
+
+
+/* Accueil AIA v4 — neuf tuiles 3D inspirées de la maquette approuvée.
+   Illustrations SVG autonomes : aucun lien externe ni image de la fiche modifié. */
+@media screen {
+ body.aia-hub-active {background:linear-gradient(180deg,#edf7ff,#f7fbff)!important;}
+ body.aia-hub-active main {max-width:680px;}
+ #aia-hub .hub-grid {
+   grid-template-columns:repeat(3,minmax(0,1fr));
+   gap:clamp(8px,2.4vw,16px)!important;
+   margin-top:clamp(42px,8vh,105px);
+   padding:0 2px;
+ }
+ #aia-hub .hub-grid .hub-tile[data-universe] {
+   aspect-ratio:0.76;
+   min-height:0;
+   padding:clamp(8px,2.4vw,16px) 2px 12px;
+   gap:clamp(7px,2vw,16px);
+   border-radius:clamp(17px,4vw,30px)!important;
+   font-size:clamp(11px,2.9vw,22px)!important;
+   color:#fff!important;
+   letter-spacing:-.02em;
+   line-height:1.12;
+   text-shadow:0 2px 3px #001b3f99!important;
+   box-shadow:inset 0 2px 4px #ffffffaf,inset 0 -8px 11px #001c3d6c,0 6px 12px #163c672b!important;
+ }
+ #aia-hub .hub-grid .hub-tile[data-universe]::before {
+   inset:4px 5px auto;
+   height:36%;
+   border-radius:25px 25px 45% 45%;
+   background:linear-gradient(180deg,#ffffff80,#ffffff02);
+ }
+ #aia-hub .hub-real-icon {
+   height:65%;
+   min-height:0;
+   width:100%;
+   display:flex;
+   justify-content:center;
+   align-items:center;
+   filter:drop-shadow(0 5px 3px #00163880);
+ }
+ #aia-hub .hub-real-icon svg {
+   width:min(80%,125px)!important;
+   height:min(86%,125px)!important;
+   stroke-width:.55;
+   overflow:visible;
+ }
+ @media(max-width:350px){
+  #aia-hub .hub-grid {gap:7px!important}
+  #aia-hub .hub-grid .hub-tile[data-universe]{font-size:10px!important;padding-bottom:8px}
+ }
+ @media(prefers-reduced-motion:reduce){
+  #aia-hub .hub-grid .hub-tile{transition:none!important}
+ }
+}
