@@ -208,3 +208,11 @@
     padding:6px 9px;
   }
 }
+
+/* AIA v52 — titres des rubriques sur fond bleu nuit. */
+@media screen {
+  html[data-aia-theme="dark"] body #indexPanel .aia-index-content h3 {
+    color:#e7f4ff!important;
+    -webkit-text-fill-color:#e7f4ff!important;
+  }
+}
