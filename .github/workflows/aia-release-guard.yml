@@ -5,6 +5,7 @@ on:
       - 'v09-test/**'
       - 'scripts/aia-release-guard.cjs'
       - 'scripts/aia-bible-references-checks.cjs'
+      - 'scripts/aia-pdf-original-pilot-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   push:
     branches:
@@ -13,6 +14,7 @@ on:
       - 'v09-test/**'
       - 'scripts/aia-release-guard.cjs'
       - 'scripts/aia-bible-references-checks.cjs'
+      - 'scripts/aia-pdf-original-pilot-checks.cjs'
       - '.github/workflows/aia-release-guard.yml'
   workflow_dispatch:
 permissions:
@@ -28,3 +30,4 @@ jobs:
           node-version: '22'
       - run: node scripts/aia-release-guard.cjs
       - run: node scripts/aia-bible-references-checks.cjs
+      - run: node scripts/aia-pdf-original-pilot-checks.cjs
