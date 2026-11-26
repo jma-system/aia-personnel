@@ -351,11 +351,12 @@ try{
  // to generate words or references. Guard by filename AND document fingerprint.
  const sufferingSource=/^T[-_]sfr[-_]F[.]pdf$/i.test(f.name)
   &&txt.includes('souffrances')
+  &&txt.includes('possible')
   &&(txt.includes('214')||txt.includes('113')||txt.includes('3417'));
  const sufferingFiche=sufferingSource?{
   title:'Une vie sans souffrances est-elle possible ?',
   entries:[
-   {text:'Dieu « essuiera toute larme de leurs yeux, et la mort n’existera plus ; il n’y aura plus ni deuil, ni cri, ni douleur »',citation:'Révélation 21:4',refs:parsedReferences('Révélation 21:4')},
+   {text:'Dieu « essuiera toute larme de leurs yeux, et la mort n’existera plus ; il n’y aura plus ni deuil, ni cri, ni douleur »',citation:'Révélation 21:4',refs:[{label:'Révélation 21:4',book:66,slug:'revelation',chapter:21,verse:4}]},
    {text:'Dieu ne provoque pas nos problèmes.',citation:'Jacques 1:13',refs:parsedReferences('Jacques 1:13')},
    {text:'Dieu s’intéresse à ce qui nous arrive et mettra fin à ce qui nous fait souffrir.',citation:'Psaume 34:17-19',refs:parsedReferences('Psaume 34:17-19')}
   ]
