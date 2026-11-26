@@ -173,7 +173,7 @@ function passageExtracted(parent,entry){
 // Export a standalone, recoverable PNG before adding the fiche to IndexedDB.
 function imageReady(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('Illustration ou QR illisible'));img.src=src})}
 function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight){
- const words=String(text).split(/\\s+/);let line='';
+ const words=String(text).trim().split(/\s+/);let line='';
  for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y);y+=lineHeight;line=word}else line=test}
  if(line){ctx.fillText(line,x,y);y+=lineHeight}return y;
 }
