@@ -315,21 +315,8 @@ function thumb(item){
 // Le fichier n'est pas enregistré dans IndexedDB.
 const jesusApproved={id:'aia-jesus-approved',label:'Les conseils de Jésus sont-ils efficaces aujourd’hui ?',topic:'Jésus',subtheme:'Jésus',placements:[{category:'TRACTS',letter:'J'}],url:'./fiches/jesus-apercu.webp?v=2',readOnly:true};
 
-/* Fiches permanentes, servies par GitHub Pages : pas de dépendance à IndexedDB.
-   Les fichiers sont installés automatiquement après dépôt de l'archive de restauration. */
-const permanentFiches=[
- ['avenir','L’avenir','Peut-on vivre pour toujours ?','avenir-restaure.webp','A'],
- ['famille','La famille','La famille peut-elle être heureuse ?','famille-restauree.webp','F'],
- ['dieu','Dieu','Qui est le vrai Dieu ?','dieu-restaure.webp','D'],
- ['priere','La prière','Est-ce que quelqu’un écoute nos prières ?','priere-restauree.webp','P'],
- ['jesus','Jésus','Les conseils de Jésus sont-ils efficaces aujourd’hui ?','jesus-restaure.webp','J'],
- ['royaume','Le Royaume de Dieu','Comment le royaume de Dieu résoudra-t-il nos problèmes ?','royaume-restaure.webp','R']
-].map(([id,topic,label,file,letter])=>({
- id:'aia-permanent-'+id,topic,label,subtheme:topic.replace(/^(La |Le |Les |L’)/,''),
- placements:[{category:'TRACTS',letter}],
- url:'./fiches/'+file,readOnly:true
-}));
-function allFiches(){return [...permanentFiches,...records.filter(r=>!permanentFiches.some(p=>p.topic===r.topic))]}
+// Afficher uniquement les fiches réellement disponibles, sans vignettes fantômes.
+function allFiches(){return records}
 
 function gallery(items,category='',letter='',theme=''){
  const wrap=document.createElement('div');wrap.className='aia-gallery-list';
