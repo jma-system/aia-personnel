@@ -18,6 +18,8 @@ css.textContent += '#aia-pdf-sheet.aia-dieu .aia-verses{align-self:stretch;justi
 css.textContent += '#aia-pdf-sheet .aia-cols{grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);gap:clamp(7px,2vw,14px)}#aia-pdf-sheet .aia-photo{aspect-ratio:291/519}#aia-pdf-sheet .aia-heading{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.12}#aia-pdf-sheet .aia-verse{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.18;overflow-wrap:normal;word-break:normal;padding:clamp(7px,2vw,14px)}#aia-pdf-sheet .aia-verse a{font-family:Verdana,Geneva,sans-serif;letter-spacing:0;line-height:1.18;margin-top:4px}#aia-pdf-sheet .aia-actions{grid-template-columns:repeat(3,minmax(0,1fr))}';
 /* Disposition FAMILLE : image et trois encadrés répartis sur la même hauteur. */
 css.textContent += '#aia-pdf-sheet .aia-cols{align-items:stretch}#aia-pdf-sheet .aia-verses{height:100%;align-self:stretch;justify-content:space-between;gap:6px}#aia-pdf-sheet .aia-verse{flex:0 1 auto;letter-spacing:normal;word-spacing:normal}';
+/* Fidélité au visuel d'origine : pas de recadrage implicite ni d'étirement. */
+css.textContent += '#aia-pdf-sheet .aia-photo{aspect-ratio:auto;height:auto;background:#fff}#aia-pdf-sheet .aia-photo img{width:100%;height:auto;object-fit:contain;object-position:center;display:block}';
 document.head.append(css);
 const box=document.createElement('section');
 box.id='aia-fiches-pdf-import';
@@ -233,7 +235,7 @@ async function renderFichePng(title,entries,photoSrc,qrSrc){
  do{c.font='bold '+titleSize+'px Verdana';titleLines=canvasLines(c,title,825);if(titleLines.length<=2)break;titleSize-=2;}while(titleSize>22);
  drawLines(c,titleLines.slice(0,3),64,182,Math.round(titleSize*1.25));
  const photoX=30,photoY=315,photoW=410,photoH=735;
- c.save();c.beginPath();c.rect(photoX,photoY,photoW,photoH);c.clip();const scale=Math.max(photoW/photo.width,photoH/photo.height);c.drawImage(photo,photoX+(photoW-photo.width*scale)/2,photoY+(photoH-photo.height*scale)/2,photo.width*scale,photo.height*scale);c.restore();
+ c.save();c.beginPath();c.rect(photoX,photoY,photoW,photoH);c.clip();const scale=Math.min(photoW/photo.width,photoH/photo.height);c.fillStyle='#fff';c.fillRect(photoX,photoY,photoW,photoH);c.drawImage(photo,photoX+(photoW-photo.width*scale)/2,photoY+(photoH-photo.height*scale)/2,photo.width*scale,photo.height*scale);c.restore();
  const boxX=465,boxW=465,innerW=425,available=735,gap=12;
  let fontSize=27,refSize=24,blocks=[],total=Infinity;
  for(;fontSize>=17;fontSize-=2){
@@ -369,7 +371,17 @@ try{
  const c2=await renderPage(p2,3);
  
  const c1=(isGod||extracted)?await renderPage(p1,3):null;
-const photo=extracted?crop(c1,c1.width*.04,0,c1.width*.92,c1.height*.44,500):isGod?crop(c1,c1.width*.04,c1.height*.015,c1.width*.92,c1.height*.40,500):'./fiches/avenir-ours.svg?v=1';
+// Les tracts officiels T-sfr_F / T-ftr_F ont été vérifiés contre
+ // leurs PDF : l'illustration s'étend sur toute la largeur en haut
+ // de la page, jusqu'à y=127.89 points (page haute de 306.14 points).
+ // Préserver ce rectangle sans rogner les personnes ni inventer d'image.
+ const verifiedIllustration=/^T[-_](?:sfr|ftr)[-_]F\.pdf$/i.test(f.name)
+   &&Math.abs(p1.view[2]-233.86)<1&&Math.abs(p1.view[3]-306.14)<1;
+ const photo=verifiedIllustration
+  ?crop(c1,0,0,c1.width,c1.height*(127.89/306.14),Math.round(c1.width))
+  :extracted?crop(c1,c1.width*.04,0,c1.width*.92,c1.height*.44,500)
+  :isGod?crop(c1,c1.width*.04,c1.height*.015,c1.width*.92,c1.height*.40,500)
+  :'./fiches/avenir-ours.svg?v=1';
  const qr=crop(c2,c2.width*(156/233.86),c2.height*(238/306.14),c2.width*(55/233.86),c2.height*(59/306.14),360);
  build(photo,qr,f,isGod?'dieu':'avenir',extracted);
  say('Fiche provisoire depuis le PDF original : vérifie les textes, les liens, l’image et le QR. Aucun enregistrement automatique.');
