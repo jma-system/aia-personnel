@@ -169,6 +169,35 @@ function passageExtracted(parent,entry){
  parent.append(card);
 }
 
+// Export a standalone, recoverable PNG before adding the fiche to IndexedDB.
+function imageReady(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(Error('Illustration ou QR illisible'));img.src=src})}
+function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight){
+ const words=String(text).split(/\\s+/);let line='';
+ for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){ctx.fillText(line,x,y);y+=lineHeight;line=word}else line=test}
+ if(line){ctx.fillText(line,x,y);y+=lineHeight}return y;
+}
+async function renderFichePng(title,entries,photoSrc,qrSrc){
+ const [photo,qr]=await Promise.all([imageReady(photoSrc),imageReady(qrSrc)]);
+ const canvas=document.createElement('canvas');canvas.width=960;canvas.height=1320;
+ const c=canvas.getContext('2d');c.fillStyle='#eaf7ff';c.fillRect(0,0,960,1320);
+ c.fillStyle='#073a79';c.fillRect(0,0,960,100);c.fillStyle='white';c.font='34px Verdana';c.fillText('AIA — Fiche illustrée',40,62);
+ c.fillStyle='#c7e6ff';c.fillRect(28,130,904,145);c.fillStyle='#071425';c.font='bold 34px Verdana';wrapCanvas(c,title,64,182,825,45);
+ const photoX=30,photoY=315,photoW=410,photoH=735;
+ c.save();c.beginPath();c.rect(photoX,photoY,photoW,photoH);c.clip();const scale=Math.max(photoW/photo.width,photoH/photo.height);c.drawImage(photo,photoX+(photoW-photo.width*scale)/2,photoY+(photoH-photo.height*scale)/2,photo.width*scale,photo.height*scale);c.restore();
+ let y=315;
+ for(const entry of entries){
+  c.font='27px Verdana';const lines=Math.max(2,Math.ceil(c.measureText(entry.text).width/440));const h=Math.max(130,Math.min(255,lines*39+76));
+  c.fillStyle='#f7fcff';c.fillRect(465,y,465,h);c.strokeStyle='#83bdd8';c.lineWidth=2;c.strokeRect(465,y,465,h);
+  c.fillStyle='#071425';let ty=wrapCanvas(c,entry.text,485,y+39,425,36);
+  c.fillStyle='#1467b2';c.font='bold 24px Verdana';wrapCanvas(c,entry.citation||'',485,Math.min(ty+8,y+h-25),420,30);
+  y+=h+13;
+  if(y>1060)break;
+ }
+ c.fillStyle='#d3eaff';c.fillRect(30,1110,900,165);c.drawImage(qr,50,1120,145,145);
+ c.fillStyle='#071425';c.font='26px Verdana';c.fillText('Fiche AIA — copie de sauvegarde',220,1200);
+ return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Export PNG impossible')),'image/png'));
+}
+function downloadBackup(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='AIA-'+name.replace(/[^a-z0-9-]+/gi,'-').slice(0,60)+'.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
 function build(photo,qr,pdfFile,kind='avenir',extracted=null){
 const god=kind==='dieu';
 sheet.classList.toggle('aia-dieu',god);
@@ -197,6 +226,29 @@ body.append(replace);
 const acts=element('div','aia-actions'),qrBtn=element('button'),qrImg=document.createElement('img');qrImg.src=qr;qrImg.alt='QR code';qrBtn.title='Agrandir le QR original';qrBtn.append(qrImg);qrBtn.onclick=()=>qrLarge(qr);
 const pdfBtn=element('button','','↓ PDF');pdfBtn.onclick=()=>{document.body.classList.add('aia-pdf-print');window.addEventListener('afterprint',()=>document.body.classList.remove('aia-pdf-print'),{once:true});window.print()};
 const shareBtn=element('button');shareBtn.setAttribute('aria-label','Partager');shareBtn.innerHTML='<svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4M8.7 13.5l6.6 4"/></svg><span>Partager</span>';shareBtn.onclick=()=>share(pdfFile);
+const saveBtn=element('button','','Enregistrer dans AIA');saveBtn.type='button';
+saveBtn.onclick=async()=>{
+ if(!extracted){say('Enregistrement pilote réservé aux fiches extraites du PDF.',true);return}
+ const theme=prompt('Classement THÈMES : L’avenir, La famille, Dieu, La prière, Jésus, Le Royaume de Dieu, Les souffrances, La mort, La religion ou Actualité',extracted.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':'');
+ if(theme===null)return;
+ saveBtn.disabled=true;
+ try{
+  const blob=await renderFichePng(extracted.title,extracted.entries,im.src,qr);
+  downloadBackup(blob,extracted.title);
+  const requestId=crypto.randomUUID();
+  const result=await new Promise((resolve,reject)=>{
+   const timeout=setTimeout(()=>{cleanup();reject(Error('Enregistrement non confirmé'))},12000);
+   function cleanup(){clearTimeout(timeout);window.removeEventListener('aia:pdf-fiche-saved',ok);window.removeEventListener('aia:pdf-fiche-save-failed',fail)}
+   function ok(e){if(e.detail?.requestId!==requestId)return;cleanup();resolve(e.detail)}
+   function fail(e){if(e.detail?.requestId!==requestId)return;cleanup();reject(Error(e.detail?.message||'Stockage indisponible'))}
+   window.addEventListener('aia:pdf-fiche-saved',ok);window.addEventListener('aia:pdf-fiche-save-failed',fail);
+   window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:extracted.title}}));
+  });
+  say('Fiche enregistrée dans THÈMES / '+theme+'. Copie PNG téléchargée.');
+  saveBtn.textContent='Enregistré dans AIA';
+ }catch(error){say('Enregistrement impossible : '+error.message,true);saveBtn.disabled=false}
+};
+body.append(saveBtn);
 acts.append(qrBtn,pdfBtn,shareBtn);body.append(acts);sheet.append(bar,body);viewer.hidden=false;viewer.scrollTop=0;document.body.style.overflow='hidden';
 }
 btn.addEventListener('click',async()=>{
