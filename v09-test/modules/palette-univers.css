@@ -180,3 +180,33 @@
     color:#f4f8ff!important;
   }
 }
+/* Portail 3D : pictogrammes expressifs et boutons aux couleurs de la maquette. */
+@media screen {
+ #aia-hub .hub-grid .hub-tile[data-universe] {
+   min-height:142px; gap:9px; border-width:2px!important;
+   border-radius:20px; font-weight:800;
+   text-shadow:0 1px 1px #ffffff55;
+   box-shadow:inset 0 2px 2px #ffffffbb,0 7px 14px #19334d27!important;
+ }
+ #aia-hub .hub-real-icon {
+   display:flex;align-items:center;justify-content:center;
+   font-family:"Noto Color Emoji","Segoe UI Emoji",sans-serif;
+   font-size:clamp(39px,10vw,62px);line-height:1.15;
+   width:100%;height:72px;filter:drop-shadow(0 5px 3px #001c3d38);
+   text-shadow:none;
+ }
+ #aia-hub .hub-tile[data-universe="repertoire"] {--tile-top:#279eff;--tile-bottom:#03448f;--tile-edge:#66c6ff;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="reunions"] {--tile-top:#0ac9dc;--tile-bottom:#06627e;--tile-edge:#78edfb;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="index"] {--tile-top:#b35af2;--tile-bottom:#55247e;--tile-edge:#d6a0ff;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="fiches"] {--tile-top:#48cb66;--tile-bottom:#08743b;--tile-edge:#8af5a5;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="rubriques"] {--tile-top:#c05de4;--tile-bottom:#64237d;--tile-edge:#e5a5fa;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="videos"] {--tile-top:#269be8;--tile-bottom:#06447f;--tile-edge:#81d1ff;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="jworg"] {--tile-top:#0758b3;--tile-bottom:#062b69;--tile-edge:#39b7ff;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="wol"] {--tile-top:#4cc94a;--tile-bottom:#176c2c;--tile-edge:#8ee891;--tile-ink:#fff;}
+ #aia-hub .hub-tile[data-universe="reglages"] {--tile-top:#f56d82;--tile-bottom:#9a2945;--tile-edge:#ffb1bf;--tile-ink:#fff;}
+ html:not([data-aia-theme="dark"]) body #aia-hub .hub-grid .hub-tile[data-universe] {
+   background:linear-gradient(155deg,var(--tile-top),var(--tile-bottom))!important;
+   color:#fff!important;border-color:var(--tile-edge)!important;
+ }
+ @media(max-width:350px){#aia-hub .hub-real-icon{height:56px;font-size:38px}}
+}
