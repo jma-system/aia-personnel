@@ -12,6 +12,8 @@ function paint(){
  for(const id of ids){
   const section=get(id);if(!section)continue;
   section.classList.toggle('hidden',id!==active);
+  // Le Répertoire utilise uniquement le bouton Accueil de l'en-tête AIA.
+  if(id==='indexPanel'){section.querySelector(':scope > .aia-navigation')?.remove();continue;}
   let bar=section.querySelector(':scope > .aia-navigation');
   if(!bar){
    bar=document.createElement('div');bar.className='aia-navigation no-print';
