@@ -47,7 +47,7 @@ async function renderPage(page,scale){const v=page.getViewport({scale});const ca
 function crop(canvas,x,y,w,h,outSize=360){const dst=document.createElement('canvas');dst.width=outSize;dst.height=Math.max(1,Math.round(outSize*h/w));dst.getContext('2d').drawImage(canvas,x,y,w,h,0,0,dst.width,dst.height);return dst.toDataURL('image/png')}
 function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')}
 function ref(title,book,chapter,verse){
-const books={19:'Psaumes',23:'Isa%C3%AFe',66:'R%C3%A9v%C3%A9lation',24:'J%C3%A9r%C3%A9mie',55:'2-timoth%C3%A9e'};
+const books={19:'Psaumes',23:'Isa%C3%AFe',66:'R%C3%A9v%C3%A9lation',24:'J%C3%A9r%C3%A9mie',55:'2-timoth%C3%A9e',59:'Jacques'};
 const link=element('a','',title);link.href='https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/'+books[book]+'/'+chapter+'/#v'+String(book).padStart(2,'0')+String(chapter).padStart(3,'0')+String(verse).padStart(3,'0');link.target='_blank';link.rel='noopener noreferrer';return link;
 }
 function passage(parent,txt,refs){const card=element('div','aia-verse',txt);refs.forEach(r=>card.append(ref(...r)));parent.append(card)}
@@ -342,10 +342,9 @@ try{
  // This layout has fragmented glyph encodings; do not use its broken text layer
  // to generate words or references. Guard by filename AND document fingerprint.
  const sufferingSource=/^T[-_]sfr[-_]F[.]pdf$/i.test(f.name)
-  &&txt.includes('uneviesanssouffrances')
-  &&txt.includes('revelation214')
-  &&txt.includes('jacques113')
-  &&txt.includes('psaume341719');
+  &&txt.includes('souffrances')
+  &&(txt.includes('revelation214')||txt.includes('214'))
+  &&(txt.includes('jacques113')||txt.includes('113'));
  const sufferingFiche=sufferingSource?{
   title:'Une vie sans souffrances est-elle possible ?',
   entries:[
