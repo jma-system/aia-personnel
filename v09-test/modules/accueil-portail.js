@@ -27,6 +27,14 @@ for(const [name,shape,target] of items){const link=target.startsWith('https://')
 page.append(grid,inner);main.prepend(page);
 const topHome=document.getElementById('aia-home-top');topHome?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openHub()},true);
 window.showHome=openHub;
+// Les boutons « Accueil » de la navigation historique gardent une ancienne fonction goHome.
+// Intercepter leur clic avant cette fonction pour revenir au portail des neuf rubriques.
+document.addEventListener('click',event=>{
+ const button=event.target.closest?.('button[data-aia-home], #aia-index-home');
+ if(!button)return;
+ event.preventDefault();event.stopImmediatePropagation();openHub();
+},true);
+if(window.AIANavigation)window.AIANavigation.home=openHub;
 const oldShow=window.show;
 window.show=function(target){if(target==='aia-hub')return openHub();document.body.classList.remove('aia-hub-active');page.hidden=true;return oldShow(target)};
 const params=new URLSearchParams(location.search);
