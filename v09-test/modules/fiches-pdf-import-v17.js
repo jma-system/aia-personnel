@@ -226,8 +226,7 @@ body.append(replace);
 const acts=element('div','aia-actions'),qrBtn=element('button'),qrImg=document.createElement('img');qrImg.src=qr;qrImg.alt='QR code';qrBtn.title='Agrandir le QR original';qrBtn.append(qrImg);qrBtn.onclick=()=>qrLarge(qr);
 const pdfBtn=element('button','','↓ PDF');pdfBtn.onclick=()=>{document.body.classList.add('aia-pdf-print');window.addEventListener('afterprint',()=>document.body.classList.remove('aia-pdf-print'),{once:true});window.print()};
 const shareBtn=element('button');shareBtn.setAttribute('aria-label','Partager');shareBtn.innerHTML='<svg class="share-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4M8.7 13.5l6.6 4"/></svg><span>Partager</span>';shareBtn.onclick=()=>share(pdfFile);
-const saveBtn=element('button','','Enregistrer dans AIA');saveBtn.type='button';
-saveBtn.onclick=async()=>{
+const saveAutomatically=async()=>{
  const fallbackEntries=kind==='dieu'?[
  {text:'« Jéhovah est réellement Dieu. Il est le Dieu vivant »',citation:'Jérémie 10:10',refs:[{label:'Jérémie 10:10',book:24,slug:'jeremie',chapter:10,verse:10}]},
  {text:'Dieu a un nom.',citation:'Psaume 83:18',refs:[{label:'Psaume 83:18',book:19,slug:'psaumes',chapter:83,verse:18}]},
@@ -239,9 +238,9 @@ saveBtn.onclick=async()=>{
  {text:'Les dégâts faits à l’environnement seront réparés.',citation:'Isaïe 35:1, 2 ; Révélation 11:18',refs:[{label:'Isaïe 35:1, 2',book:23,slug:'isaie',chapter:35,verse:1},{label:'Révélation 11:18',book:66,slug:'revelation',chapter:11,verse:18}]}
 ];
  const fiche=extracted||{title:kind==='dieu'?'Qui est le vrai Dieu ?':'Peut-on vivre pour toujours ?',entries:fallbackEntries};
- const theme=prompt('Classement THÈMES : L’avenir, La famille, Dieu, La prière, Jésus, Le Royaume de Dieu, Les souffrances, La mort, La religion ou Actualité',extracted?.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':kind==='avenir'?'L’avenir':kind==='dieu'?'Dieu':'');
- if(theme===null)return;
- saveBtn.disabled=true;
+ const theme=extracted?.title.toLowerCase().includes('royaume')?'Le Royaume de Dieu':kind==='avenir'?'L’avenir':kind==='dieu'?'Dieu':null;
+ if(!theme){say('Choisis le thème avant de sauvegarder cette fiche.',true);return;}
+
  try{
   const blob=await renderFichePng(fiche.title,fiche.entries,im.src,qr);
   downloadBackup(blob,fiche.title);
@@ -256,11 +255,12 @@ saveBtn.onclick=async()=>{
    window.dispatchEvent(new CustomEvent('aia:save-pdf-fiche',{detail:{requestId,blob,topic:theme,label:fiche.title,references}}));
   });
   say('Fiche enregistrée dans THÈMES / '+theme+'. Copie PNG téléchargée.');
-  saveBtn.remove();
- }catch(error){say('Enregistrement impossible : '+error.message,true);saveBtn.disabled=false}
+
+ }catch(error){say('Enregistrement impossible : '+error.message,true);}
 };
-body.append(saveBtn);
+
 acts.append(qrBtn,pdfBtn,shareBtn);body.append(acts);sheet.append(bar,body);viewer.hidden=false;viewer.scrollTop=0;document.body.style.overflow='hidden';
+void saveAutomatically();
 }
 btn.addEventListener('click',async()=>{
 if(!input.files?.length)return say('Choisis un PDF.',true);
