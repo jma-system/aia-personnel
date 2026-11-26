@@ -1,0 +1,99 @@
+/* AIA — palette bleue inspirée de la maquette validée, écran uniquement.
+   Surcharge visuelle : aucune modification de navigation, d'import ou de fiches PDF. */
+@media screen {
+  :root{
+    --aia-blue-deep:#0d396e;
+    --aia-blue-main:#176dc5;
+    --aia-blue-strong:#1255a5;
+    --aia-blue-pale:#e8f4ff;
+    --aia-blue-edge:#b9d5f0;
+    --aia-ink:#15345a;
+  }
+  html:not([data-aia-theme="dark"]){
+    background:#f3f8ff;
+    color:var(--aia-ink);
+  }
+  html:not([data-aia-theme="dark"]) body {
+    background:linear-gradient(180deg,#e9f4ff 0,#f5f9ff 250px,#f8fbff 100%);
+  }
+  body > header {
+    background:linear-gradient(115deg,#082d62,#15529c 62%,#2367b3);
+    color:#fff;
+    border-bottom:2px solid #387ec5;
+  }
+  body > header .aia-brand strong {color:#fff}
+  body > header #aia-home-top,
+  body > header #date,
+  body > header #aia-theme-toggle {
+    background:#fff;
+    color:#102947;
+    border:1px solid #b6d0eb;
+  }
+  html:not([data-aia-theme="dark"]) main > .card:not(#aia-hub){
+    border-color:#c5d8ec;
+    background:#fbfdff;
+  }
+  html:not([data-aia-theme="dark"]) .aia-workflow,
+  html:not([data-aia-theme="dark"]) .aia-search-panel{
+    background:#fff;
+    border-color:#bcd5ef;
+  }
+  html:not([data-aia-theme="dark"]) .primary,
+  html:not([data-aia-theme="dark"]) #home .primary {
+    background:linear-gradient(180deg,#2383df,#1158b2);
+    border-color:#175daf;
+    color:#fff;
+  }
+  html:not([data-aia-theme="dark"]) #home .selected {
+    background:#dcebfb;
+    border-color:#4b8ac8;
+    color:#164c84;
+  }
+  html:not([data-aia-theme="dark"]) #home #aia-repertoire-open {
+    background:#d8ebff;
+    color:#114f93;
+    border-color:#72aadf;
+  }
+  html:not([data-aia-theme="dark"]) #indexPanel {
+    background:#f7fbff;
+    border-color:#bcd7ef;
+  }
+  html:not([data-aia-theme="dark"]) #indexPanel .aia-index-tabs button.selected,
+  html:not([data-aia-theme="dark"]) #indexPanel .aia-index-letters button.selected{
+    background:#146cc6!important;
+    border-color:#146cc6!important;
+    color:white!important;
+  }
+  html:not([data-aia-theme="dark"]) #indexPanel .aia-index-tile {
+    background:#e9f4ff!important;
+    border-color:#afcdeb!important;
+  }
+  html:not([data-aia-theme="dark"]) #indexPanel .aia-index-content h3 {
+    color:#0d4485;
+  }
+  /* Portail principal : neuf cartes bleu très clair, icônes bleues foncées. */
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-tile {
+    background:linear-gradient(180deg,#fff,#e9f4ff);
+    border:1px solid #aecce9;
+    color:#0f3767;
+    box-shadow:0 3px 8px #1a5b9a14;
+  }
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-tile:nth-child(1),
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-tile:nth-child(2),
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-tile:nth-child(3){
+    background:linear-gradient(180deg,#f8fcff,#dceeff);
+  }
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-tile:active {
+    background:#c9e6ff;
+    border-color:#468fcf;
+  }
+  html:not([data-aia-theme="dark"]) #aia-hub .hub-inner h2 {color:#0c4589}
+  /* Pas de recoloration des illustrations et fiches ouvrables : elles gardent leurs nuances d'origine. */
+  html[data-aia-theme="dark"] #aia-hub .hub-tile {
+    background:linear-gradient(180deg,#263f5e,#1b2b42);
+    color:#edf5ff;
+    border-color:#5c8dbb;
+    box-shadow:0 2px 7px #0003;
+  }
+  html[data-aia-theme="dark"] #aia-hub .hub-inner h2 {color:#d3e8ff}
+}
