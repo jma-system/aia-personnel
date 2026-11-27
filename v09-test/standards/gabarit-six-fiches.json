@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "aia-fiches-illustrees-six",
+  "name": "Fiches illustrées — modèle des 6 fiches",
+  "status": "Gabarit de référence documenté — automatisation à tester",
+  "reference": "v09-test/standards/FAMILLE-REFERENCE.md",
+  "examples": [
+    {
+      "title": "L’avenir",
+      "asset": "v09-test/fiches/avenir-restaure.webp",
+      "type": "Tract"
+    },
+    {
+      "title": "La famille",
+      "asset": "v09-test/fiches/famille-restauree.webp",
+      "type": "Thème"
+    },
+    {
+      "title": "Dieu",
+      "asset": "v09-test/fiches/dieu-restaure.webp",
+      "type": "Tract"
+    },
+    {
+      "title": "La prière",
+      "asset": "v09-test/fiches/priere-restauree.webp",
+      "type": "Thème"
+    },
+    {
+      "title": "Jésus",
+      "asset": "v09-test/fiches/jesus-restaure.webp",
+      "type": "Thème"
+    },
+    {
+      "title": "Le Royaume de Dieu",
+      "asset": "v09-test/fiches/royaume-restaure.webp",
+      "type": "Tract"
+    }
+  ],
+  "presentation": {
+    "header": "Bandeau bleu foncé avec retour, catégorie/titre, signet visible",
+    "title": "Question principale dans un bandeau bleu pâle avec trait vertical turquoise",
+    "layout": "Illustration portrait à gauche, encadrés de contenu à droite",
+    "blocks": "Nombre variable, généralement 3, parfois 4 selon le contenu vérifié",
+    "typography": "Verdana, texte foncé, références bibliques bleues soulignées",
+    "references": "Vrais liens HTML accessibles ouvrant les bons versets sur jw.org",
+    "footer": [
+      "QR code",
+      "PDF",
+      "Partager"
+    ],
+    "responsive": "Mise en page adaptable au téléphone sans découpage ni zones tactiles fondées sur une capture",
+    "source": "PDF JW.org utilisé pour identifier thèmes et références, pas pour reproduire mécaniquement la maquette",
+    "rights": "Rédaction originale et illustrations autorisées ; la refonte graphique ne suffit pas à autoriser la reproduction de contenus protégés",
+    "storage": "Gabarit de référence seul, sans modification des fiches existantes ni nouveau stockage navigateur"
+  },
+  "usage": "Référence pour les futures fiches ; l'application automatique et l'export restent à développer et tester séparément."
+}
