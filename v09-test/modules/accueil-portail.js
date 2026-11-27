@@ -69,7 +69,7 @@ function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;g
    dimensionsList.append(li);
   }
   preset.append(dimensionsList);
-  note.textContent='Dimensions natives des fichiers, pas des captures ni de l’écran. Conserver les proportions. Gabarit de référence ; les six fiches actuelles restent inchangées.';
+  note.textContent='STANDARD NOUVELLES FICHES : '+data.dimensions.futureStandard.widthPx+' × '+data.dimensions.futureStandard.heightPx+' px (modèle FAMILLE). Les six premières restent strictement inchangées.';
   preset.append(note);
  }).catch(()=>{status.textContent='Gabarit enregistré dans GitHub, mais chargement indisponible pour le moment.'});
 }else{const p=document.createElement('p');p.textContent='Espace indépendant à construire, sans modifier les pages existantes.';inner.append(p)}window.scrollTo(0,0);}
