@@ -261,7 +261,16 @@ large.draggable=false;
 function openImage(item){
  focusBefore=document.activeElement;large.src=item.url;large.alt=item.label;
  currentPhoto=item;placingLink=false;statusLink.hidden=true;
- avenirTitle.hidden=item.id!=='aia-approved-avenir';
+ const validatedHeaderTitles={
+  'aia-approved-avenir':'Tract - Avenir',
+  'aia-approved-famille':'Tract - Famille'
+ };
+ const headerTitle=validatedHeaderTitles[item.id];
+ avenirTitle.hidden=!headerTitle;
+ if(headerTitle){
+  avenirTitle.textContent=headerTitle;
+  avenirTitle.setAttribute('aria-label',headerTitle);
+ }
 
  linkButton.textContent='Ajouter un verset';
  imageFrame.classList.remove('aia-placing-link');
