@@ -12,7 +12,8 @@ Références : fiche **FAMILLE** (modèle visuel strict), fiche **PRIÈRE** (com
 - Ne pas remplacer le gabarit final par une capture d’écran cliquable par coordonnées : créer du **HTML/CSS et de vrais liens** pour l’accessibilité et la robustesse responsive.
 
 ## 2. Fiche et liens bibliques
-- Conserver fidèlement les illustrations, titres, formulations et références de la fiche source. Contrôler chaque référence à partir du document original avant de fabriquer les liens.
+- Pour les six fiches déjà validées, conserver leurs éléments existants sans remplacement. Pour toute **nouvelle** fiche issue d'une publication JW.org, utiliser le PDF comme référence de recherche, mais produire une rédaction et une mise en page originales ; ne pas reproduire automatiquement le texte ni les illustrations protégées. Contrôler chaque référence biblique à partir de la source officielle avant de fabriquer les liens. Les droits d'auteur restent applicables malgré le changement de mise en page.
+- Gabarit commun documenté dans `v09-test/standards/gabarit-six-fiches.json`, visible dans **AIA → RÉGLAGES**. Il sert de référence pour de futures fiches, sans application automatique aux six fiches existantes.
 - Chaque référence est un élément `<a>` distinct vers la **Traduction du monde nouveau sur JW.org**, ouvrant exactement le bon chapitre/verset ; vérifier avec le téléphone, ne pas se contenter de la présence du lien dans le code.
 - Pilote JÉSUS : Matthieu 7:12, Jean 13:34,35, Matthieu 11:28-30 — **les trois destinations ont été validées sur le Honor par l’utilisateur** le 25/11/2026.
 - QR : doit pointer vers la fiche réelle ; bouton PDF : tester la génération / impression au format PDF ; Partager : vérifier l’interface de partage Android. Ne pas prétendre ces trois fonctions validées sans test.
