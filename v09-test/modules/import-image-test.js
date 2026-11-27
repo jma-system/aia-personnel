@@ -46,7 +46,7 @@ avenirTitle.hidden=true;
 avenirTitle.setAttribute('aria-label','Tract - Avenir');
 const jesusQuestion=document.createElement('span');
 jesusQuestion.className='aia-approved-jesus-question';
-jesusQuestion.textContent='Les conseils de Jésus sont-ils utiles ?';
+jesusQuestion.textContent='Les conseils de Jésus\nsont-ils utiles ?';
 jesusQuestion.hidden=true;
 const avenirQuestion=document.createElement('span');
 avenirQuestion.className='aia-approved-avenir-question';
@@ -64,6 +64,11 @@ const dieuQuestion=document.createElement('span');
 dieuQuestion.className='aia-approved-dieu-question';
 dieuQuestion.textContent='Qui est le vrai Dieu ?';
 dieuQuestion.hidden=true;
+// Masquer uniquement l'ancien libellé sous le X de la fiche Prière.
+const prayerHeader=document.createElement('span');
+prayerHeader.className='aia-approved-prayer-header';
+prayerHeader.textContent='Thème – Prière';
+prayerHeader.hidden=true;
 // Les liens sont des zones transparentes placées exactement sur les textes bleus.
 const familyVerseLinks=[
  {name:'Éphésiens 5:28, 33',verse:'Éphésiens 5:28',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028',pos:'eph'},
@@ -85,7 +90,7 @@ const familyVerseLinks=[
  link.hidden=true;
  return link;
 });
-imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,royaumeQuestion,familleQuestion,dieuQuestion,...familyVerseLinks);
+imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,royaumeQuestion,familleQuestion,dieuQuestion,prayerHeader,...familyVerseLinks);
 // Fiche Prière : trois liens directs, sans modification de l'image.
 const prayerVerseLinks=[
  {name:'Psaume 65:2',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/65/#v19065002',coords:[48.5,39.8,25,3.3]},
@@ -210,6 +215,7 @@ viewerFix.textContent += '.aia-photo-frame{container-type:inline-size!important}
 viewerFix.textContent += '.aia-approved-avenir-question{position:absolute;left:11%;top:9.55%;width:84%;height:7.7%;box-sizing:border-box;display:flex;align-items:center;padding:0 1%;color:#0a1935;background:#cde7fb;font:400 5cqw/1.15 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-avenir-question[hidden]{display:none!important}';
 viewerFix.textContent += '.aia-approved-royaume-question{position:absolute;left:11.2%;top:10.45%;width:84.7%;height:10.35%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-royaume-question[hidden]{display:none!important}';
 viewerFix.textContent += '.aia-photo-frame>.aia-photo-close{position:absolute!important;top:2.75%!important;right:20%!important;left:auto!important;bottom:auto!important;transform:translateY(-50%)!important;z-index:8!important;width:clamp(34px,6cqw,42px)!important;height:clamp(34px,6cqw,42px)!important;display:grid!important;place-items:center!important;padding:0!important;line-height:1!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important}.aia-approved-famille-question{position:absolute;left:11%;top:11.2%;width:84.5%;height:13%;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.14 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:normal}.aia-approved-famille-question[hidden]{display:none!important}.aia-approved-dieu-question{position:absolute;left:11.2%;top:10.85%;width:84.2%;height:8.1%;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.14 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3}.aia-approved-dieu-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-approved-jesus-question{white-space:pre-line!important}.aia-approved-prayer-header{position:absolute;top:0;left:42%;width:31%;height:8.1%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;white-space:nowrap;pointer-events:none;z-index:5;background:#0a376d;color:#fff;font:400 3.8cqw/1 Verdana,Geneva,sans-serif}.aia-approved-prayer-header[hidden]{display:none!important}';
 document.head.append(viewerFix);document.body.append(viewer);
 let currentPhoto=null,placingLink=false;
 function parseVerseReference(input){
@@ -298,6 +304,7 @@ function openImage(item){
  jesusQuestion.hidden=item.id!=='aia-approved-jesus';
  familleQuestion.hidden=item.id!=='aia-approved-famille';
  dieuQuestion.hidden=item.id!=='aia-approved-dieu';
+ prayerHeader.hidden=item.id!=='aia-approved-priere';
  avenirQuestion.hidden=item.id!=='aia-approved-avenir';
  royaumeQuestion.hidden=item.id!=='aia-approved-royaume';
  if(headerTitle){
