@@ -52,6 +52,10 @@ const avenirQuestion=document.createElement('span');
 avenirQuestion.className='aia-approved-avenir-question';
 avenirQuestion.textContent='Peut-on vivre pour toujours ?';
 avenirQuestion.hidden=true;
+const royaumeQuestion=document.createElement('span');
+royaumeQuestion.className='aia-approved-royaume-question';
+royaumeQuestion.textContent='Que fera le Royaume de Dieu ?';
+royaumeQuestion.hidden=true;
 // Les liens sont des zones transparentes placées exactement sur les textes bleus.
 const familyVerseLinks=[
  {name:'Éphésiens 5:28, 33',verse:'Éphésiens 5:28',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028',pos:'eph'},
@@ -73,7 +77,7 @@ const familyVerseLinks=[
  link.hidden=true;
  return link;
 });
-imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,...familyVerseLinks);
+imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,royaumeQuestion,...familyVerseLinks);
 // Fiche Prière : trois liens directs, sans modification de l'image.
 const prayerVerseLinks=[
  {name:'Psaume 65:2',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/65/#v19065002',coords:[48.5,39.8,25,3.3]},
@@ -194,6 +198,7 @@ viewerFix.textContent='.aia-photo-viewer{overflow-x:hidden!important;overflow-y:
 viewerFix.textContent += '.aia-photo-frame{position:relative!important}.aia-approved-header-title{position:absolute;left:15%;top:0;width:70%;height:8.1%;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#fff;background:#013060;font:400 clamp(12px,4vw,36px)/1.1 Verdana,Geneva,sans-serif;white-space:nowrap;z-index:3}.aia-approved-header-title[hidden]{display:none!important}';
 viewerFix.textContent += '.aia-approved-jesus-question{position:absolute;left:10.1%;top:11.5%;width:86%;height:10.2%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:700 clamp(14px,3.8vw,42px)/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3}.aia-approved-jesus-question[hidden]{display:none!important}';
 viewerFix.textContent += '.aia-approved-avenir-question{position:absolute;left:11%;top:9.55%;width:84%;height:7.7%;box-sizing:border-box;display:flex;align-items:center;padding:0 1%;color:#0a1935;background:#cde7fb;font:400 clamp(12px,3.9vw,40px)/1.15 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-avenir-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-approved-royaume-question{position:absolute;left:11.2%;top:10.45%;width:84.7%;height:10.35%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 clamp(12px,3.8vw,40px)/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-royaume-question[hidden]{display:none!important}';
 document.head.append(viewerFix);document.body.append(viewer);
 let currentPhoto=null,placingLink=false;
 function parseVerseReference(input){
@@ -274,12 +279,14 @@ function openImage(item){
  const validatedHeaderTitles={
   'aia-approved-avenir':'Tract - Avenir',
   'aia-approved-famille':'Tract - Famille',
-  'aia-approved-jesus':'Tract - Jésus'
+  'aia-approved-jesus':'Tract - Jésus',
+  'aia-approved-royaume':'Tract - Royaume'
  };
  const headerTitle=validatedHeaderTitles[item.id];
  avenirTitle.hidden=!headerTitle;
  jesusQuestion.hidden=item.id!=='aia-approved-jesus';
  avenirQuestion.hidden=item.id!=='aia-approved-avenir';
+ royaumeQuestion.hidden=item.id!=='aia-approved-royaume';
  if(headerTitle){
   avenirTitle.textContent=headerTitle;
   avenirTitle.setAttribute('aria-label',headerTitle);
