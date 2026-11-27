@@ -269,7 +269,8 @@ function openImage(item){
  const validatedHeaderTitles={
   'aia-approved-avenir':'Tract - Avenir',
   'aia-approved-famille':'Tract - Famille',
-  'aia-approved-jesus':'Tract - Jésus'
+  'aia-approved-jesus':'Tract - Jésus',
+  'aia-approved-priere':'Tract - Prière'
  };
  const headerTitle=validatedHeaderTitles[item.id];
  avenirTitle.hidden=!headerTitle;
