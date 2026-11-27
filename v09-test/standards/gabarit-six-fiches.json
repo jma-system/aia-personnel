@@ -71,11 +71,20 @@
     "rights": "Rédaction originale et illustrations autorisées ; la refonte graphique ne suffit pas à autoriser la reproduction de contenus protégés",
     "storage": "Gabarit de référence seul, sans modification des fiches existantes ni nouveau stockage navigateur"
   },
-  "usage": "Référence pour les futures fiches ; l'application automatique et l'export restent à développer et tester séparément.",
+  "usage": "Les six fiches approuvées sont inchangées. Le canevas 642 × 963 px sert de standard aux nouvelles créations uniquement. Automatisation à tester avant usage.",
   "dimensions": {
     "unit": "pixels",
     "measurement": "dimensions natives des six fichiers WebP du ZIP de validation utilisateur du 26 novembre 2026 ; non les dimensions de l'écran",
-    "rule": "Conserver le ratio de chaque fichier pour éviter toute déformation. Ne pas imposer de dimensions fixes uniques : les six références n'ont pas toutes le même format.",
-    "referenceForNewFiches": "Choisir la fiche de référence appropriée et vérifier visuellement sur Honor avant validation; dimensions finales du nouveau gabarit à confirmer fiche par fiche."
+    "rule": "Les six premières fiches sont conservées exactement telles quelles, sans redimensionnement, recadrage ni écrasement.",
+    "referenceForNewFiches": "Pour toute nouvelle fiche seulement : canevas standard 642 × 963 px, proportions 2:3 (modèle FAMILLE), composition adaptée sans déformer l'illustration. Vérification visuelle sur Honor avant validation.",
+    "futureStandard": {
+      "widthPx": 642,
+      "heightPx": 963,
+      "ratio": "2:3",
+      "reference": "La famille",
+      "appliesTo": "Nouvelles fiches uniquement",
+      "existingSix": "Intouchables",
+      "fitting": "Ne pas étirer, ne pas déformer; adapter marges et placement sur le canevas"
+    }
   }
 }
