@@ -263,7 +263,8 @@ function openImage(item){
  currentPhoto=item;placingLink=false;statusLink.hidden=true;
  const validatedHeaderTitles={
   'aia-approved-avenir':'Tract - Avenir',
-  'aia-approved-famille':'Tract - Famille'
+  'aia-approved-famille':'Tract - Famille',
+  'aia-approved-jesus':'Tract - Jésus'
  };
  const headerTitle=validatedHeaderTitles[item.id];
  avenirTitle.hidden=!headerTitle;
