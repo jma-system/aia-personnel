@@ -32,7 +32,7 @@ select{width:100%;padding:10px;background:white;border:1px solid #a5bbcf;border-
 .muted{font-size:13px;color:#596b7e;line-height:1.55}
 #status{font-size:14px;line-height:1.5}
 .error{color:#ad2b2b}.ok{color:#166b42}
-#result[hidden],#summaryBox[hidden],#draftPanel[hidden]{display:none!important}
+#result[hidden],#summaryBox[hidden],#draftPanel[hidden],#cvm-file-import[hidden]{display:none!important}
 #summaryBox{margin-top:8px;background:#eef6ff;border:1px solid #bfd6e9;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.5}
 .small{font-size:12px;color:#65788a}
 #draftPanel{border:2px solid #91b4d1}
@@ -117,17 +117,17 @@ if(window.parent!==window){
 <main>
 <div class="top"><h1>AIA — Test CVM JWPUB</h1><a href="./index.html">AIA Test</a></div>
 <p class="desc">Test privé sur ton téléphone. Le programme est lu localement depuis ton fichier JWPUB. Aucun contenu CVM n’est envoyé à GitHub ni enregistré dans AIA. Une connexion Internet est nécessaire pour charger les outils de lecture.</p>
-<div class="panel">
+<div class="panel" id="cvm-file-import" hidden>
 <label for="file"><strong>1. Choisir le fichier CVM</strong></label>
 <input id="file" type="file" accept=".jwpub,.zip,application/zip,application/octet-stream">
 <p><button id="load" type="button">Lire le programme CVM</button></p>
 <p><button id="loadOfficial" type="button">Programme du 30 novembre au 6 décembre 2026 — sans fichier</button></p>
-<p id="status" role="status">Prêt pour l’importation.</p>
 </div>
+<p id="status" role="status">Chargement du programme CVM…</p>
 <div id="result" hidden>
 <div class="panel">
-<h2>2. Choisir une semaine</h2>
-<label for="week" class="small">Semaines trouvées dans ton fichier :</label>
+<h2>Choisir une semaine</h2>
+<label for="week" class="small">Semaine du programme CVM :</label>
 <select id="week"></select>
 <p id="weekInfo" class="muted"></p>
 <div class="row"><button id="all" type="button">Tout sélectionner</button><button id="none" type="button">Tout désélectionner</button></div>
