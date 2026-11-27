@@ -44,7 +44,7 @@ function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;g
  const h=document.createElement('h3');h.textContent='Gabarit — Fiches illustrées';h.style.cssText='font-size:17px;margin:0 0 8px';
  const status=document.createElement('p');status.textContent='Chargement du gabarit…';status.style.cssText='font-size:14px;margin:0';
  preset.append(h,status);inner.append(preset);
- fetch('./standards/gabarit-six-fiches.json?v=1',{cache:'no-store'}).then(response=>{
+ fetch('./standards/gabarit-six-fiches.json?v=2-dimensions',{cache:'no-store'}).then(response=>{
   if(!response.ok)throw Error('Gabarit indisponible');
   return response.json();
  }).then(data=>{
