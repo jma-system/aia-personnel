@@ -1,0 +1,21 @@
+name: AIA CVM semaine 30 novembre — contrôles
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'v09-test/data/cvm-2026-11-30.json'
+      - 'v09-test/test-cvm-jwpub.html'
+      - 'scripts/aia-cvm-20261130-checks.cjs'
+      - '.github/workflows/aia-cvm-20261130.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/aia-cvm-20261130-checks.cjs
