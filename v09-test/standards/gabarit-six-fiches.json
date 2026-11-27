@@ -8,32 +8,50 @@
     {
       "title": "L’avenir",
       "asset": "v09-test/fiches/avenir-restaure.webp",
-      "type": "Tract"
+      "type": "Tract",
+      "widthPx": 1025,
+      "heightPx": 1536,
+      "ratio": 0.667
     },
     {
       "title": "La famille",
       "asset": "v09-test/fiches/famille-restauree.webp",
-      "type": "Thème"
+      "type": "Thème",
+      "widthPx": 642,
+      "heightPx": 963,
+      "ratio": 0.667
     },
     {
       "title": "Dieu",
       "asset": "v09-test/fiches/dieu-restaure.webp",
-      "type": "Tract"
+      "type": "Tract",
+      "widthPx": 1045,
+      "heightPx": 1536,
+      "ratio": 0.68
     },
     {
       "title": "La prière",
       "asset": "v09-test/fiches/priere-restauree.webp",
-      "type": "Thème"
+      "type": "Thème",
+      "widthPx": 642,
+      "heightPx": 1018,
+      "ratio": 0.631
     },
     {
       "title": "Jésus",
       "asset": "v09-test/fiches/jesus-restaure.webp",
-      "type": "Thème"
+      "type": "Thème",
+      "widthPx": 1073,
+      "heightPx": 1536,
+      "ratio": 0.699
     },
     {
       "title": "Le Royaume de Dieu",
       "asset": "v09-test/fiches/royaume-restaure.webp",
-      "type": "Tract"
+      "type": "Tract",
+      "widthPx": 983,
+      "heightPx": 1536,
+      "ratio": 0.64
     }
   ],
   "presentation": {
@@ -53,5 +71,11 @@
     "rights": "Rédaction originale et illustrations autorisées ; la refonte graphique ne suffit pas à autoriser la reproduction de contenus protégés",
     "storage": "Gabarit de référence seul, sans modification des fiches existantes ni nouveau stockage navigateur"
   },
-  "usage": "Référence pour les futures fiches ; l'application automatique et l'export restent à développer et tester séparément."
+  "usage": "Référence pour les futures fiches ; l'application automatique et l'export restent à développer et tester séparément.",
+  "dimensions": {
+    "unit": "pixels",
+    "measurement": "dimensions natives des six fichiers WebP du ZIP de validation utilisateur du 26 novembre 2026 ; non les dimensions de l'écran",
+    "rule": "Conserver le ratio de chaque fichier pour éviter toute déformation. Ne pas imposer de dimensions fixes uniques : les six références n'ont pas toutes le même format.",
+    "referenceForNewFiches": "Choisir la fiche de référence appropriée et vérifier visuellement sur Honor avant validation; dimensions finales du nouveau gabarit à confirmer fiche par fiche."
+  }
 }
