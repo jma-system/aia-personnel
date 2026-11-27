@@ -366,7 +366,22 @@ try{
    {text:'Dieu s’intéresse à ce qui nous arrive et mettra fin à ce qui nous fait souffrir.',citation:'Psaume 34:17-19',refs:parsedReferences('Psaume 34:17-19')}
   ]
  }:null;
- let extracted=sufferingFiche||(!isGod&&!isAvenir?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null);
+ // Ce tract possède une couche texte différente : la citation de Jean 5:28, 29
+ // se trouve en dehors de la zone fixe analysée par extractTract().
+ // Repli limité au document effectivement reconnu par ses trois références.
+ // Contenu reformulé pour la nouvelle fiche AIA ; aperçu non enregistré automatiquement.
+ const deathSource=/^T[-_]dth[-_]F[.]pdf$/i.test(f.name)
+  &&txt.includes('reverrezvousunjour')&&txt.includes('jean52829')
+  &&txt.includes('actes2415')&&txt.includes('job141315');
+ const deathFiche=deathSource?{
+  title:'Reverra-t-on un jour nos proches décédés ?',
+  entries:[
+   {text:'Jésus a annoncé que les personnes dans les tombes entendraient son appel.',citation:'Jean 5:28, 29',refs:[{label:'Jean 5:28, 29',book:43,slug:'jean',chapter:5,verse:28}]},
+   {text:'La Bible annonce une résurrection.',citation:'Actes 24:15',refs:[{label:'Actes 24:15',book:44,slug:'actes',chapter:24,verse:15}]},
+   {text:'Job exprimait son désir de revoir la vie grâce à Dieu.',citation:'Job 14:13-15',refs:[{label:'Job 14:13-15',book:18,slug:'job',chapter:14,verse:13}]}
+  ]
+ }:null;
+ let extracted=deathFiche||sufferingFiche||(!isGod&&!isAvenir?extractTract(p1,p2,(await p1.getTextContent()).items,(await p2.getTextContent()).items):null);
  const officialFilename=/^T[-_]ftr[-_]F[.]pdf$/i.test(f.name);const officialText=txt.includes('pourtoujours')&&txt.includes('3729');const sourceEvidence=txt.length>120&&(txt.includes('3324')||txt.includes('1118'));if(!extracted&&!isGod&&(!sourceEvidence||!(officialFilename||officialText)))throw Error('Document non reconnu : vérifie que tu as choisi le PDF « Qui est le vrai Dieu ? » ou « Peut-on vivre pour toujours ? ».');
  const c2=await renderPage(p2,3);
  
@@ -375,7 +390,7 @@ try{
  // leurs PDF : l'illustration s'étend sur toute la largeur en haut
  // de la page, jusqu'à y=127.89 points (page haute de 306.14 points).
  // Préserver ce rectangle sans rogner les personnes ni inventer d'image.
- const verifiedIllustration=/^T[-_](?:sfr|ftr)[-_]F\.pdf$/i.test(f.name)
+ const verifiedIllustration=/^T[-_](?:sfr|ftr|dth)[-_]F\.pdf$/i.test(f.name)
    &&Math.abs(p1.view[2]-233.86)<1&&Math.abs(p1.view[3]-306.14)<1;
  const photo=verifiedIllustration
   ?crop(c1,0,0,c1.width,c1.height*(127.89/306.14),Math.round(c1.width))
