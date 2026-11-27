@@ -56,6 +56,14 @@ const royaumeQuestion=document.createElement('span');
 royaumeQuestion.className='aia-approved-royaume-question';
 royaumeQuestion.textContent='Que fera le Royaume de Dieu ?';
 royaumeQuestion.hidden=true;
+const familleQuestion=document.createElement('span');
+familleQuestion.className='aia-approved-famille-question';
+familleQuestion.textContent='Une famille heureuse - Est-ce possible ?';
+familleQuestion.hidden=true;
+const dieuQuestion=document.createElement('span');
+dieuQuestion.className='aia-approved-dieu-question';
+dieuQuestion.textContent='Qui est le vrai Dieu ?';
+dieuQuestion.hidden=true;
 // Les liens sont des zones transparentes placées exactement sur les textes bleus.
 const familyVerseLinks=[
  {name:'Éphésiens 5:28, 33',verse:'Éphésiens 5:28',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/%C3%89ph%C3%A9siens/5/#v49005028',pos:'eph'},
@@ -77,7 +85,7 @@ const familyVerseLinks=[
  link.hidden=true;
  return link;
 });
-imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,royaumeQuestion,...familyVerseLinks);
+imageFrame.append(large,avenirTitle,jesusQuestion,avenirQuestion,royaumeQuestion,familleQuestion,dieuQuestion,...familyVerseLinks);
 // Fiche Prière : trois liens directs, sans modification de l'image.
 const prayerVerseLinks=[
  {name:'Psaume 65:2',url:'https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/65/#v19065002',coords:[48.5,39.8,25,3.3]},
@@ -196,10 +204,11 @@ viewer.append(close,imageFrame,studyDetails,linkButton,statusLink);
 const viewerFix=document.createElement('style');
 viewerFix.textContent='.aia-photo-viewer{overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important}.aia-photo-frame{display:block!important;box-sizing:border-box!important;max-width:min(100%,960px)!important;width:100%!important;margin-left:auto!important;margin-right:auto!important;min-width:0!important}.aia-photo-frame>img{display:block!important;width:100%!important;max-width:100%!important;height:auto!important;object-fit:contain!important}.aia-saved-references{box-sizing:border-box;max-width:min(100%,960px);margin:10px auto 24px;padding:8px 12px;border-radius:10px;background:#eaf7ff;color:#073a79;font:14px Verdana,sans-serif}.aia-saved-references[hidden]{display:none!important}.aia-saved-references summary{cursor:pointer;min-height:32px;display:list-item;padding:6px 0}.aia-saved-references nav{max-width:100%;overflow-wrap:anywhere}';
 viewerFix.textContent += '.aia-photo-frame{position:relative!important}.aia-approved-header-title{position:absolute;left:15%;top:0;width:70%;height:8.1%;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#fff;background:#013060;font:400 clamp(12px,4vw,36px)/1.1 Verdana,Geneva,sans-serif;white-space:nowrap;z-index:3}.aia-approved-header-title[hidden]{display:none!important}';
-viewerFix.textContent += '.aia-approved-jesus-question{position:absolute;left:10.1%;top:11.5%;width:86%;height:10.2%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 clamp(14px,3.8vw,42px)/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3}.aia-approved-jesus-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-approved-jesus-question{position:absolute;left:10.1%;top:11.5%;width:86%;height:10.2%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.14 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3}.aia-approved-jesus-question[hidden]{display:none!important}';
 viewerFix.textContent += '.aia-photo-frame{container-type:inline-size!important}';
-viewerFix.textContent += '.aia-approved-avenir-question{position:absolute;left:11%;top:9.55%;width:84%;height:7.7%;box-sizing:border-box;display:flex;align-items:center;padding:0 1%;color:#0a1935;background:#cde7fb;font:400 4.3cqw/1.15 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-avenir-question[hidden]{display:none!important}';
-viewerFix.textContent += '.aia-approved-royaume-question{position:absolute;left:11.2%;top:10.45%;width:84.7%;height:10.35%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 clamp(12px,3.8vw,40px)/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-royaume-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-approved-avenir-question{position:absolute;left:11%;top:9.55%;width:84%;height:7.7%;box-sizing:border-box;display:flex;align-items:center;padding:0 1%;color:#0a1935;background:#cde7fb;font:400 5cqw/1.15 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-avenir-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-approved-royaume-question{position:absolute;left:11.2%;top:10.45%;width:84.7%;height:10.35%;display:flex;align-items:center;justify-content:flex-start;box-sizing:border-box;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.16 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:nowrap}.aia-approved-royaume-question[hidden]{display:none!important}';
+viewerFix.textContent += '.aia-photo-close{transform:translateY(-48px)!important;z-index:6!important}.aia-approved-famille-question{position:absolute;left:11%;top:11.2%;width:84.5%;height:13%;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.14 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3;white-space:normal}.aia-approved-famille-question[hidden]{display:none!important}.aia-approved-dieu-question{position:absolute;left:11.2%;top:10.85%;width:84.2%;height:8.1%;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;padding:0 1%;background:#cfe8fc;color:#061a35;font:400 5cqw/1.14 Verdana,Geneva,sans-serif;pointer-events:none;z-index:3}.aia-approved-dieu-question[hidden]{display:none!important}';
 document.head.append(viewerFix);document.body.append(viewer);
 let currentPhoto=null,placingLink=false;
 function parseVerseReference(input){
@@ -286,6 +295,8 @@ function openImage(item){
  const headerTitle=validatedHeaderTitles[item.id];
  avenirTitle.hidden=!headerTitle;
  jesusQuestion.hidden=item.id!=='aia-approved-jesus';
+ familleQuestion.hidden=item.id!=='aia-approved-famille';
+ dieuQuestion.hidden=item.id!=='aia-approved-dieu';
  avenirQuestion.hidden=item.id!=='aia-approved-avenir';
  royaumeQuestion.hidden=item.id!=='aia-approved-royaume';
  if(headerTitle){
