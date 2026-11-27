@@ -6,16 +6,19 @@
 main{width:min(calc(100% - 24px),642px);margin:18px auto 40px}
 .notice{color:#fff;font:13px/1.5 Verdana,sans-serif;margin:0 0 12px}
 .fiche{width:100%;aspect-ratio:642/963;overflow:hidden;border:2px solid #65b5e3;border-radius:20px;background:#e9f7ff;display:flex;flex-direction:column}
-.bar{height:8%;flex:none;display:flex;align-items:center;justify-content:center;background:#073b79;color:white;font-size:clamp(12px,3vw,19px);font-weight:400;padding:0 12px}
+.bar{height:8%;flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#073b79;color:white;font-size:clamp(12px,3vw,19px);font-weight:400;padding:0 3%}
+.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;text-align:center}
+.bar-icon{display:inline-flex;align-items:center;justify-content:center;width:34px;height:40px;flex:none;color:white;text-decoration:none;background:none;border:0;padding:0;cursor:pointer}
+.bar-icon svg{width:28px;height:30px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .body{padding:3% 3.2% 2.2%;display:flex;flex:1;flex-direction:column;min-height:0}
-.question{position:relative;background:#cbe8ff;border-radius:13px;padding:2.4% 3% 2.4% 8%;min-height:11%;display:flex;align-items:center;font-size:clamp(18px,4.2vw,27px);line-height:1.13;font-weight:400}
+.question{position:relative;background:#cbe8ff;border-radius:13px;padding:2.4% 3% 2.4% 8%;min-height:11%;display:flex;align-items:center;font-size:clamp(18px,4.2vw,27px);line-height:1.13;font-weight:700}
 .question:before{content:"";position:absolute;left:3%;top:18%;bottom:18%;width:7px;border-radius:6px;background:#00cfe3}
 .cols{display:grid;grid-template-columns:48% 1fr;gap:3%;margin-top:4.2%;flex:1;min-height:0;align-items:stretch}
 .photo{position:relative;overflow:hidden;border-radius:12px;background:#fff;min-height:0}
 .photo img{position:absolute;width:219.5%;height:auto;max-width:none;left:-7.1%;top:-31.8%;display:block}
 .verses{display:flex;flex-direction:column;justify-content:space-between;gap:2%;min-height:0}
 .verse{border:1.5px solid #a6d9e8;border-radius:12px;background:#f7fcff;padding:3.8% 4.2%;font-weight:400;font-size:clamp(10px,2.7vw,17px);line-height:1.19;overflow-wrap:break-word}
-.verse a{display:block;color:#0762be;text-decoration:underline;font-weight:400;margin-top:3px;line-height:1.14}
+.verse a{display:block;color:#0762be;text-decoration:underline;font-weight:700;margin-top:3px;line-height:1.14}
 .footer{margin-top:3.6%;height:13%;flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2.5%}
 .action{display:flex;justify-content:center;align-items:center;gap:7px;min-width:0;background:#d3eaff;border:1.5px solid #85c7e4;border-radius:12px;font:400 clamp(11px,3vw,18px)/1.1 Verdana,Geneva,sans-serif;color:#10243a;text-decoration:none;cursor:pointer;padding:4px 5px}
 .action svg{height:clamp(18px,5vw,27px);width:clamp(18px,5vw,27px);flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -25,8 +28,8 @@ main{width:min(calc(100% - 24px),642px);margin:18px auto 40px}
 @media print{ @page{size:auto;margin:5mm} body{background:#fff}main{width:100%;margin:0}.notice,#action-status{display:none!important}.fiche{width:100%;max-width:642px;margin:auto;print-color-adjust:exact;-webkit-print-color-adjust:exact} }
 @media(min-width:643px){.question{font-size:27px}.verse{font-size:17px}.bar{font-size:19px}.action{font-size:18px}}
 </style></head>
-<body><main><p class="notice">AIA — Essai isolé de typographie. Aucune fiche sauvegardée ou remplacée. QR vers cet aperçu, export PDF par impression et partage du lien de cet aperçu.</p>
-<article class="fiche"><header class="bar">Tract — L’avenir</header><div class="body">
+<body><main><p class="notice">AIA — Prototype de mise en page. Les six fiches déjà validées restent inchangées.</p>
+<article class="fiche"><header class="bar"><a class="bar-icon" href="../index.html" aria-label="Retour à AIA"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg></a><span class="bar-label">Tract — L’avenir</span><span class="bar-icon" aria-label="Signet (à venir)" role="img"><svg viewBox="0 0 24 28" aria-hidden="true"><path d="M4 2h16v24l-8-6-8 6z"/></svg></span></header><div class="body">
 <h1 class="question">Peut-on imaginer un avenir sans fin ?</h1>
 <div class="cols"><div class="photo" aria-label="Illustration déjà validée de l'homme et des ours"><img src="../fiches/avenir-restaure.webp" alt="Illustration de l’homme avec les ours, recadrée depuis la fiche Avenir validée"></div>
 <div class="verses">
