@@ -86,5 +86,36 @@
       "existingSix": "Intouchables",
       "fitting": "Ne pas étirer, ne pas déformer; adapter marges et placement sur le canevas"
     }
+  },
+  "masterTypography": {
+    "referenceFiles": [
+      "v09-test/fiches/famille-restauree.webp",
+      "v09-test/fiches/priere-restauree.webp"
+    ],
+    "fontFamily": "Verdana, Geneva, sans-serif",
+    "fontWeight": {
+      "header": 400,
+      "question": 400,
+      "body": 400,
+      "bibleReference": 400
+    },
+    "referenceStyle": "bleu, souligné ; sans gras forcé",
+    "layout": "image à gauche, encadrés à droite ; même marges et typographie pour les prochaines et quatre fiches restantes",
+    "editableSource": "HTML/CSS ; ne pas modifier la typographie dans les images WebP existantes",
+    "status": "GABARIT MAÎTRE DOCUMENTÉ ; rendu pilote avant remplacement"
+  },
+  "implementation": {
+    "referencesLocked": [
+      "La famille",
+      "La prière"
+    ],
+    "targetsForPilot": [
+      "L’avenir",
+      "Dieu",
+      "Jésus",
+      "Le Royaume de Dieu"
+    ],
+    "preservation": "Conserver sans altération les six WebP d'origine ; ne remplacer une fiche visible qu'après validation visuelle du pilote sur Honor",
+    "pilot": "standards/test-typographie-avenir.html"
   }
 }
