@@ -60,7 +60,17 @@ function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;g
   const list=document.createElement('ul');list.style.cssText='font-size:14px;line-height:1.55;padding-left:22px';
   for(const item of lines){const li=document.createElement('li');li.textContent=item;list.append(li)}
   const note=document.createElement('p');note.textContent='Gabarit enregistré pour les prochaines créations ; les six fiches actuelles restent inchangées.';
-  note.style.cssText='font-size:13px;margin:8px 0 0';preset.append(list,note);
+  note.style.cssText='font-size:13px;margin:8px 0 0';preset.append(list);
+  const dimensionsHeading=document.createElement('h4');dimensionsHeading.textContent='Dimensions des 6 fiches (fichiers WebP)';dimensionsHeading.style.cssText='font-size:14px;margin:12px 0 6px';preset.append(dimensionsHeading);
+  const dimensionsList=document.createElement('ul');dimensionsList.style.cssText='font-size:13px;line-height:1.55;padding-left:22px';
+  for(const fiche of data.examples){
+   const li=document.createElement('li');
+   li.textContent=fiche.title+' : '+fiche.widthPx+' × '+fiche.heightPx+' px';
+   dimensionsList.append(li);
+  }
+  preset.append(dimensionsList);
+  note.textContent='Dimensions natives des fichiers, pas des captures ni de l’écran. Conserver les proportions. Gabarit de référence ; les six fiches actuelles restent inchangées.';
+  preset.append(note);
  }).catch(()=>{status.textContent='Gabarit enregistré dans GitHub, mais chargement indisponible pour le moment.'});
 }else{const p=document.createElement('p');p.textContent='Espace indépendant à construire, sans modifier les pages existantes.';inner.append(p)}window.scrollTo(0,0);}
 const items=[['RÉPERTOIRE','users','indexPanel','repertoire'],['RÉUNIONS','calendar','home','reunions'],['INDEX','layers','index','index'],['FICHES','file','library','fiches'],['RUBRIQUES','grid','rubriques','rubriques'],['VIDÉOS','video','desk','videos'],['JW.ORG','globe','https://www.jw.org/fr/','jworg'],['WOL','book','https://wol.jw.org/fr/wol/h/r30/lp-f','wol'],['RÉGLAGES','gear','reglages','reglages']];
