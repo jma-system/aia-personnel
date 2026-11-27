@@ -121,6 +121,7 @@ if(window.parent!==window){
 <label for="file"><strong>1. Choisir le fichier CVM</strong></label>
 <input id="file" type="file" accept=".jwpub,.zip,application/zip,application/octet-stream">
 <p><button id="load" type="button">Lire le programme CVM</button></p>
+<p><button id="loadOfficial" type="button">Programme du 30 novembre au 6 décembre 2026 — sans fichier</button></p>
 <p id="status" role="status">Prêt pour l’importation.</p>
 </div>
 <div id="result" hidden>
@@ -241,10 +242,11 @@ async function renderWeek(){
  if(!week)return;
  $('subjects').replaceChildren();
  $('weekInfo').textContent='Programme : '+week.Title+' — '+week.Subtitle+'.';
+ if(week.source){const a=document.createElement('a');a.href=week.source;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Source officielle WOL';$('weekInfo').append(document.createTextNode(' · '),a)}
  try{
   status('Lecture de la semaine du '+prettyDate(week.FirstDateOffset)+'…');
-  const html=await decode(week.Content);
-  const tasks=programFromHTML(html);currentTasks=tasks;$('draftPanel').hidden=true;
+  const tasks=Array.isArray(week.verifiedTasks)?week.verifiedTasks:programFromHTML(await decode(week.Content));
+  currentTasks=tasks;$('draftPanel').hidden=true;
   let currentGroup='';
   for(const task of tasks){
    if(task.group!==currentGroup){
@@ -291,6 +293,30 @@ async function renderWeek(){
   updateSelected();
  }catch(e){status('Impossible de lire cette semaine : '+e.message,true);$('summaryBox').textContent=''}
 }
+async function loadOfficial(){
+ const button=$('loadOfficial');button.disabled=true;
+ try{
+  status('Chargement du programme CVM officiel…');
+  const response=await fetch('./data/cvm-2026-11-30.json?v=1',{cache:'no-store'});
+  if(!response.ok)throw Error('Programme indisponible ('+response.status+')');
+  const data=await response.json();
+  if(data.schema!==1||data.start!=='2026-11-30'||data.end!=='2026-12-06'||
+     !Array.isArray(data.tasks)||data.tasks.length!==8||
+     data.tasks.some((task,i)=>task.number!==i+1||!task.title||!Array.isArray(task.details))||
+     data.source!=='https://wol.jw.org/fr/wol/d/r30/lp-f/202026405')
+    throw Error('Données CVM non conformes');
+  weeks=[{Title:data.title,Subtitle:data.subtitle,FirstDateOffset:data.firstDateOffset,
+    LastDateOffset:data.lastDateOffset,verifiedTasks:data.tasks,source:data.source}];
+  const selector=$('week');selector.replaceChildren();
+  const opt=document.createElement('option');opt.value='0';opt.textContent=data.title+' · '+data.subtitle;selector.append(opt);
+  selector.value='0';$('result').hidden=false;
+  await renderWeek();
+ }catch(error){status('Impossible de charger la semaine : '+error.message,true)}
+ finally{button.disabled=false}
+}
+$('loadOfficial').addEventListener('click',loadOfficial);
+// Cette semaine vérifiée est disponible immédiatement, sans téléchargement JWPUB.
+loadOfficial();
 $('load').addEventListener('click',async()=>{
  const file=$('file').files?.[0];
  if(!file){status('Choisis d’abord ton fichier CVM JWPUB.',true);return}
