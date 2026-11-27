@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-27",
+  "status": "Audit visuel/local — 6 WebP source du ZIP validé, pas encore correction des 6 dans AIA",
+  "rule": "Chaque QR doit ouvrir la fiche source correspondante sur jw.org, jamais une page AIA ni un verset isolé.",
+  "method": "Décodage automatique sur les QR dans les fichiers WebP source, puis vérification manuelle de la destination sur jw.org. Décodage impossible ne prouve pas qu'un QR est inactif sur téléphone.",
+  "items": [
+    {
+      "fiche": "La famille",
+      "qrDecoded": "https://www.jw.org/finder?wtlocale=F&pub=T-fam&srcid=QR#16FUW59VEW",
+      "status": "Décodable; domaine jw.org; ouverture finale sur Honor à vérifier"
+    },
+    {
+      "fiche": "Jésus",
+      "qrDecoded": "https://jma-system.github.io/aia-personnel/v09-test/fiches/jesus.html",
+      "official": "https://www.jw.org/fr/biblioth%C3%A8que/tracts/jesus/tract/",
+      "status": "Non conforme : pointe sur AIA, correction requise"
+    },
+    {
+      "fiche": "L’avenir",
+      "status": "Indécodable sur fichier WebP; vérification visuelle sur Honor requise"
+    },
+    {
+      "fiche": "La prière",
+      "status": "Indécodable sur fichier WebP; vérification visuelle sur Honor requise"
+    },
+    {
+      "fiche": "Dieu",
+      "status": "Indécodable sur fichier WebP; vérification visuelle sur Honor requise"
+    },
+    {
+      "fiche": "Le Royaume de Dieu",
+      "status": "Indécodable sur fichier WebP; vérification visuelle sur Honor requise"
+    },
+    {
+      "fiche": "Résurrection",
+      "official": "https://www.jw.org/fr/biblioth%C3%A8que/tracts/mort/tract/",
+      "status": "Nouveau QR généré, décodage automatique réussi sur PNG 642x963 ; fichier non encore intégré à AIA"
+    }
+  ],
+  "security": "Ne pas remplacer les WebP originaux tant que sauvegarde, intégration et test téléphone non validés."
+}
