@@ -17,10 +17,15 @@ main{width:min(calc(100% - 24px),642px);margin:18px auto 40px}
 .verse{border:1.5px solid #a6d9e8;border-radius:12px;background:#f7fcff;padding:3.8% 4.2%;font-weight:400;font-size:clamp(10px,2.7vw,17px);line-height:1.19;overflow-wrap:break-word}
 .verse a{display:block;color:#0762be;text-decoration:underline;font-weight:400;margin-top:3px;line-height:1.14}
 .footer{margin-top:3.6%;height:13%;flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2.5%}
-.action{display:flex;justify-content:center;align-items:center;background:#d3eaff;border:1px solid #85c7e4;border-radius:12px;font-size:clamp(11px,3vw,18px);font-weight:400}
+.action{display:flex;justify-content:center;align-items:center;gap:7px;min-width:0;background:#d3eaff;border:1.5px solid #85c7e4;border-radius:12px;font:400 clamp(11px,3vw,18px)/1.1 Verdana,Geneva,sans-serif;color:#10243a;text-decoration:none;cursor:pointer;padding:4px 5px}
+.action svg{height:clamp(18px,5vw,27px);width:clamp(18px,5vw,27px);flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.action.qr{padding:3px}.action.qr img{display:block;width:auto;height:85%;max-width:85%;image-rendering:pixelated;background:#fff;padding:3px}
+.action:focus-visible{outline:3px solid #1165bd;outline-offset:2px}
+#action-status{color:#fff;font-size:13px;line-height:1.5;min-height:20px;margin-top:8px}
+@media print{ @page{size:auto;margin:5mm} body{background:#fff}main{width:100%;margin:0}.notice,#action-status{display:none!important}.fiche{width:100%;max-width:642px;margin:auto;print-color-adjust:exact;-webkit-print-color-adjust:exact} }
 @media(min-width:643px){.question{font-size:27px}.verse{font-size:17px}.bar{font-size:19px}.action{font-size:18px}}
 </style></head>
-<body><main><p class="notice">AIA — Essai isolé de typographie. Aucune fiche sauvegardée ou remplacée. Les boutons du bas sont ici des repères visuels.</p>
+<body><main><p class="notice">AIA — Essai isolé de typographie. Aucune fiche sauvegardée ou remplacée. QR vers cet aperçu, export PDF par impression et partage du lien de cet aperçu.</p>
 <article class="fiche"><header class="bar">Tract — L’avenir</header><div class="body">
 <h1 class="question">Peut-on imaginer un avenir sans fin ?</h1>
 <div class="cols"><div class="photo" aria-label="Illustration déjà validée de l'homme et des ours"><img src="../fiches/avenir-restaure.webp" alt="Illustration de l’homme avec les ours, recadrée depuis la fiche Avenir validée"></div>
@@ -28,5 +33,19 @@ main{width:min(calc(100% - 24px),642px);margin:18px auto 40px}
 <section class="verse">La Bible annonce une vie durable sur la terre.<a href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Psaumes/37/#v19037029" target="_blank" rel="noopener noreferrer">Psaume 37:29</a></section>
 <section class="verse">Elle décrit un avenir où les maladies auront disparu.<a href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Isa%C3%AFe/33/#v23033024" target="_blank" rel="noopener noreferrer">Isaïe 33:24</a><a href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Isa%C3%AFe/35/#v23035005" target="_blank" rel="noopener noreferrer">Isaïe 35:5, 6</a></section>
 <section class="verse">La restauration de la terre fait aussi partie des promesses bibliques.<a href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/Isa%C3%AFe/35/#v23035001" target="_blank" rel="noopener noreferrer">Isaïe 35:1, 2</a><a href="https://www.jw.org/fr/biblioth%C3%A8que/bible/nwt/livres/R%C3%A9v%C3%A9lation/11/#v66011018" target="_blank" rel="noopener noreferrer">Révélation 11:18</a></section>
-</div></div><div class="footer"><div class="action">QR — aperçu</div><div class="action">PDF — aperçu</div><div class="action">Partager — aperçu</div></div>
-</div></article></main></body></html>
+</div></div><div class="footer">
+<a class="action qr" href="https://jma-system.github.io/aia-personnel/v09-test/standards/test-typographie-avenir.html" target="_blank" rel="noopener noreferrer" aria-label="Ouvrir la fiche du QR code" title="QR code vers cet aperçu"><img alt="QR code vers cet aperçu" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgAQAAAACjtFqAAAACcElEQVR42u1XsW7bMBB9DAPQi0Vnpy0D/QkVUKoAGfod7RcomwMUkTw5k9V+Qb8jQwEWNqBs+QUqyl5qYwpJ16FTUWS4QFvL8YDj8b13fEcKwt/rBP9uEBSACBpFbFeJIA/ExEonqvrcKWlHpQ8dESf9pWA3AyCvTdLeNedls+CknwIAXdqmdPrnqF9BiFd7wBRUi4Csc5pNyB65pNY65eUUhPzWKM3bnUmaOkpzrkZENKaQQdq47vqCiJiI6lJ6KlvbBGGBglk9UnTwMcU1kigreekv7SmosrnZxFZY6gWb5Pnb5nLxdOsU1MlxvrxyvOraikNlNkbF1PUFeZpA4jHrDkQkySlNXhJX4nqfFj1kEDWyba+ZhHSbHHjaDLNV0n0bVMM8PNV76WUwaEJnb0xOU0gcrmwhQ0xx8CnARPQ8XHzOhFH43swWgMnZVpkf9fHWKZd0O891MIUH/anDBsk7NT/fT2PUuh6lN0UcAGReVlxfChF0S322SpBte+Y1VFAtlUuB+0PlMT/tHLO9EyBvS6AJwup+ChMIuvZAG+I6DlGay5KJiC6+9Bh2wON9ZyNTMKuLeswqWRolggcTEShEamuBTWsbK6jiefJLwfbuR1HSbNis1HDx4bRb826ch7Y5BQMKPqvYHhIlHwFA1o/3C9A6dxP0vKCKSgcHQaIHCuIPvkLuYrtKRF+0TFMNQAQ4EMVhxFVbMQkh2h4qWa6f8XBmo6GZghCv9rJ0CsmoyAI5E5FXFVFfUL1KItzEr5hcg3hzjef2tj2cua9rHiIdAByr5XuX0fmPZTPR8zUjo6QVwacRWKNH/P8O/Ll+ATh3j5UEcUGQAAAAAElFTkSuQmCC"></a>
+<button class="action" id="aia-print" type="button" aria-label="Exporter la fiche au format PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v14m-5-5 5 5 5-5M4 20h16"/></svg><span>PDF</span></button>
+<button class="action" id="aia-share" type="button" aria-label="Partager cette fiche"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="5" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m7.5 10.8 8-4.5M7.5 13.2l8 4.5"/></svg><span>Partager</span></button>
+</div>
+</div></article><p id="action-status" role="status" aria-live="polite"></p></main>
+<script>
+document.getElementById('aia-print').addEventListener('click',()=>window.print());
+document.getElementById('aia-share').addEventListener('click',async()=>{
+ const status=document.getElementById('action-status');
+ const url='https://jma-system.github.io/aia-personnel/v09-test/standards/test-typographie-avenir.html';
+ if(navigator.share){try{await navigator.share({title:'AIA — L’avenir',url});return}catch(e){if(e.name==='AbortError')return}}
+ try{await navigator.clipboard.writeText(url);status.textContent='Lien de cet aperçu copié.'}
+ catch(e){status.textContent='Partage indisponible sur ce navigateur.'}
+});
+</script></body></html>
