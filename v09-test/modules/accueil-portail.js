@@ -36,7 +36,33 @@ function icon(key){
 }
 function openHub(){delete document.body.dataset.aiaUniverse;page.hidden=false;grid.hidden=false;inner.hidden=true;document.body.classList.add('aia-hub-active');window.scrollTo(0,0);}
 function leaveHub(target,universe){document.body.dataset.aiaUniverse=universe;document.body.classList.remove('aia-hub-active');page.hidden=true;window.show(target);}
-function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;grid.hidden=true;inner.hidden=false;inner.replaceChildren();const back=document.createElement('button');back.textContent='← Accueil';back.onclick=openHub;const title=document.createElement('h2');title.textContent=name;inner.append(back,title);if(name==='RÉGLAGES'){const btn=document.createElement('button');btn.textContent='Changer le mode clair / nuit';btn.onclick=()=>document.getElementById('aia-theme-toggle')?.click();inner.append(btn)}else{const p=document.createElement('p');p.textContent='Espace indépendant à construire, sans modifier les pages existantes.';inner.append(p)}window.scrollTo(0,0);}
+function placeholder(name,universe){document.body.dataset.aiaUniverse=universe;grid.hidden=true;inner.hidden=false;inner.replaceChildren();const back=document.createElement('button');back.textContent='← Accueil';back.onclick=openHub;const title=document.createElement('h2');title.textContent=name;inner.append(back,title);if(name==='RÉGLAGES'){
+ const btn=document.createElement('button');btn.textContent='Changer le mode clair / nuit';
+ btn.onclick=()=>document.getElementById('aia-theme-toggle')?.click();inner.append(btn);
+ const preset=document.createElement('section');preset.setAttribute('aria-label','Gabarit des fiches illustrées');
+ preset.style.cssText='margin-top:20px;padding:14px;border:1px solid #8cc4dc;border-radius:12px;background:#edf8ff;color:#172234';
+ const h=document.createElement('h3');h.textContent='Gabarit — Fiches illustrées';h.style.cssText='font-size:17px;margin:0 0 8px';
+ const status=document.createElement('p');status.textContent='Chargement du gabarit…';status.style.cssText='font-size:14px;margin:0';
+ preset.append(h,status);inner.append(preset);
+ fetch('./standards/gabarit-six-fiches.json?v=1',{cache:'no-store'}).then(response=>{
+  if(!response.ok)throw Error('Gabarit indisponible');
+  return response.json();
+ }).then(data=>{
+  if(data.schema!==1||data.id!=='aia-fiches-illustrees-six'||!Array.isArray(data.examples)||data.examples.length!==6)throw Error('Gabarit invalide');
+  if(!preset.isConnected)return;
+  status.textContent='Modèle de référence : '+data.examples.length+' fiches déjà validées. Non appliqué automatiquement.';
+  const lines=[
+   'Bandeau bleu et question en titre',
+   'Illustration à gauche ; 3 ou 4 encadrés à droite',
+   'Verdana et liens bibliques directs vers JW.org',
+   'QR code, PDF et Partager en bas'
+  ];
+  const list=document.createElement('ul');list.style.cssText='font-size:14px;line-height:1.55;padding-left:22px';
+  for(const item of lines){const li=document.createElement('li');li.textContent=item;list.append(li)}
+  const note=document.createElement('p');note.textContent='Gabarit enregistré pour les prochaines créations ; les six fiches actuelles restent inchangées.';
+  note.style.cssText='font-size:13px;margin:8px 0 0';preset.append(list,note);
+ }).catch(()=>{status.textContent='Gabarit enregistré dans GitHub, mais chargement indisponible pour le moment.'});
+}else{const p=document.createElement('p');p.textContent='Espace indépendant à construire, sans modifier les pages existantes.';inner.append(p)}window.scrollTo(0,0);}
 const items=[['RÉPERTOIRE','users','indexPanel','repertoire'],['RÉUNIONS','calendar','home','reunions'],['INDEX','layers','index','index'],['FICHES','file','library','fiches'],['RUBRIQUES','grid','rubriques','rubriques'],['VIDÉOS','video','desk','videos'],['JW.ORG','globe','https://www.jw.org/fr/','jworg'],['WOL','book','https://wol.jw.org/fr/wol/h/r30/lp-f','wol'],['RÉGLAGES','gear','reglages','reglages']];
 for(const [name,shape,target,universe] of items){const link=target.startsWith('https://');const b=document.createElement(link?'a':'button');b.className='hub-tile';b.dataset.universe=universe;b.setAttribute('aria-label',name);if(link){b.href=target;b.target='_blank';b.rel='noopener noreferrer'}else{b.type='button';b.onclick=()=>['index','rubriques','reglages'].includes(target)?placeholder(name,universe):leaveHub(target,universe)}b.append(icon(shape),document.createTextNode(name));grid.append(b)}
 
